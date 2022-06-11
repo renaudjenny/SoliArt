@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4C3D194F28547D810096404F /* SoliArtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D194E28547D810096404F /* SoliArtApp.swift */; };
-		4C3D195128547D810096404F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D195028547D810096404F /* ContentView.swift */; };
+		4C3D195128547D810096404F /* AppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D195028547D810096404F /* AppView.swift */; };
 		4C3D195328547D840096404F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C3D195228547D840096404F /* Assets.xcassets */; };
 		4C3D195628547D840096404F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C3D195528547D840096404F /* Preview Assets.xcassets */; };
 		4C3D196028547D840096404F /* SoliArtTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D195F28547D840096404F /* SoliArtTests.swift */; };
@@ -36,7 +36,7 @@
 /* Begin PBXFileReference section */
 		4C3D194B28547D810096404F /* SoliArt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SoliArt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C3D194E28547D810096404F /* SoliArtApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtApp.swift; sourceTree = "<group>"; };
-		4C3D195028547D810096404F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		4C3D195028547D810096404F /* AppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppView.swift; sourceTree = "<group>"; };
 		4C3D195228547D840096404F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4C3D195528547D840096404F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		4C3D195B28547D840096404F /* SoliArtTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SoliArtTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -44,6 +44,7 @@
 		4C3D196528547D840096404F /* SoliArtUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SoliArtUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C3D196928547D840096404F /* SoliArtUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtUITests.swift; sourceTree = "<group>"; };
 		4C3D196B28547D840096404F /* SoliArtUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		4C3D197828547DF60096404F /* SoliArt.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = SoliArt.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,10 +75,11 @@
 		4C3D194228547D810096404F = {
 			isa = PBXGroup;
 			children = (
+				4C3D194C28547D810096404F /* Products */,
 				4C3D194D28547D810096404F /* SoliArt */,
+				4C3D197828547DF60096404F /* SoliArt.xctestplan */,
 				4C3D195E28547D840096404F /* SoliArtTests */,
 				4C3D196828547D840096404F /* SoliArtUITests */,
-				4C3D194C28547D810096404F /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -95,7 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				4C3D194E28547D810096404F /* SoliArtApp.swift */,
-				4C3D195028547D810096404F /* ContentView.swift */,
+				4C3D195028547D810096404F /* AppView.swift */,
 				4C3D195228547D840096404F /* Assets.xcassets */,
 				4C3D195428547D840096404F /* Preview Content */,
 			);
@@ -257,7 +259,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C3D195128547D810096404F /* ContentView.swift in Sources */,
+				4C3D195128547D810096404F /* AppView.swift in Sources */,
 				4C3D194F28547D810096404F /* SoliArtApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

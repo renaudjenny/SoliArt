@@ -1,0 +1,36 @@
+{
+  "configurations" : [
+    {
+      "id" : "F9ED235C-B8EF-41A6-8062-D8D884687B69",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:SoliArt.xcodeproj",
+      "identifier" : "4C3D194A28547D810096404F",
+      "name" : "SoliArt"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:SoliArt.xcodeproj",
+        "identifier" : "4C3D195A28547D840096404F",
+        "name" : "SoliArtTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:SoliArt.xcodeproj",
+        "identifier" : "4C3D196428547D840096404F",
+        "name" : "SoliArtUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
