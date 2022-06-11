@@ -1,0 +1,588 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4C3D194F28547D810096404F /* SoliArtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D194E28547D810096404F /* SoliArtApp.swift */; };
+		4C3D195128547D810096404F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D195028547D810096404F /* ContentView.swift */; };
+		4C3D195328547D840096404F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C3D195228547D840096404F /* Assets.xcassets */; };
+		4C3D195628547D840096404F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C3D195528547D840096404F /* Preview Assets.xcassets */; };
+		4C3D196028547D840096404F /* SoliArtTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D195F28547D840096404F /* SoliArtTests.swift */; };
+		4C3D196A28547D840096404F /* SoliArtUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D196928547D840096404F /* SoliArtUITests.swift */; };
+		4C3D196C28547D840096404F /* SoliArtUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D196B28547D840096404F /* SoliArtUITestsLaunchTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4C3D195C28547D840096404F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4C3D194328547D810096404F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4C3D194A28547D810096404F;
+			remoteInfo = SoliArt;
+		};
+		4C3D196628547D840096404F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4C3D194328547D810096404F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4C3D194A28547D810096404F;
+			remoteInfo = SoliArt;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		4C3D194B28547D810096404F /* SoliArt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SoliArt.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C3D194E28547D810096404F /* SoliArtApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtApp.swift; sourceTree = "<group>"; };
+		4C3D195028547D810096404F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		4C3D195228547D840096404F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4C3D195528547D840096404F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		4C3D195B28547D840096404F /* SoliArtTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SoliArtTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C3D195F28547D840096404F /* SoliArtTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtTests.swift; sourceTree = "<group>"; };
+		4C3D196528547D840096404F /* SoliArtUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SoliArtUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C3D196928547D840096404F /* SoliArtUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtUITests.swift; sourceTree = "<group>"; };
+		4C3D196B28547D840096404F /* SoliArtUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtUITestsLaunchTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4C3D194828547D810096404F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4C3D195828547D840096404F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4C3D196228547D840096404F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4C3D194228547D810096404F = {
+			isa = PBXGroup;
+			children = (
+				4C3D194D28547D810096404F /* SoliArt */,
+				4C3D195E28547D840096404F /* SoliArtTests */,
+				4C3D196828547D840096404F /* SoliArtUITests */,
+				4C3D194C28547D810096404F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4C3D194C28547D810096404F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4C3D194B28547D810096404F /* SoliArt.app */,
+				4C3D195B28547D840096404F /* SoliArtTests.xctest */,
+				4C3D196528547D840096404F /* SoliArtUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4C3D194D28547D810096404F /* SoliArt */ = {
+			isa = PBXGroup;
+			children = (
+				4C3D194E28547D810096404F /* SoliArtApp.swift */,
+				4C3D195028547D810096404F /* ContentView.swift */,
+				4C3D195228547D840096404F /* Assets.xcassets */,
+				4C3D195428547D840096404F /* Preview Content */,
+			);
+			path = SoliArt;
+			sourceTree = "<group>";
+		};
+		4C3D195428547D840096404F /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				4C3D195528547D840096404F /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		4C3D195E28547D840096404F /* SoliArtTests */ = {
+			isa = PBXGroup;
+			children = (
+				4C3D195F28547D840096404F /* SoliArtTests.swift */,
+			);
+			path = SoliArtTests;
+			sourceTree = "<group>";
+		};
+		4C3D196828547D840096404F /* SoliArtUITests */ = {
+			isa = PBXGroup;
+			children = (
+				4C3D196928547D840096404F /* SoliArtUITests.swift */,
+				4C3D196B28547D840096404F /* SoliArtUITestsLaunchTests.swift */,
+			);
+			path = SoliArtUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4C3D194A28547D810096404F /* SoliArt */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4C3D196F28547D840096404F /* Build configuration list for PBXNativeTarget "SoliArt" */;
+			buildPhases = (
+				4C3D194728547D810096404F /* Sources */,
+				4C3D194828547D810096404F /* Frameworks */,
+				4C3D194928547D810096404F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SoliArt;
+			productName = SoliArt;
+			productReference = 4C3D194B28547D810096404F /* SoliArt.app */;
+			productType = "com.apple.product-type.application";
+		};
+		4C3D195A28547D840096404F /* SoliArtTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4C3D197228547D840096404F /* Build configuration list for PBXNativeTarget "SoliArtTests" */;
+			buildPhases = (
+				4C3D195728547D840096404F /* Sources */,
+				4C3D195828547D840096404F /* Frameworks */,
+				4C3D195928547D840096404F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4C3D195D28547D840096404F /* PBXTargetDependency */,
+			);
+			name = SoliArtTests;
+			productName = SoliArtTests;
+			productReference = 4C3D195B28547D840096404F /* SoliArtTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		4C3D196428547D840096404F /* SoliArtUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4C3D197528547D840096404F /* Build configuration list for PBXNativeTarget "SoliArtUITests" */;
+			buildPhases = (
+				4C3D196128547D840096404F /* Sources */,
+				4C3D196228547D840096404F /* Frameworks */,
+				4C3D196328547D840096404F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4C3D196728547D840096404F /* PBXTargetDependency */,
+			);
+			name = SoliArtUITests;
+			productName = SoliArtUITests;
+			productReference = 4C3D196528547D840096404F /* SoliArtUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4C3D194328547D810096404F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1340;
+				LastUpgradeCheck = 1340;
+				TargetAttributes = {
+					4C3D194A28547D810096404F = {
+						CreatedOnToolsVersion = 13.4.1;
+					};
+					4C3D195A28547D840096404F = {
+						CreatedOnToolsVersion = 13.4.1;
+						TestTargetID = 4C3D194A28547D810096404F;
+					};
+					4C3D196428547D840096404F = {
+						CreatedOnToolsVersion = 13.4.1;
+						TestTargetID = 4C3D194A28547D810096404F;
+					};
+				};
+			};
+			buildConfigurationList = 4C3D194628547D810096404F /* Build configuration list for PBXProject "SoliArt" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4C3D194228547D810096404F;
+			productRefGroup = 4C3D194C28547D810096404F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4C3D194A28547D810096404F /* SoliArt */,
+				4C3D195A28547D840096404F /* SoliArtTests */,
+				4C3D196428547D840096404F /* SoliArtUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4C3D194928547D810096404F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4C3D195628547D840096404F /* Preview Assets.xcassets in Resources */,
+				4C3D195328547D840096404F /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4C3D195928547D840096404F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4C3D196328547D840096404F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4C3D194728547D810096404F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4C3D195128547D810096404F /* ContentView.swift in Sources */,
+				4C3D194F28547D810096404F /* SoliArtApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4C3D195728547D840096404F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4C3D196028547D840096404F /* SoliArtTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4C3D196128547D840096404F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4C3D196A28547D840096404F /* SoliArtUITests.swift in Sources */,
+				4C3D196C28547D840096404F /* SoliArtUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4C3D195D28547D840096404F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4C3D194A28547D810096404F /* SoliArt */;
+			targetProxy = 4C3D195C28547D840096404F /* PBXContainerItemProxy */;
+		};
+		4C3D196728547D840096404F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4C3D194A28547D810096404F /* SoliArt */;
+			targetProxy = 4C3D196628547D840096404F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4C3D196D28547D840096404F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		4C3D196E28547D840096404F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4C3D197028547D840096404F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"SoliArt/Preview Content\"";
+				DEVELOPMENT_TEAM = MBQ98GC8JT;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = renaud.jenny.SoliArt;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4C3D197128547D840096404F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"SoliArt/Preview Content\"";
+				DEVELOPMENT_TEAM = MBQ98GC8JT;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = renaud.jenny.SoliArt;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4C3D197328547D840096404F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MBQ98GC8JT;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = renaud.jenny.SoliArtTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SoliArt.app/SoliArt";
+			};
+			name = Debug;
+		};
+		4C3D197428547D840096404F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MBQ98GC8JT;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = renaud.jenny.SoliArtTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SoliArt.app/SoliArt";
+			};
+			name = Release;
+		};
+		4C3D197628547D840096404F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MBQ98GC8JT;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = renaud.jenny.SoliArtUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SoliArt;
+			};
+			name = Debug;
+		};
+		4C3D197728547D840096404F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MBQ98GC8JT;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = renaud.jenny.SoliArtUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SoliArt;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4C3D194628547D810096404F /* Build configuration list for PBXProject "SoliArt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4C3D196D28547D840096404F /* Debug */,
+				4C3D196E28547D840096404F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4C3D196F28547D840096404F /* Build configuration list for PBXNativeTarget "SoliArt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4C3D197028547D840096404F /* Debug */,
+				4C3D197128547D840096404F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4C3D197228547D840096404F /* Build configuration list for PBXNativeTarget "SoliArtTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4C3D197328547D840096404F /* Debug */,
+				4C3D197428547D840096404F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4C3D197528547D840096404F /* Build configuration list for PBXNativeTarget "SoliArtUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4C3D197628547D840096404F /* Debug */,
+				4C3D197728547D840096404F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4C3D194328547D810096404F /* Project object */;
+}
