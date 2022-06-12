@@ -14,6 +14,7 @@
 		4C3D196028547D840096404F /* SoliArtTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D195F28547D840096404F /* SoliArtTests.swift */; };
 		4C3D196A28547D840096404F /* SoliArtUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D196928547D840096404F /* SoliArtUITests.swift */; };
 		4C3D196C28547D840096404F /* SoliArtUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D196B28547D840096404F /* SoliArtUITestsLaunchTests.swift */; };
+		4C3D197B2854BABD0096404F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 4C3D197A2854BABD0096404F /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,7 @@
 		4C3D196928547D840096404F /* SoliArtUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtUITests.swift; sourceTree = "<group>"; };
 		4C3D196B28547D840096404F /* SoliArtUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		4C3D197828547DF60096404F /* SoliArt.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = SoliArt.xctestplan; sourceTree = "<group>"; };
+		4C3D197D2855EDC10096404F /* swift-ui-card-game */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "swift-ui-card-game"; path = "../swift-ui-card-game"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C3D197B2854BABD0096404F /* ComposableArchitecture in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +78,7 @@
 		4C3D194228547D810096404F = {
 			isa = PBXGroup;
 			children = (
+				4C3D197C2855EDC10096404F /* Packages */,
 				4C3D194C28547D810096404F /* Products */,
 				4C3D194D28547D810096404F /* SoliArt */,
 				4C3D197828547DF60096404F /* SoliArt.xctestplan */,
@@ -129,6 +133,14 @@
 			path = SoliArtUITests;
 			sourceTree = "<group>";
 		};
+		4C3D197C2855EDC10096404F /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				4C3D197D2855EDC10096404F /* swift-ui-card-game */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -145,6 +157,9 @@
 			dependencies = (
 			);
 			name = SoliArt;
+			packageProductDependencies = (
+				4C3D197A2854BABD0096404F /* ComposableArchitecture */,
+			);
 			productName = SoliArt;
 			productReference = 4C3D194B28547D810096404F /* SoliArt.app */;
 			productType = "com.apple.product-type.application";
@@ -217,6 +232,9 @@
 				Base,
 			);
 			mainGroup = 4C3D194228547D810096404F;
+			packageReferences = (
+				4C3D19792854BABD0096404F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+			);
 			productRefGroup = 4C3D194C28547D810096404F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -585,6 +603,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4C3D19792854BABD0096404F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.36.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4C3D197A2854BABD0096404F /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4C3D19792854BABD0096404F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4C3D194328547D810096404F /* Project object */;
 }
