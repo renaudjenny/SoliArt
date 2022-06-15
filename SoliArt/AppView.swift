@@ -4,22 +4,34 @@ import SwiftUICardGame
 
 struct AppView: View {
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
+            ZStack {
+                Color.green.brightness(-40/100).ignoresSafeArea()
+                HStack(spacing: 40) {
+                    Text("Score: \(0) points").foregroundColor(.white)
+                    Text("Move: \(0)").foregroundColor(.white)
+                    Spacer()
+                }
+                .padding()
+            }
+            .fixedSize(horizontal: false, vertical: true)
+
             HStack {
                 HStack {
                     ForEach(suits) { suit in
                         RoundedRectangle(cornerRadius: 4)
-                            .stroke()
+                            .fill(Color.white)
                             .frame(width: 50, height: 70)
                             .overlay(
                                 suit.view
                                     .fill(style: .init(eoFill: true, antialiased: true))
                                     .foregroundColor(suit.color)
-                                    .padding()
-                        )
+                                    .padding(4)
+                            )
+                            .brightness(-20/100)
                     }
                 }
-                .frame(maxHeight: .infinity, alignment: .top)
+                .frame(maxHeight: .infinity)
 
                 HStack {
                     CardVerticalDeckView(
@@ -43,16 +55,23 @@ struct AppView: View {
                         facedUpSpacing: 0
                     )
                 }
-                .fixedSize(horizontal: true, vertical: false)
+                .fixedSize(horizontal: true, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .frame(height: 150)
-            HStack {
-                ForEach(decks, id: \.indices) {
-                    CardVerticalDeckView(cards: $0, cardHeight: 70, facedDownSpacing: 20, facedUpSpacing: 10)
+            .padding()
+            .frame(height: 120)
+            .background(Color.green.brightness(-30/100))
+
+            ZStack {
+                Color.green.brightness(-15/100).ignoresSafeArea()
+                HStack {
+                    ForEach(decks, id: \.indices) {
+                        CardVerticalDeckView(cards: $0, cardHeight: 70, facedDownSpacing: 20, facedUpSpacing: 10)
+                    }
                 }
+                .padding()
             }
-        }.padding()
+        }
     }
 
     var suits: [StandardDeckCard.Suit] { [.hearts, .spades, .diamonds, .spades] }
