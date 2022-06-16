@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4C2E2BAD285B007F0095A238 /* AppCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2E2BAC285B007F0095A238 /* AppCore.swift */; };
+		4C2E2BAF285B00AC0095A238 /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2E2BAE285B00AC0095A238 /* Deck.swift */; };
 		4C3D194F28547D810096404F /* SoliArtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D194E28547D810096404F /* SoliArtApp.swift */; };
 		4C3D195128547D810096404F /* AppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D195028547D810096404F /* AppView.swift */; };
 		4C3D195328547D840096404F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C3D195228547D840096404F /* Assets.xcassets */; };
@@ -36,6 +38,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4C2E2BAC285B007F0095A238 /* AppCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCore.swift; sourceTree = "<group>"; };
+		4C2E2BAE285B00AC0095A238 /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
 		4C3D194B28547D810096404F /* SoliArt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SoliArt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C3D194E28547D810096404F /* SoliArtApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtApp.swift; sourceTree = "<group>"; };
 		4C3D195028547D810096404F /* AppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppView.swift; sourceTree = "<group>"; };
@@ -77,6 +81,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4C2E2BAB285B00700095A238 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				4C3D195028547D810096404F /* AppView.swift */,
+				4C2E2BAC285B007F0095A238 /* AppCore.swift */,
+				4C2E2BAE285B00AC0095A238 /* Deck.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
 		4C3D194228547D810096404F = {
 			isa = PBXGroup;
 			children = (
@@ -103,8 +117,8 @@
 		4C3D194D28547D810096404F /* SoliArt */ = {
 			isa = PBXGroup;
 			children = (
+				4C2E2BAB285B00700095A238 /* App */,
 				4C3D194E28547D810096404F /* SoliArtApp.swift */,
-				4C3D195028547D810096404F /* AppView.swift */,
 				4C3D195228547D840096404F /* Assets.xcassets */,
 				4C3D195428547D840096404F /* Preview Content */,
 			);
@@ -288,6 +302,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C2E2BAF285B00AC0095A238 /* Deck.swift in Sources */,
+				4C2E2BAD285B007F0095A238 /* AppCore.swift in Sources */,
 				4C3D195128547D810096404F /* AppView.swift in Sources */,
 				4C3D194F28547D810096404F /* SoliArtApp.swift in Sources */,
 			);
