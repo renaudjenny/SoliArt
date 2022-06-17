@@ -1,23 +1,25 @@
 import SwiftUICardGame
 import ComposableArchitecture
 
-struct Foundation: Identifiable {
+struct Foundation: Equatable, Identifiable {
     let suit: StandardDeckCard.Suit
     var cards: IdentifiedArrayOf<StandardDeckCard>
 
     var id: String { suit.rawValue }
 }
 
-struct Pile: Identifiable {
+struct Pile: Equatable, Identifiable {
     let id: Int
     var cards: IdentifiedArrayOf<StandardDeckCard>
 }
 
-extension StandardDeckCard: Identifiable {
+extension StandardDeckCard: Equatable, Identifiable {
     public var id: Int {
         var hasher = Hasher()
         hasher.combine(rank)
         hasher.combine(suit)
         return hasher.finalize()
     }
+
+    public static func == (lhs: Self, rhs: Self) -> Bool { lhs.id == rhs.id }
 }
