@@ -11,8 +11,8 @@ struct AppView: View {
                 ZStack {
                     Color.green.brightness(-40/100).ignoresSafeArea()
                     HStack(spacing: 40) {
-                        Text("Score: \(0) points").foregroundColor(.white)
-                        Text("Move: \(0)").foregroundColor(.white)
+                        Text("Score: \(viewStore.score) points").foregroundColor(.white)
+                        Text("Moves: \(viewStore.moves)").foregroundColor(.white)
                         Spacer()
                     }
                     .padding()
@@ -21,14 +21,14 @@ struct AppView: View {
 
                 HStack {
                     HStack {
-                        ForEach(suits) { suit in
+                        ForEach(viewStore.foundations) { foundation in
                             RoundedRectangle(cornerRadius: 4)
                                 .fill(Color.white)
                                 .frame(width: 50, height: 70)
                                 .overlay(
-                                    suit.view
+                                    foundation.suit.view
                                         .fill(style: .init(eoFill: true, antialiased: true))
-                                        .foregroundColor(suit.color)
+                                        .foregroundColor(foundation.suit.color)
                                         .padding(4)
                                 )
                                 .brightness(-20/100)
@@ -38,21 +38,13 @@ struct AppView: View {
 
                     HStack {
                         CardVerticalDeckView(
-                            cards: Array(
-                                [StandardDeckCard].standard52Deck(action: { _, _ in })
-                                    .map {
-                                        var card = $0
-                                        card.isFacedUp = true
-                                        return card
-                                    }
-                                    .prefix(3)
-                            ),
+                            cards: Array(viewStore.deck.upwards.prefix(3)),
                             cardHeight: 70,
                             facedDownSpacing: 3,
                             facedUpSpacing: 2
                         )
                         CardVerticalDeckView(
-                            cards: Array([StandardDeckCard].standard52Deck(action: { _, _ in }).prefix(3)),
+                            cards: Array(viewStore.deck.downwards.prefix(3)),
                             cardHeight: 70,
                             facedDownSpacing: 3,
                             facedUpSpacing: 0
@@ -68,27 +60,22 @@ struct AppView: View {
                 ZStack {
                     Color.green.brightness(-15/100).ignoresSafeArea()
                     HStack {
-                        ForEach(decks, id: \.indices) {
-                            CardVerticalDeckView(cards: $0, cardHeight: 70, facedDownSpacing: 20, facedUpSpacing: 10)
+                        ForEach(viewStore.piles) {
+                            CardVerticalDeckView(
+                                cards: $0.cards.elements,
+                                cardHeight: 70,
+                                facedDownSpacing: 20,
+                                facedUpSpacing: 10
+                            )
                         }
                     }
                     .padding()
                 }
             }
+            .task { viewStore.send(.shuffleCards(.standard52Deck(
+                action: { viewStore.send(.cardTapped(rank: $0, suit: $1)) }
+            ))) }
         }
-    }
-
-    var suits: [StandardDeckCard.Suit] { [.hearts, .spades, .diamonds, .spades] }
-
-    var cards: [StandardDeckCard] {
-        .standard52Deck(action: { _, _ in })
-    }
-
-    var decks: [[StandardDeckCard]] {
-        (1...7).map { Array(
-            repeating: StandardDeckCard(.ace, of: .spades, isFacedUp: false, action: {}),
-            count: $0
-        ) }
     }
 }
 

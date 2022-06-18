@@ -13,6 +13,11 @@ struct Pile: Equatable, Identifiable {
     var cards: IdentifiedArrayOf<StandardDeckCard>
 }
 
+struct Deck: Equatable {
+    var downwards: IdentifiedArrayOf<StandardDeckCard>
+    var upwards: IdentifiedArrayOf<StandardDeckCard>
+}
+
 extension StandardDeckCard: Equatable, Identifiable {
     public var id: Int {
         var hasher = Hasher()
