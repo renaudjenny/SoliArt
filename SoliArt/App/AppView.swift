@@ -81,6 +81,10 @@ struct AppView: View {
 
 struct AppView_Previews: PreviewProvider {
     static var previews: some View {
-        AppView(store: Store(initialState: AppState(), reducer: appReducer, environment: AppEnvironment()))
+        AppView(store: Store(
+            initialState: AppState(),
+            reducer: appReducer,
+            environment: AppEnvironment(shuffleCards: { $0.shuffled() })
+        ))
     }
 }

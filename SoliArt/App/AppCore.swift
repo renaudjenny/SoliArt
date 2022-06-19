@@ -17,13 +17,13 @@ enum AppAction: Equatable {
 }
 
 struct AppEnvironment {
-
+    let shuffleCards: ([StandardDeckCard]) -> [StandardDeckCard]
 }
 
 let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, environment in
     switch action {
     case let .shuffleCards(cards):
-        var cards = cards.shuffled()
+        var cards = environment.shuffleCards(cards)
 
         state.piles = IdentifiedArrayOf(uniqueElements: state.piles.map {
             var pile = $0
