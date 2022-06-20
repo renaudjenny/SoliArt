@@ -5,7 +5,8 @@ import XCTest
 
 class AppCoreTests: XCTestCase {
     func testShuffleCards() {
-        let store = TestStore(initialState: AppState(), reducer: appReducer, environment: .test)
+        let scheduler = DispatchQueue.test
+        let store = TestStore(initialState: AppState(), reducer: appReducer, environment: .test(scheduler: scheduler))
         let cards = [StandardDeckCard].standard52Deck
 
         store.send(.shuffleCards) {
@@ -60,5 +61,13 @@ class AppCoreTests: XCTestCase {
 }
 
 extension AppEnvironment {
-    static let test = AppEnvironment(shuffleCards: { .standard52Deck })
+    static func test(scheduler: TestSchedulerOf<DispatchQueue>) -> AppEnvironment {
+        AppEnvironment(mainQueue: scheduler.eraseToAnyScheduler(), shuffleCards: { .standard52Deck })
+    }
+}
+
+extension Card {
+    init(_ rank: Rank, of suit: Suit, isFacedUp: Bool) {
+        self.init(rank, of: suit, isFacedUp: isFacedUp) { CardBackground() }
+    }
 }
