@@ -5,6 +5,8 @@ import SwiftUICardGame
 struct AppView: View {
     let store: Store<AppState, AppAction>
 
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         WithViewStore(store) { viewStore in
             VStack(spacing: 0) {
@@ -28,7 +30,7 @@ struct AppView: View {
                                 .overlay(
                                     foundation.suit.view
                                         .fill(style: .init(eoFill: true, antialiased: true))
-                                        .foregroundColor(foundation.suit.color)
+                                        .foregroundColor(.suit(foundation.suit, colorScheme: colorScheme))
                                         .padding(4)
                                 )
                                 .brightness(-20/100)
@@ -38,17 +40,31 @@ struct AppView: View {
 
                     HStack {
                         CardVerticalDeckView(
-                            cards: Array(viewStore.deck.upwards.prefix(3)),
+                            cards: Array(viewStore.deck.upwards.suffix(3)),
                             cardHeight: 70,
                             facedDownSpacing: 3,
                             facedUpSpacing: 2
                         )
-                        CardVerticalDeckView(
-                            cards: Array(viewStore.deck.downwards.prefix(3)),
-                            cardHeight: 70,
-                            facedDownSpacing: 3,
-                            facedUpSpacing: 0
-                        )
+                        if viewStore.deck.downwards.count > 0 {
+                            Button { viewStore.send(.drawCard) } label: {
+                                CardVerticalDeckView(
+                                    cards: Array(viewStore.deck.downwards.prefix(3)),
+                                    cardHeight: 70,
+                                    facedDownSpacing: 3,
+                                    facedUpSpacing: 0
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        } else {
+                            Button { viewStore.send(.flipDeck) } label: {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Color.green)
+                                    .frame(width: 50, height: 70)
+                                    .brightness(-40/100)
+                                    .overlay(Text("Flip").foregroundColor(.white).padding(4))
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
                     .fixedSize(horizontal: true, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .trailing)
@@ -72,9 +88,7 @@ struct AppView: View {
                     .padding()
                 }
             }
-            .task { viewStore.send(.shuffleCards(.standard52Deck(
-                action: { viewStore.send(.cardTapped(rank: $0, suit: $1)) }
-            ))) }
+            .task { viewStore.send(.shuffleCards) }
         }
     }
 }
@@ -84,7 +98,10 @@ struct AppView_Previews: PreviewProvider {
         AppView(store: Store(
             initialState: AppState(),
             reducer: appReducer,
-            environment: AppEnvironment(shuffleCards: { $0.shuffled() })
+            environment: AppEnvironment(
+                mainQueue: .main,
+                shuffleCards: { .standard52Deck.shuffled() }
+            )
         ))
     }
 }

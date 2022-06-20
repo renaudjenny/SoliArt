@@ -1,21 +1,30 @@
-import SwiftUICardGame
 import ComposableArchitecture
+import SwiftUI
+import SwiftUICardGame
+
+struct CardBackground: View {
+    var body: some View {
+        Color.red
+    }
+}
+
+typealias Card = StandardDeckCard<CardBackground>
 
 struct Foundation: Equatable, Identifiable {
-    let suit: StandardDeckCard.Suit
-    var cards: IdentifiedArrayOf<StandardDeckCard>
+    let suit: Suit
+    var cards: IdentifiedArrayOf<Card>
 
     var id: String { suit.rawValue }
 }
 
 struct Pile: Equatable, Identifiable {
     let id: Int
-    var cards: IdentifiedArrayOf<StandardDeckCard>
+    var cards: IdentifiedArrayOf<Card>
 }
 
 struct Deck: Equatable {
-    var downwards: IdentifiedArrayOf<StandardDeckCard>
-    var upwards: IdentifiedArrayOf<StandardDeckCard>
+    var downwards: IdentifiedArrayOf<Card>
+    var upwards: IdentifiedArrayOf<Card>
 }
 
 extension StandardDeckCard: Equatable, Identifiable {
@@ -27,4 +36,10 @@ extension StandardDeckCard: Equatable, Identifiable {
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool { lhs.id == rhs.id }
+}
+
+extension Array where Element == Card {
+    static var standard52Deck: Self {
+        StandardDeckCard.standard52Deck { CardBackground() }
+    }
 }

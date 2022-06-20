@@ -9,7 +9,10 @@ struct SoliArtApp: App {
             AppView(store: Store(
                 initialState: AppState(),
                 reducer: appReducer,
-                environment: AppEnvironment(shuffleCards: { $0.shuffled() })
+                environment: AppEnvironment(
+                    mainQueue: .main,
+                    shuffleCards: { .standard52Deck.shuffled() }
+                )
             ))
         }
     }

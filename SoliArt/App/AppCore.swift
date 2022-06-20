@@ -3,7 +3,7 @@ import SwiftUICardGame
 
 struct AppState: Equatable {
     var foundations = IdentifiedArrayOf<Foundation>(
-        uniqueElements: StandardDeckCard.Suit.orderedCases.map { Foundation(suit: $0, cards: []) }
+        uniqueElements: Suit.orderedCases.map { Foundation(suit: $0, cards: []) }
     )
     var piles = IdentifiedArrayOf<Pile>(uniqueElements: (1...7).map { Pile(id: $0, cards: []) })
     var deck = Deck(downwards: [], upwards: [])
@@ -12,18 +12,20 @@ struct AppState: Equatable {
 }
 
 enum AppAction: Equatable {
-    case shuffleCards([StandardDeckCard])
-    case cardTapped(rank: StandardDeckCard.Rank, suit: StandardDeckCard.Suit)
+    case shuffleCards
+    case drawCard
+    case flipDeck
 }
 
 struct AppEnvironment {
-    let shuffleCards: ([StandardDeckCard]) -> [StandardDeckCard]
+    let mainQueue: AnySchedulerOf<DispatchQueue>
+    let shuffleCards: () -> [Card]
 }
 
 let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, environment in
     switch action {
-    case let .shuffleCards(cards):
-        var cards = environment.shuffleCards(cards)
+    case .shuffleCards:
+        var cards = environment.shuffleCards()
 
         state.piles = IdentifiedArrayOf(uniqueElements: state.piles.map {
             var pile = $0
@@ -41,11 +43,27 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         state.deck.downwards = IdentifiedArrayOf(uniqueElements: cards)
 
         return .none
-    case let .cardTapped(rank, suit):
+    case .drawCard:
+        let cards = state.deck.downwards
+        let upwardsToAdd: [Card] = cards[..<1].map {
+            var card = $0
+            card.isFacedUp = true
+            return card
+        }
+        state.deck.upwards = IdentifiedArrayOf(uniqueElements: state.deck.upwards.elements + upwardsToAdd)
+        state.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[1...])
         return .none
+    case .flipDeck:
+        state.deck.downwards = IdentifiedArrayOf(uniqueElements: state.deck.upwards.map {
+            var card = $0
+            card.isFacedUp = false
+            return card
+        })
+        state.deck.upwards = []
+        return Effect(value: .drawCard).delay(for: 0.4, scheduler: environment.mainQueue).eraseToEffect()
     }
 }
 
-private extension StandardDeckCard.Suit {
+private extension Suit {
     static var orderedCases: [Self] { [.hearts, .clubs, .diamonds, .spades] }
 }

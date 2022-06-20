@@ -25,6 +25,7 @@
       }
     },
     {
+      "enabled" : false,
       "target" : {
         "containerPath" : "container:SoliArt.xcodeproj",
         "identifier" : "4C3D196428547D840096404F",
