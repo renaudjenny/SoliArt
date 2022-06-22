@@ -11,7 +11,7 @@ struct AppView: View {
         WithViewStore(store) { viewStore in
             VStack(spacing: 0) {
                 ZStack {
-                    Color.green.brightness(-40/100).ignoresSafeArea()
+                    Color.toolbar.ignoresSafeArea()
                     HStack(spacing: 40) {
                         Text("Score: \(viewStore.score) points").foregroundColor(.white)
                         Text("Moves: \(viewStore.moves)").foregroundColor(.white)
@@ -71,10 +71,10 @@ struct AppView: View {
                 }
                 .padding()
                 .frame(height: 120)
-                .background(Color.green.brightness(-30/100))
+                .background(Color.piles)
 
                 ZStack {
-                    Color.green.brightness(-15/100).ignoresSafeArea()
+                    Color.board.ignoresSafeArea()
                     HStack {
                         ForEach(viewStore.piles) {
                             CardVerticalDeckView(

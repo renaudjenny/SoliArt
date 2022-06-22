@@ -4,7 +4,7 @@ import SwiftUICardGame
 
 struct CardBackground: View {
     var body: some View {
-        Color.red
+        Image("CardBackground").resizable()
     }
 }
 
