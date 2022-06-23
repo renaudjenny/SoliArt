@@ -24,16 +24,16 @@ struct AppView: View {
                 HStack {
                     HStack {
                         ForEach(viewStore.foundations) { foundation in
+                            let (suitColor, background) = foundationColors(foundation.suit)
                             RoundedRectangle(cornerRadius: 4)
-                                .fill(Color.white)
+                                .fill(background)
                                 .frame(width: 50, height: 70)
                                 .overlay(
                                     foundation.suit.view
                                         .fill(style: .init(eoFill: true, antialiased: true))
-                                        .foregroundColor(.suit(foundation.suit, colorScheme: colorScheme))
+                                        .foregroundColor(suitColor)
                                         .padding(4)
                                 )
-                                .brightness(-20/100)
                         }
                     }
                     .frame(maxHeight: .infinity)
@@ -90,6 +90,26 @@ struct AppView: View {
             }
             .task { viewStore.send(.shuffleCards) }
         }
+    }
+
+    private func foundationColors(_ suit: Suit) -> (suitColor: Color, background: Color) {
+        let suitColor: Color
+        switch (suit, colorScheme) {
+        case (.clubs, .light), (.spades, .light):
+            suitColor = Color(red: 120/255, green: 134/255, blue: 142/255)
+        case (.hearts, .light), (.diamonds, .light):
+            suitColor = Color(red: 191/255, green: 155/255, blue: 181/255)
+        case (.clubs, .dark), (.spades, .dark):
+            suitColor = Color(red: 11/255, green: 16/255, blue: 45/255)
+        case (.hearts, .dark), (.diamonds, .dark):
+            suitColor = Color(red: 65/255, green: 19/255, blue: 58/255)
+        case (_, _):
+            suitColor = .black
+        }
+        let background = colorScheme == .dark
+            ? Color(red: 17/255, green: 25/255, blue: 59/255)
+            : Color(red: 185/255, green: 206/255, blue: 207/255)
+        return (suitColor, background)
     }
 }
 
