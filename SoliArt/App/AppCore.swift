@@ -7,6 +7,7 @@ struct AppState: Equatable {
     )
     var piles = IdentifiedArrayOf<Pile>(uniqueElements: (1...7).map { Pile(id: $0, cards: []) })
     var deck = Deck(downwards: [], upwards: [])
+    var selectedCardID: StandardDeckCard.ID? = nil
     var score = 0
     var moves = 0
 }
@@ -15,6 +16,7 @@ enum AppAction: Equatable {
     case shuffleCards
     case drawCard
     case flipDeck
+    case selectCard(StandardDeckCard.ID)
 }
 
 struct AppEnvironment {
@@ -61,6 +63,9 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         })
         state.deck.upwards = []
         return Effect(value: .drawCard).delay(for: 0.4, scheduler: environment.mainQueue).eraseToEffect()
+    case let .selectCard(selectedCardID):
+        state.selectedCardID = selectedCardID
+        return .none
     }
 }
 

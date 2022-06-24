@@ -18,6 +18,7 @@
 		4C3D196C28547D840096404F /* SoliArtUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D196B28547D840096404F /* SoliArtUITestsLaunchTests.swift */; };
 		4C3D197B2854BABD0096404F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 4C3D197A2854BABD0096404F /* ComposableArchitecture */; };
 		4C3D19802855EF250096404F /* SwiftUICardGame in Frameworks */ = {isa = PBXBuildFile; productRef = 4C3D197F2855EF250096404F /* SwiftUICardGame */; };
+		4C6169CC286647B1006B4D48 /* CardVerticalDeckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C6169CB286647B1006B4D48 /* CardVerticalDeckView.swift */; };
 		4CA0D7CE2863AEAB00EF30D1 /* Color+Assets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA0D7CD2863AEAB00EF30D1 /* Color+Assets.swift */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +54,7 @@
 		4C3D196B28547D840096404F /* SoliArtUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		4C3D197828547DF60096404F /* SoliArt.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = SoliArt.xctestplan; sourceTree = "<group>"; };
 		4C3D197D2855EDC10096404F /* swift-ui-card-game */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "swift-ui-card-game"; path = "../swift-ui-card-game"; sourceTree = "<group>"; };
+		4C6169CB286647B1006B4D48 /* CardVerticalDeckView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardVerticalDeckView.swift; sourceTree = "<group>"; };
 		4CA0D7CD2863AEAB00EF30D1 /* Color+Assets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Assets.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -86,6 +88,7 @@
 		4C2E2BAB285B00700095A238 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				4C6169CB286647B1006B4D48 /* CardVerticalDeckView.swift */,
 				4C3D195028547D810096404F /* AppView.swift */,
 				4C2E2BAC285B007F0095A238 /* AppCore.swift */,
 				4C2E2BAE285B00AC0095A238 /* Deck.swift */,
@@ -310,6 +313,7 @@
 				4C2E2BAD285B007F0095A238 /* AppCore.swift in Sources */,
 				4C3D195128547D810096404F /* AppView.swift in Sources */,
 				4C3D194F28547D810096404F /* SoliArtApp.swift in Sources */,
+				4C6169CC286647B1006B4D48 /* CardVerticalDeckView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

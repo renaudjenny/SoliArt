@@ -40,14 +40,17 @@ struct AppView: View {
 
                     HStack {
                         CardVerticalDeckView(
+                            store: store,
                             cards: Array(viewStore.deck.upwards.suffix(3)),
                             cardHeight: 70,
                             facedDownSpacing: 3,
                             facedUpSpacing: 2
                         )
+                        .onTapGesture { viewStore.deck.upwards.last.map { viewStore.send(.selectCard($0.id)) } }
                         if viewStore.deck.downwards.count > 0 {
                             Button { viewStore.send(.drawCard) } label: {
                                 CardVerticalDeckView(
+                                    store: store,
                                     cards: Array(viewStore.deck.downwards.prefix(3)),
                                     cardHeight: 70,
                                     facedDownSpacing: 3,
@@ -76,9 +79,10 @@ struct AppView: View {
                 ZStack {
                     Color.board.ignoresSafeArea()
                     HStack {
-                        ForEach(viewStore.piles) {
+                        ForEach(viewStore.piles) { pile in
                             CardVerticalDeckView(
-                                cards: $0.cards.elements,
+                                store: store,
+                                cards: pile.cards.elements,
                                 cardHeight: 70,
                                 facedDownSpacing: 20,
                                 facedUpSpacing: 10
@@ -113,6 +117,7 @@ struct AppView: View {
     }
 }
 
+#if DEBUG
 struct AppView_Previews: PreviewProvider {
     static var previews: some View {
         AppView(store: Store(
@@ -125,3 +130,11 @@ struct AppView_Previews: PreviewProvider {
         ))
     }
 }
+
+extension AppEnvironment {
+    static let preview = AppEnvironment(
+        mainQueue: .main,
+        shuffleCards: { .standard52Deck.shuffled() }
+    )
+}
+#endif
