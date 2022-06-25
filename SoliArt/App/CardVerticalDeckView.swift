@@ -9,15 +9,21 @@ struct CardVerticalDeckView: View {
     let cardHeight: CGFloat
     let facedDownSpacing: CGFloat
     let facedUpSpacing: CGFloat
+    private(set) var isInteractionEnabled = true
 
     var body: some View {
         WithViewStore(store) { viewStore in
             ZStack(alignment: .top) {
                 Color.clear
                 ForEach(cardsAndYOffset, id: \.yOffset) { card, yOffset in
-                    Button { viewStore.send(.selectCard(card.id)) } label: {
-                        card.frame(height: cardHeight).offset(x: 0, y: yOffset)
-                    }.buttonStyle(.plain)
+                    let content = card.frame(height: cardHeight).offset(x: 0, y: yOffset)
+                    if isInteractionEnabled {
+                        Button { viewStore.send(.selectCard(card.id)) } label: {
+                            content
+                        }.buttonStyle(.plain)
+                    } else {
+                        content
+                    }
                 }
             }
         }

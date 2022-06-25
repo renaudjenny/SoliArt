@@ -46,7 +46,6 @@ struct AppView: View {
                             facedDownSpacing: 3,
                             facedUpSpacing: 2
                         )
-                        .onTapGesture { viewStore.deck.upwards.last.map { viewStore.send(.selectCard($0.id)) } }
                         if viewStore.deck.downwards.count > 0 {
                             Button { viewStore.send(.drawCard) } label: {
                                 CardVerticalDeckView(
@@ -54,7 +53,8 @@ struct AppView: View {
                                     cards: Array(viewStore.deck.downwards.prefix(3)),
                                     cardHeight: 70,
                                     facedDownSpacing: 3,
-                                    facedUpSpacing: 0
+                                    facedUpSpacing: 0,
+                                    isInteractionEnabled: false
                                 )
                             }
                             .buttonStyle(.plain)
