@@ -9,6 +9,18 @@ struct AppView: View {
 
     var body: some View {
         WithViewStore(store) { viewStore in
+            ZStack {
+                content
+                viewStore.draggedCard.map {
+                    $0.card.frame(height: 70).position($0.position.applying(CGAffineTransform(translationX: 0, y: -45)))
+                }
+            }
+            .task { viewStore.send(.shuffleCards) }
+        }
+    }
+
+    private var content: some View {
+        WithViewStore(store) { viewStore in
             VStack(spacing: 0) {
                 ZStack {
                     Color.toolbar.ignoresSafeArea()
@@ -92,7 +104,6 @@ struct AppView: View {
                     .padding()
                 }
             }
-            .task { viewStore.send(.shuffleCards) }
         }
     }
 

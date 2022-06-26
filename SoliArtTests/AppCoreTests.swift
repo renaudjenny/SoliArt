@@ -72,7 +72,7 @@ class AppCoreTests: XCTestCase {
         }
     }
 
-    func testSelectCard() {
+    func testDragCard() {
         let scheduler = DispatchQueue.test
         let store = TestStore(initialState: AppState(), reducer: appReducer, environment: .test(scheduler: scheduler))
         let cards = [StandardDeckCard].standard52Deck
@@ -82,8 +82,9 @@ class AppCoreTests: XCTestCase {
             $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[28...])
         }
 
-        store.send(.selectCard(42)) {
-            $0.selectedCardID = 42
+        let dragCard = DragCard(card: cards[42], position: CGPoint(x: 123, y: 123))
+        store.send(.dragCard(dragCard)) {
+            $0.draggedCard = dragCard
         }
     }
 

@@ -5,7 +5,7 @@ import SwiftUICardGame
 struct CardVerticalDeckView: View {
     let store: Store<AppState, AppAction>
 
-    let cards: [StandardDeckCard<CardBackground>]
+    let cards: [Card]
     let cardHeight: CGFloat
     let facedDownSpacing: CGFloat
     let facedUpSpacing: CGFloat
@@ -18,9 +18,15 @@ struct CardVerticalDeckView: View {
                 ForEach(cardsAndYOffset, id: \.yOffset) { card, yOffset in
                     let content = card.frame(height: cardHeight).offset(x: 0, y: yOffset)
                     if isInteractionEnabled {
-                        Button { viewStore.send(.selectCard(card.id)) } label: {
-                            content
-                        }.buttonStyle(.plain)
+                        content
+                        .gesture(DragGesture(coordinateSpace: .global)
+                            .onChanged { value in
+                                viewStore.send(.dragCard(DragCard(card: card, position: value.location)))
+                            }
+                            .onEnded { value in
+                                viewStore.send(.dragCard(nil))
+                            }
+                        )
                     } else {
                         content
                     }
