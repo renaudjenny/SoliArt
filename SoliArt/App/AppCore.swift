@@ -11,6 +11,7 @@ struct AppState: Equatable {
     var score = 0
     var moves = 0
     var draggedCard: DragCard?
+    var dragOrigin: DragOrigin?
 }
 
 enum AppAction: Equatable {
@@ -65,14 +66,28 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         state.deck.upwards = []
         return Effect(value: .drawCard).delay(for: 0.4, scheduler: environment.mainQueue).eraseToEffect()
     case let .dragCard(dragCard):
+        guard let card = dragCard?.card else {
+            state.draggedCard = nil
+            state.dragOrigin = nil
+            return .none
+        }
+
         state.draggedCard = dragCard
+
+        guard let pile = state.piles.first(where: { $0.cards.contains(card) }) else { return .none }
+        state.dragOrigin = .pile(pile)
+
         return .none
     }
 }
 
 struct DragCard: Equatable {
     let card: Card
-    let position: CGPoint
+    var position: CGPoint
+}
+
+enum DragOrigin: Equatable {
+    case pile(Pile)
 }
 
 private extension Suit {

@@ -21,12 +21,18 @@ struct CardVerticalDeckView: View {
                         content
                         .gesture(DragGesture(coordinateSpace: .global)
                             .onChanged { value in
-                                viewStore.send(.dragCard(DragCard(card: card, position: value.location)))
+                                if var draggedCard = viewStore.draggedCard {
+                                    draggedCard.position = value.location
+                                    viewStore.send(.dragCard(draggedCard))
+                                } else {
+                                    viewStore.send(.dragCard(DragCard(card: card, position: value.location)))
+                                }
                             }
                             .onEnded { value in
                                 viewStore.send(.dragCard(nil))
                             }
                         )
+                        .opacity(card == viewStore.draggedCard?.card ? 50/100 : 100/100)
                     } else {
                         content
                     }
