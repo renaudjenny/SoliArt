@@ -16,7 +16,7 @@ struct PilesView: View {
                                 cards: pile.cards.elements,
                                 cardHeight: 70,
                                 facedDownSpacing: 20,
-                                facedUpSpacing: 10
+                                facedUpSpacing: 30
                             )
                             .task { viewStore.send(.updateFrame(.pile(pile, geo.frame(in: .global)))) }
                         }

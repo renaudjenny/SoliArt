@@ -12,7 +12,6 @@ struct AppState: Equatable {
     var moves = 0
     var frames: IdentifiedArrayOf<Frame> = []
     var draggedCard: DragCard?
-    var dragOrigin: DragOrigin?
 }
 
 enum AppAction: Equatable {
@@ -75,16 +74,9 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         guard let card = dragCard?.card else {
             let draggedCard = state.draggedCard
             state.draggedCard = nil
-            state.dragOrigin = nil
-
             return draggedCard.map { Effect(value: .dropCard($0)) } ?? .none
         }
-
         state.draggedCard = dragCard
-
-        guard let pile = state.piles.first(where: { $0.cards.contains(card) }) else { return .none }
-        state.dragOrigin = .pile(pile)
-
         return .none
     case let .dropCard(dragCard):
         let dropFrame = state.frames.first { frame in
@@ -93,11 +85,16 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         switch dropFrame {
         case let .pile(pile, _):
             guard
-                let pile = state.piles[id: pile.id],
+                var pile = state.piles[id: pile.id],
                 isValidMove(card: dragCard.card, onto: pile.cards.last)
             else { return .none }
 
-            print("Valid move!")
+            pile.cards.updateOrAppend(dragCard.card)
+            state.piles.updateOrAppend(pile)
+
+            var origin = state.piles.first { $0.cards.contains(dragCard.card) }
+            origin?.cards.remove(dragCard.card)
+            _ = origin.map { state.piles.updateOrAppend($0) }
 
             return .none
         case .none: return .none
