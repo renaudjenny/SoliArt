@@ -87,9 +87,36 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
 
         return .none
     case let .dropCard(dragCard):
-        print("Card dropped at: ", dragCard.position)
-        return .none
+        let dropFrame = state.frames.first { frame in
+            frame.rect.contains(dragCard.position)
+        }
+        switch dropFrame {
+        case let .pile(pile, _):
+            guard
+                let pile = state.piles[id: pile.id],
+                isValidMove(card: dragCard.card, onto: pile.cards.last)
+            else { return .none }
+
+            print("Valid move!")
+
+            return .none
+        case .none: return .none
+        }
     }
+}
+
+private func isValidMove(card: Card, onto: Card?) -> Bool {
+    guard let onto = onto else { return false }
+
+    let isColorDifferent: Bool
+    switch card.suit {
+    case .clubs, .spades: isColorDifferent = [.diamonds, .hearts].contains(onto.suit)
+    case .diamonds, .hearts: isColorDifferent = [.clubs, .spades].contains(onto.suit)
+    }
+
+    let isRankLower = card.rank == onto.rank.lower
+
+    return isColorDifferent && isRankLower
 }
 
 struct DragCard: Equatable {
@@ -113,8 +140,21 @@ enum Frame: Equatable, Hashable, Identifiable {
     }
 
     var id: Int { hashValue }
+
+    var rect: CGRect {
+        switch self {
+        case let .pile(_, rect): return rect
+        }
+    }
 }
 
 private extension Suit {
     static var orderedCases: [Self] { [.hearts, .clubs, .diamonds, .spades] }
+}
+
+private extension Rank {
+    var lower: Rank? {
+        guard let index = Rank.allCases.firstIndex(of: self) else { return nil }
+        return index > 0 ? Rank.allCases[index - 1] : nil
+    }
 }
