@@ -10,6 +10,7 @@ struct AppState: Equatable {
     var deck = Deck(downwards: [], upwards: [])
     var score = 0
     var moves = 0
+    var frames: IdentifiedArrayOf<Frame> = []
     var draggedCard: DragCard?
     var dragOrigin: DragOrigin?
 }
@@ -18,7 +19,9 @@ enum AppAction: Equatable {
     case shuffleCards
     case drawCard
     case flipDeck
+    case updateFrame(Frame)
     case dragCard(DragCard?)
+    case dropCard(DragCard)
 }
 
 struct AppEnvironment {
@@ -65,11 +68,16 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         })
         state.deck.upwards = []
         return Effect(value: .drawCard).delay(for: 0.4, scheduler: environment.mainQueue).eraseToEffect()
+    case let .updateFrame(frame):
+        state.frames.updateOrAppend(frame)
+        return .none
     case let .dragCard(dragCard):
         guard let card = dragCard?.card else {
+            let draggedCard = state.draggedCard
             state.draggedCard = nil
             state.dragOrigin = nil
-            return .none
+
+            return draggedCard.map { Effect(value: .dropCard($0)) } ?? .none
         }
 
         state.draggedCard = dragCard
@@ -77,6 +85,9 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         guard let pile = state.piles.first(where: { $0.cards.contains(card) }) else { return .none }
         state.dragOrigin = .pile(pile)
 
+        return .none
+    case let .dropCard(dragCard):
+        print("Card dropped at: ", dragCard.position)
         return .none
     }
 }
@@ -88,6 +99,20 @@ struct DragCard: Equatable {
 
 enum DragOrigin: Equatable {
     case pile(Pile)
+}
+
+enum Frame: Equatable, Hashable, Identifiable {
+    case pile(Pile, CGRect)
+
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .pile(pile, _):
+            hasher.combine("Pile")
+            hasher.combine(pile.id)
+        }
+    }
+
+    var id: Int { hashValue }
 }
 
 private extension Suit {
