@@ -17,8 +17,8 @@
 		4C3D196A28547D840096404F /* SoliArtUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D196928547D840096404F /* SoliArtUITests.swift */; };
 		4C3D196C28547D840096404F /* SoliArtUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D196B28547D840096404F /* SoliArtUITestsLaunchTests.swift */; };
 		4C3D197B2854BABD0096404F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 4C3D197A2854BABD0096404F /* ComposableArchitecture */; };
-		4C3D19802855EF250096404F /* SwiftUICardGame in Frameworks */ = {isa = PBXBuildFile; productRef = 4C3D197F2855EF250096404F /* SwiftUICardGame */; };
 		4C6169CC286647B1006B4D48 /* CardVerticalDeckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C6169CB286647B1006B4D48 /* CardVerticalDeckView.swift */; };
+		4C6169CF286CD2D1006B4D48 /* SwiftUICardGame in Frameworks */ = {isa = PBXBuildFile; productRef = 4C6169CE286CD2D1006B4D48 /* SwiftUICardGame */; };
 		4CA0D7CE2863AEAB00EF30D1 /* Color+Assets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA0D7CD2863AEAB00EF30D1 /* Color+Assets.swift */; };
 /* End PBXBuildFile section */
 
@@ -53,7 +53,6 @@
 		4C3D196928547D840096404F /* SoliArtUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtUITests.swift; sourceTree = "<group>"; };
 		4C3D196B28547D840096404F /* SoliArtUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		4C3D197828547DF60096404F /* SoliArt.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = SoliArt.xctestplan; sourceTree = "<group>"; };
-		4C3D197D2855EDC10096404F /* swift-ui-card-game */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "swift-ui-card-game"; path = "../swift-ui-card-game"; sourceTree = "<group>"; };
 		4C6169CB286647B1006B4D48 /* CardVerticalDeckView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardVerticalDeckView.swift; sourceTree = "<group>"; };
 		4CA0D7CD2863AEAB00EF30D1 /* Color+Assets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Assets.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -63,7 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C3D19802855EF250096404F /* SwiftUICardGame in Frameworks */,
+				4C6169CF286CD2D1006B4D48 /* SwiftUICardGame in Frameworks */,
 				4C3D197B2854BABD0096404F /* ComposableArchitecture in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -159,7 +158,6 @@
 		4C3D197C2855EDC10096404F /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				4C3D197D2855EDC10096404F /* swift-ui-card-game */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -189,7 +187,7 @@
 			name = SoliArt;
 			packageProductDependencies = (
 				4C3D197A2854BABD0096404F /* ComposableArchitecture */,
-				4C3D197F2855EF250096404F /* SwiftUICardGame */,
+				4C6169CE286CD2D1006B4D48 /* SwiftUICardGame */,
 			);
 			productName = SoliArt;
 			productReference = 4C3D194B28547D810096404F /* SoliArt.app */;
@@ -265,6 +263,7 @@
 			mainGroup = 4C3D194228547D810096404F;
 			packageReferences = (
 				4C3D19792854BABD0096404F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				4C6169CD286CD2D1006B4D48 /* XCRemoteSwiftPackageReference "swift-ui-card-game" */,
 			);
 			productRefGroup = 4C3D194C28547D810096404F /* Products */;
 			projectDirPath = "";
@@ -648,6 +647,14 @@
 				minimumVersion = 0.36.0;
 			};
 		};
+		4C6169CD286CD2D1006B4D48 /* XCRemoteSwiftPackageReference "swift-ui-card-game" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/renaudjenny/swift-ui-card-game";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -656,8 +663,9 @@
 			package = 4C3D19792854BABD0096404F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
 		};
-		4C3D197F2855EF250096404F /* SwiftUICardGame */ = {
+		4C6169CE286CD2D1006B4D48 /* SwiftUICardGame */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 4C6169CD286CD2D1006B4D48 /* XCRemoteSwiftPackageReference "swift-ui-card-game" */;
 			productName = SwiftUICardGame;
 		};
 /* End XCSwiftPackageProductDependency section */

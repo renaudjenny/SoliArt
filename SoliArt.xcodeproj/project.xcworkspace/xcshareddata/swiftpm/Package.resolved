@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/combine-schedulers",
       "state" : {
-        "revision" : "4cf088c29a20f52be0f2ca54992b492c54e0076b",
-        "version" : "0.5.3"
+        "revision" : "0ba3a562716efabb585ccb169450c5389107286b",
+        "version" : "0.6.0"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "db890996189ca27da9e56f4cc82a70057819429a",
-        "version" : "0.36.0"
+        "revision" : "b55977808fcc2ff75081b90f197f6e72a21214b4",
+        "version" : "0.38.1"
       }
     },
     {
@@ -55,12 +55,21 @@
       }
     },
     {
+      "identity" : "swift-ui-card-game",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/renaudjenny/swift-ui-card-game",
+      "state" : {
+        "branch" : "main",
+        "revision" : "ab0aefd7468322efa52abf42cccc57a8e33575ac"
+      }
+    },
+    {
       "identity" : "xctest-dynamic-overlay",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "50a70a9d3583fe228ce672e8923010c8df2deddd",
-        "version" : "0.2.1"
+        "revision" : "f821dcbac7cb6913f8e0d1a80496d0ba0199fa81",
+        "version" : "0.3.0"
       }
     }
   ],
