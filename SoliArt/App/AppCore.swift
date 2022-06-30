@@ -21,6 +21,7 @@ enum AppAction: Equatable {
     case updateFrame(Frame)
     case dragCard(DragCard?)
     case dropCard(DragCard)
+    case turnOverRandomCard
 }
 
 struct AppEnvironment {
@@ -92,13 +93,33 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
             pile.cards.updateOrAppend(dragCard.card)
             state.piles.updateOrAppend(pile)
 
-            var origin = state.piles.first { $0.cards.contains(dragCard.card) }
-            origin?.cards.remove(dragCard.card)
-            _ = origin.map { state.piles.updateOrAppend($0) }
+            guard var origin = state.piles.first(where: { $0.cards.contains(dragCard.card) })
+            else { return .none }
+
+            origin.cards.remove(dragCard.card)
+
+            guard var lastCard = origin.cards.last else {
+                state.piles.updateOrAppend(origin)
+                return .none
+            }
+            lastCard.isFacedUp = true
+            origin.cards.updateOrAppend(lastCard)
+            state.piles.updateOrAppend(origin)
 
             return .none
         case .none: return .none
         }
+    case .turnOverRandomCard:
+        guard
+            var pile = state.piles.randomElement(),
+            var randomCard = pile.cards.filter({ !$0.isFacedUp }).randomElement()
+        else { return .none }
+
+        randomCard.isFacedUp = true
+        pile.cards.updateOrAppend(randomCard)
+        state.piles.updateOrAppend(pile)
+
+        return .none
     }
 }
 

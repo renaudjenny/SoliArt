@@ -28,7 +28,7 @@ struct FoundationsView: View {
                 HStack {
                     CardVerticalDeckView(
                         store: store,
-                        cards: Array(viewStore.deck.upwards.suffix(3)),
+                        cards: IdentifiedArrayOf(uniqueElements: viewStore.deck.upwards.suffix(3)),
                         cardHeight: 70,
                         facedDownSpacing: 3,
                         facedUpSpacing: 2
@@ -37,7 +37,9 @@ struct FoundationsView: View {
                         Button { viewStore.send(.drawCard) } label: {
                             CardVerticalDeckView(
                                 store: store,
-                                cards: Array(viewStore.deck.downwards.prefix(3)),
+                                cards: IdentifiedArrayOf(
+                                    uniqueElements:viewStore.deck.downwards.prefix(3)
+                                ),
                                 cardHeight: 70,
                                 facedDownSpacing: 3,
                                 facedUpSpacing: 0,

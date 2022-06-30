@@ -13,7 +13,7 @@ struct PilesView: View {
                         GeometryReader { geo in
                             CardVerticalDeckView(
                                 store: store,
-                                cards: pile.cards.elements,
+                                cards: pile.cards,
                                 cardHeight: 70,
                                 facedDownSpacing: 20,
                                 facedUpSpacing: 30

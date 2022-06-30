@@ -5,7 +5,7 @@ import SwiftUICardGame
 struct CardVerticalDeckView: View {
     let store: Store<AppState, AppAction>
 
-    let cards: [Card]
+    let cards: IdentifiedArrayOf<Card>
     let cardHeight: CGFloat
     let facedDownSpacing: CGFloat
     let facedUpSpacing: CGFloat
@@ -51,60 +51,60 @@ struct CardVerticalDeckView: View {
 }
 
 #if DEBUG
-struct CardVerticalDeckView_Previews: PreviewProvider {
-    static var previews: some View {
-        Preview(store: Store(
-            initialState: AppState(),
-            reducer: appReducer,
-            environment: .preview
-        ))
-    }
-
-    private struct Preview: View {
-        let store: Store<AppState, AppAction>
-
-        @State private var cards: [StandardDeckCard<CardBackground>] = .standard52Deck
-            .enumerated()
-            .map { index, card in
-                if index == 51 || index == 50 || index == 49 || index == 48 {
-                    var lastCard = card
-                    lastCard.isFacedUp = true
-                    return lastCard
-                }
-                return card
-            }
-            .suffix(15)
-
-        var body: some View {
-            WithViewStore(store) { viewStore in
-                VStack {
-                    CardVerticalDeckView(
-                        store: store,
-                        cards: cards,
-                        cardHeight: 250,
-                        facedDownSpacing: 6,
-                        facedUpSpacing: 50
-                    )
-                    .padding()
-
-                    Button("Next card") {
-                        cards = cards
-                            .enumerated()
-                            .map { index, card in
-                                if index == cards.count - 1 {
-                                    return nil
-                                } else if index == cards.count - 2 {
-                                    var secondCard = card
-                                    secondCard.isFacedUp = true
-                                    return secondCard
-                                }
-                                return card
-                            }
-                            .compactMap { $0 }
-                    }.padding()
-                }
-            }
-        }
-    }
-}
+// TODO: fix
+//struct CardVerticalDeckView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        Preview(store: Store(
+//            initialState: AppState(),
+//            reducer: appReducer,
+//            environment: .preview
+//        ))
+//    }
+//
+//    private struct Preview: View {
+//        let store: Store<AppState, AppAction>
+//
+//        @State private var cards = IdentifiedArrayOf<Card>(uniqueElements: [Card].standard52Deck)
+//            .map { index, card in
+//                if index == 51 || index == 50 || index == 49 || index == 48 {
+//                    var lastCard = card
+//                    lastCard.isFacedUp = true
+//                    return lastCard
+//                }
+//                return card
+//            }
+//            .suffix(15)
+//
+//        var body: some View {
+//            WithViewStore(store) { viewStore in
+//                VStack {
+//                    CardVerticalDeckView(
+//                        store: store,
+//                        cards: cards,
+//                        cardHeight: 250,
+//                        facedDownSpacing: 6,
+//                        facedUpSpacing: 50
+//                    )
+//                    .padding()
+//
+//                    Button("Next card") {
+//                        cards = cards
+//                            .enumerated()
+//                            .map { index, card in
+//                                if index == cards.count - 1 {
+//                                    return nil
+//                                } else if index == cards.count - 2 {
+//                                    var secondCard = card
+//                                    secondCard.isFacedUp = true
+//                                    return secondCard
+//                                }
+//                                return card
+//                            }
+//                            .compactMap { $0 }
+//                    }.padding()
+//                }
+//            }
+//        }
+//    }
+//}
 #endif
