@@ -16,7 +16,9 @@ struct CardVerticalDeckView: View {
             ZStack(alignment: .top) {
                 Color.clear
                 ForEach(cardsAndYOffset, id: \.yOffset) { card, yOffset in
-                    let content = card.frame(height: cardHeight).offset(x: 0, y: yOffset)
+                    let content = StandardDeckCardView(card: card, backgroundContent: CardBackground.init)
+                    .frame(height: cardHeight).offset(x: 0, y: yOffset)
+
                     if isInteractionEnabled {
                         content
                         .gesture(DragGesture(coordinateSpace: .global)
@@ -41,7 +43,7 @@ struct CardVerticalDeckView: View {
         }
     }
 
-    private var cardsAndYOffset: [(card: StandardDeckCard<CardBackground>, yOffset: CGFloat)] {
+    private var cardsAndYOffset: [(card: StandardDeckCard, yOffset: CGFloat)] {
         cards.reduce([]) { result, card in
             guard let previous = result.last else { return [(card, 0)] }
             let spacing = previous.card.isFacedUp ? facedUpSpacing : facedDownSpacing
