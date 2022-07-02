@@ -18,7 +18,7 @@ struct PilesView: View {
                                 facedDownSpacing: 20,
                                 facedUpSpacing: 30
                             )
-                            .task { viewStore.send(.updateFrame(.pile(pile, geo.frame(in: .global)))) }
+                            .task { viewStore.send(.updateFrame(.pile(pile.id, geo.frame(in: .global)))) }
                         }
                     }
                 }

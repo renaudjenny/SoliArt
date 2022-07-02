@@ -11,7 +11,7 @@ struct AppState: Equatable {
     var score = 0
     var moves = 0
     var frames: IdentifiedArrayOf<Frame> = []
-    var draggedCard: DragCard?
+    var draggedCards: DragCards?
 }
 
 enum AppAction: Equatable {
@@ -19,8 +19,8 @@ enum AppAction: Equatable {
     case drawCard
     case flipDeck
     case updateFrame(Frame)
-    case dragCard(DragCard?)
-    case dropCard(DragCard)
+    case dragCards(DragCards?)
+    case dropCards(DragCards)
     case turnOverRandomCard
 }
 
@@ -71,32 +71,36 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
     case let .updateFrame(frame):
         state.frames.updateOrAppend(frame)
         return .none
-    case let .dragCard(dragCard):
-        guard let card = dragCard?.card else {
-            let draggedCard = state.draggedCard
-            state.draggedCard = nil
-            return draggedCard.map { Effect(value: .dropCard($0)) } ?? .none
+    case let .dragCards(dragCards):
+        if dragCards == nil {
+            let draggedCards = state.draggedCards
+            state.draggedCards = nil
+            return draggedCards.map { Effect(value: .dropCards($0)) } ?? .none
+        } else {
+            state.draggedCards = dragCards
+            return .none
         }
-        state.draggedCard = dragCard
-        return .none
-    case let .dropCard(dragCard):
+    case let .dropCards(dragCards):
         let dropFrame = state.frames.first { frame in
-            frame.rect.contains(dragCard.position)
+            frame.rect.contains(dragCards.position)
         }
         switch dropFrame {
-        case let .pile(pile, _):
+        case let .pile(pileID, _):
             guard
-                var pile = state.piles[id: pile.id],
-                isValidMove(card: dragCard.card, onto: pile.cards.last)
+                var pile = state.piles[id: pileID],
+                let cardID = dragCards.cardIDs.last,
+                let card = state.card(id: cardID),
+                isValidMove(card: card, onto: pile.cards.last)
             else { return .none }
 
-            pile.cards.updateOrAppend(dragCard.card)
+            let origin = state.piles.first(where: { $0.cards.contains(card) })
+
+            pile.cards.updateOrAppend(card)
             state.piles.updateOrAppend(pile)
 
-            guard var origin = state.piles.first(where: { $0.cards.contains(dragCard.card) })
-            else { return .none }
+            guard var origin = origin else { return .none }
 
-            origin.cards.remove(dragCard.card)
+            origin.cards.remove(card)
 
             guard var lastCard = origin.cards.last else {
                 state.piles.updateOrAppend(origin)
@@ -137,23 +141,34 @@ private func isValidMove(card: Card, onto: Card?) -> Bool {
     return isColorDifferent && isRankLower
 }
 
-struct DragCard: Equatable {
-    let card: Card
+extension AppState {
+    func card(id: Card.ID) -> Card? {
+        piles.flatMap(\.cards).first { $0.id == id }
+    }
+
+    var actualDraggedCards: IdentifiedArrayOf<Card>? {
+        guard let cardIDs = draggedCards?.cardIDs else { return nil }
+        return IdentifiedArrayOf(uniqueElements: cardIDs.compactMap(card(id:)))
+    }
+}
+
+struct DragCards: Equatable {
+    let cardIDs: [Card.ID]
     var position: CGPoint
 }
 
 enum DragOrigin: Equatable {
-    case pile(Pile)
+    case pile(Pile.ID)
 }
 
 enum Frame: Equatable, Hashable, Identifiable {
-    case pile(Pile, CGRect)
+    case pile(Pile.ID, CGRect)
 
     func hash(into hasher: inout Hasher) {
         switch self {
-        case let .pile(pile, _):
+        case let .pile(pileID, _):
             hasher.combine("Pile")
-            hasher.combine(pile.id)
+            hasher.combine(pileID)
         }
     }
 

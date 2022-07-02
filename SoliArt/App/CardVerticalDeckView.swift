@@ -23,18 +23,18 @@ struct CardVerticalDeckView: View {
                         content
                         .gesture(DragGesture(coordinateSpace: .global)
                             .onChanged { value in
-                                if var draggedCard = viewStore.draggedCard {
-                                    draggedCard.position = value.location
-                                    viewStore.send(.dragCard(draggedCard))
+                                if var draggedCards = viewStore.draggedCards {
+                                    draggedCards.position = value.location
+                                    viewStore.send(.dragCards(draggedCards))
                                 } else {
-                                    viewStore.send(.dragCard(DragCard(card: card, position: value.location)))
+                                    viewStore.send(.dragCards(draggedCards(from: card, position: value.location)))
                                 }
                             }
                             .onEnded { value in
-                                viewStore.send(.dragCard(nil))
+                                viewStore.send(.dragCards(nil))
                             }
                         )
-                        .opacity(card == viewStore.draggedCard?.card ? 50/100 : 100/100)
+                        .opacity(viewStore.actualDraggedCards?.contains(card) ?? false ? 50/100 : 100/100)
                     } else {
                         content
                     }
@@ -49,6 +49,12 @@ struct CardVerticalDeckView: View {
             let spacing = previous.card.isFacedUp ? facedUpSpacing : facedDownSpacing
             return result + [(card, previous.yOffset + spacing)]
         }
+    }
+
+    private func draggedCards(from card: Card, position: CGPoint) -> DragCards {
+        guard let cardIndex = cards.index(id: card.id)
+        else { return DragCards(cardIDs: [card.id], position: position) }
+        return DragCards(cardIDs: cards[cardIndex...].map(\.id), position: position)
     }
 }
 

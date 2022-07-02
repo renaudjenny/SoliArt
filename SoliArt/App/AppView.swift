@@ -9,10 +9,17 @@ struct AppView: View {
         WithViewStore(store) { viewStore in
             ZStack {
                 content
-                viewStore.draggedCard.map {
-                    StandardDeckCardView(card: $0.card, backgroundContent: EmptyView.init)
-                        .frame(height: 70)
-                        .position($0.position.applying(CGAffineTransform(translationX: 0, y: -45)))
+                if let position = viewStore.draggedCards?.position, let cards = viewStore.actualDraggedCards {
+                    GeometryReader { geo in
+                        CardVerticalDeckView(
+                            store: store,
+                            cards: cards,
+                            cardHeight: 70,
+                            facedDownSpacing: 0,
+                            facedUpSpacing: 20
+                        )
+                        .position(position.applying(CGAffineTransform(translationX: 0, y: geo.size.height/2 - 80)))
+                    }
                 }
             }
             .task { viewStore.send(.shuffleCards) }
