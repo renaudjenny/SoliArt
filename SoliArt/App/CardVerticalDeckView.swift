@@ -10,6 +10,7 @@ struct CardVerticalDeckView: View {
     let facedDownSpacing: CGFloat
     let facedUpSpacing: CGFloat
     private(set) var isInteractionEnabled = true
+    private(set) var ignoreDraggedCards = false
 
     var body: some View {
         WithViewStore(store) { viewStore in
@@ -34,7 +35,10 @@ struct CardVerticalDeckView: View {
                                 viewStore.send(.dragCards(nil))
                             }
                         )
-                        .opacity(viewStore.actualDraggedCards?.contains(card) ?? false ? 50/100 : 100/100)
+                        .opacity(viewStore.actualDraggedCards?.contains(card) ?? false && !ignoreDraggedCards
+                                 ? 50/100
+                                 : 100/100
+                        )
                     } else {
                         content
                     }

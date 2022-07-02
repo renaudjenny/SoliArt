@@ -16,7 +16,8 @@ struct AppView: View {
                             cards: cards,
                             cardHeight: 70,
                             facedDownSpacing: 0,
-                            facedUpSpacing: 20
+                            facedUpSpacing: 20,
+                            ignoreDraggedCards: true
                         )
                         .position(position.applying(CGAffineTransform(translationX: 0, y: geo.size.height/2 - 80)))
                     }

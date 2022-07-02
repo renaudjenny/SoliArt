@@ -86,21 +86,18 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         }
         switch dropFrame {
         case let .pile(pileID, _):
-            guard
-                var pile = state.piles[id: pileID],
-                let cardID = dragCards.cardIDs.last,
-                let card = state.card(id: cardID),
-                isValidMove(card: card, onto: pile.cards.last)
-            else { return .none }
+            guard var pile = state.piles[id: pileID] else { return .none }
+            let cards = dragCards.cardIDs.compactMap(state.card(id:))
+            guard isValidMove(cards: cards, onto: pile.cards.elements), let card = cards.first else { return .none }
 
             let origin = state.piles.first(where: { $0.cards.contains(card) })
 
-            pile.cards.updateOrAppend(card)
+            pile.cards.append(contentsOf: cards)
             state.piles.updateOrAppend(pile)
 
             guard var origin = origin else { return .none }
 
-            origin.cards.remove(card)
+            for card in cards { origin.cards.remove(card) }
 
             guard var lastCard = origin.cards.last else {
                 state.piles.updateOrAppend(origin)
@@ -127,16 +124,16 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
     }
 }
 
-private func isValidMove(card: Card, onto: Card?) -> Bool {
-    guard let onto = onto else { return false }
+private func isValidMove(cards: [Card], onto: [Card]) -> Bool {
+    guard let first = cards.first, let onto = onto.last, onto.isFacedUp else { return false }
 
     let isColorDifferent: Bool
-    switch card.suit {
+    switch first.suit {
     case .clubs, .spades: isColorDifferent = [.diamonds, .hearts].contains(onto.suit)
     case .diamonds, .hearts: isColorDifferent = [.clubs, .spades].contains(onto.suit)
     }
 
-    let isRankLower = card.rank == onto.rank.lower
+    let isRankLower = first.rank == onto.rank.lower
 
     return isColorDifferent && isRankLower
 }
