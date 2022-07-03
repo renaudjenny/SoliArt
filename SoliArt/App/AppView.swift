@@ -33,10 +33,6 @@ struct AppView: View {
                 ScoreView(store: store)
                 FoundationsView(store: store)
                 PilesView(store: store)
-                Button { viewStore.send(.turnOverRandomCard) } label: {
-                    Text("Turn over a random card")
-                }
-                Text("Faced up cards: \(viewStore.piles.flatMap(\.cards).filter(\.isFacedUp).count)")
             }
         }
     }

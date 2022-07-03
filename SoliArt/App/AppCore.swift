@@ -21,7 +21,6 @@ enum AppAction: Equatable {
     case updateFrame(Frame)
     case dragCards(DragCards?)
     case dropCards(DragCards)
-    case turnOverRandomCard
 }
 
 struct AppEnvironment {
@@ -110,17 +109,6 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
             return .none
         case .none: return .none
         }
-    case .turnOverRandomCard:
-        guard
-            var pile = state.piles.randomElement(),
-            var randomCard = pile.cards.filter({ !$0.isFacedUp }).randomElement()
-        else { return .none }
-
-        randomCard.isFacedUp = true
-        pile.cards.updateOrAppend(randomCard)
-        state.piles.updateOrAppend(pile)
-
-        return .none
     }
 }
 
