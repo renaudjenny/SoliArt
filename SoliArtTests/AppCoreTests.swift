@@ -33,9 +33,12 @@ class AppCoreTests: XCTestCase {
         }
 
         store.send(.drawCard) {
-            var facedUpCard = cards[29]
-            facedUpCard.isFacedUp = true
-            $0.deck.upwards = IdentifiedArrayOf(uniqueElements: [cards[28]] + [facedUpCard])
+            let facedUpCards = cards[28...29].map { card -> Card in
+                var card = card
+                card.isFacedUp = true
+                return card
+            }
+            $0.deck.upwards = IdentifiedArrayOf(uniqueElements: facedUpCards)
             $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[30...])
         }
     }
@@ -52,9 +55,12 @@ class AppCoreTests: XCTestCase {
 
         for drawCardNumber in 28...51 {
             store.send(.drawCard) {
-                var facedUpCard = cards[drawCardNumber]
-                facedUpCard.isFacedUp = true
-                $0.deck.upwards = IdentifiedArrayOf(uniqueElements: cards[28...drawCardNumber])
+                let facedUpCards = cards[28...drawCardNumber].map { card -> Card in
+                    var card = card
+                    card.isFacedUp = true
+                    return card
+                }
+                $0.deck.upwards = IdentifiedArrayOf(uniqueElements: facedUpCards)
                 $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[(drawCardNumber + 1)...])
             }
         }
@@ -82,9 +88,9 @@ class AppCoreTests: XCTestCase {
             $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[28...])
         }
 
-        let dragCard = DragCard(card: cards[42], position: CGPoint(x: 123, y: 123))
-        store.send(.dragCard(dragCard)) {
-            $0.draggedCard = dragCard
+        let dragCards = DragCards(cardIDs: [cards[42].id], position: CGPoint(x: 123, y: 123))
+        store.send(.dragCards(dragCards)) {
+            $0.draggedCards = dragCards
         }
     }
 
@@ -139,11 +145,5 @@ class AppCoreTests: XCTestCase {
 extension AppEnvironment {
     static func test(scheduler: TestSchedulerOf<DispatchQueue>) -> AppEnvironment {
         AppEnvironment(mainQueue: scheduler.eraseToAnyScheduler(), shuffleCards: { .standard52Deck })
-    }
-}
-
-extension Card {
-    init(_ rank: Rank, of suit: Suit, isFacedUp: Bool) {
-        self.init(rank, of: suit, isFacedUp: isFacedUp) { CardBackground() }
     }
 }
