@@ -78,7 +78,7 @@ class AppCoreTests: XCTestCase {
         }
     }
 
-    func testDragCard() {
+    func testDragCards() {
         let scheduler = DispatchQueue.test
         let store = TestStore(initialState: AppState(), reducer: appReducer, environment: .test(scheduler: scheduler))
         let cards = [StandardDeckCard].standard52Deck
@@ -91,6 +91,22 @@ class AppCoreTests: XCTestCase {
         let dragCards = DragCards(cardIDs: [cards[42].id], position: CGPoint(x: 123, y: 123))
         store.send(.dragCards(dragCards)) {
             $0.draggedCards = dragCards
+        }
+
+        store.send(.dragCards(nil)) {
+            $0.draggedCards = nil
+        }
+        store.receive(.dropCards(dragCards))
+    }
+
+
+    func testUpdateFrame() {
+        let scheduler = DispatchQueue.test
+        let store = TestStore(initialState: AppState(), reducer: appReducer, environment: .test(scheduler: scheduler))
+
+        let frame: Frame = .pile(0, CGRect(x: 100, y: 100, width: 100, height: 200))
+        store.send(.updateFrame(frame)) {
+            $0.frames = IdentifiedArrayOf(uniqueElements: [frame])
         }
     }
 
