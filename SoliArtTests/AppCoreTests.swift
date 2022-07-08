@@ -110,6 +110,49 @@ class AppCoreTests: XCTestCase {
         }
     }
 
+    func testDropCards() {
+        let scheduler = DispatchQueue.test
+        let store = TestStore(
+            initialState: AppState(),
+            reducer: appReducer,
+            environment: .testEasyGame(scheduler: scheduler)
+        )
+        let cards = AppEnvironment.superEasyGame.shuffleCards()
+
+        let frame: Frame = .pile(5, CGRect(x: 100, y: 100, width: 100, height: 200))
+        store.send(.updateFrame(frame)) {
+            $0.frames = IdentifiedArrayOf(uniqueElements: [frame])
+        }
+
+        store.send(.shuffleCards) {
+            $0.piles = self.pilesAfterShuffleForEasyGame()
+            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[28...])
+        }
+
+        let dragCard = Card(.ace, of: .spades, isFacedUp: true)
+        let dragCards = DragCards(cardIDs: [dragCard.id], position: CGPoint(x: 123, y: 123))
+        store.send(.dragCards(dragCards)) {
+            $0.draggedCards = dragCards
+        }
+
+        store.send(.dragCards(nil)) {
+            $0.draggedCards = nil
+        }
+        store.receive(.dropCards(dragCards)) {
+            var pile4 = $0.piles[id: 4]!
+            pile4.cards.remove(dragCard)
+
+            var threeOfClubs = pile4.cards[id: Card(.three, of: .clubs, isFacedUp: false).id]!
+            threeOfClubs.isFacedUp = true
+            pile4.cards.updateOrAppend(threeOfClubs)
+            $0.piles.updateOrAppend(pile4)
+
+            var pile5 = $0.piles[id: 5]!
+            pile5.cards.updateOrAppend(dragCard)
+            $0.piles.updateOrAppend(pile5)
+        }
+    }
+
     private func pilesAfterShuffle() -> IdentifiedArrayOf<Pile> {
         IdentifiedArrayOf(uniqueElements: [
             Pile(id: 1, cards: IdentifiedArrayOf(uniqueElements: [
@@ -156,10 +199,32 @@ class AppCoreTests: XCTestCase {
             ])),
         ])
     }
+
+    private func pilesAfterShuffleForEasyGame() -> IdentifiedArrayOf<Pile> {
+        var cards = AppEnvironment.superEasyGame.shuffleCards()
+        return IdentifiedArrayOf(uniqueElements: (1...7).map {
+            var pile = Pile(id: $0, cards: IdentifiedArrayOf(uniqueElements: cards[..<$0]))
+            cards = Array(cards[$0...])
+
+            if var last = pile.cards.last {
+                last.isFacedUp = true
+                pile.cards.updateOrAppend(last)
+            }
+
+            return pile
+        })
+    }
 }
 
 extension AppEnvironment {
     static func test(scheduler: TestSchedulerOf<DispatchQueue>) -> AppEnvironment {
         AppEnvironment(mainQueue: scheduler.eraseToAnyScheduler(), shuffleCards: { .standard52Deck })
+    }
+
+    static func testEasyGame(scheduler: TestSchedulerOf<DispatchQueue>) -> AppEnvironment {
+        AppEnvironment(
+            mainQueue: scheduler.eraseToAnyScheduler(),
+            shuffleCards: { AppEnvironment.superEasyGame.shuffleCards() }
+        )
     }
 }
