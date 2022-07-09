@@ -9,18 +9,23 @@ struct FoundationsView: View {
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack {
-                HStack {
+                HStack(spacing: 40) {
                     ForEach(viewStore.foundations) { foundation in
                         let (suitColor, background) = foundationColors(foundation.suit)
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(background)
-                            .frame(width: 50, height: 70)
-                            .overlay(
-                                foundation.suit.view
-                                    .fill(style: .init(eoFill: true, antialiased: true))
-                                    .foregroundColor(suitColor)
-                                    .padding(4)
-                            )
+                        GeometryReader { geo in
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(background)
+                                .frame(width: 50, height: 70)
+                                .overlay(
+                                    foundation.suit.view
+                                        .fill(style: .init(eoFill: true, antialiased: true))
+                                        .foregroundColor(suitColor)
+                                        .padding(4)
+                                )
+                                .task { viewStore.send(.updateFrame(
+                                    .foundation(foundation.id, geo.frame(in: .global))
+                                )) }
+                        }
                     }
                 }
                 .frame(maxHeight: .infinity)

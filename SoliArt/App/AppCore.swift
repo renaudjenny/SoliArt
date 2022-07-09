@@ -107,6 +107,8 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
             state.piles.updateOrAppend(origin)
 
             return .none
+        case let .foundation(foundationID, _):
+            return .none
         case .none: return .none
         }
     }
@@ -148,12 +150,16 @@ enum DragOrigin: Equatable {
 
 enum Frame: Equatable, Hashable, Identifiable {
     case pile(Pile.ID, CGRect)
+    case foundation(Foundation.ID, CGRect)
 
     func hash(into hasher: inout Hasher) {
         switch self {
         case let .pile(pileID, _):
             hasher.combine("Pile")
             hasher.combine(pileID)
+        case let .foundation(foundationID, _):
+            hasher.combine("Foundation")
+            hasher.combine(foundationID)
         }
     }
 
@@ -161,7 +167,7 @@ enum Frame: Equatable, Hashable, Identifiable {
 
     var rect: CGRect {
         switch self {
-        case let .pile(_, rect): return rect
+        case let .pile(_, rect), let .foundation(_, rect): return rect
         }
     }
 }
