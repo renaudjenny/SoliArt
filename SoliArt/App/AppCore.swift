@@ -108,6 +108,14 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
 
             return .none
         case let .foundation(foundationID, _):
+            guard
+                dragCards.cardIDs.count == 1,
+                let foundation = state.foundations[id: foundationID],
+                let card = dragCards.cardIDs.first.map({ state.card(id: $0) }),
+                isValidScoring(card: card, onto: foundation)
+            else { return .none }
+
+            print("Score!")
             return .none
         case .none: return .none
         }
@@ -126,6 +134,12 @@ private func isValidMove(cards: [Card], onto: [Card]) -> Bool {
     let isRankLower = first.rank == onto.rank.lower
 
     return isColorDifferent && isRankLower
+}
+
+private func isValidScoring(card: Card?, onto foundation: Foundation) -> Bool {
+    guard let card = card else { return false }
+    let canScore = card.rank == .ace || card.rank.lower == foundation.cards.last?.rank
+    return card.suit == foundation.suit && canScore
 }
 
 extension AppState {

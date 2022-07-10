@@ -9,7 +9,7 @@ struct FoundationsView: View {
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack {
-                HStack(spacing: 40) {
+                HStack {
                     ForEach(viewStore.foundations) { foundation in
                         let (suitColor, background) = foundationColors(foundation.suit)
                         GeometryReader { geo in
