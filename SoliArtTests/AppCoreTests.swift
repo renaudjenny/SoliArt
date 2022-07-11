@@ -4,89 +4,70 @@ import SwiftUICardGame
 import XCTest
 
 class AppCoreTests: XCTestCase {
-    func testShuffleCards() {
-        let scheduler = DispatchQueue.test
-        let store = TestStore(initialState: AppState(), reducer: appReducer, environment: .test(scheduler: scheduler))
-        let cards = [StandardDeckCard].standard52Deck
+    private var scheduler: TestSchedulerOf<DispatchQueue>!
+    private var store: TestStore<AppState, AppState, AppAction, AppAction, AppEnvironment>!
+    private var cards = [StandardDeckCard].standard52Deck
 
-        store.send(.shuffleCards) {
-            $0.piles = self.pilesAfterShuffle()
-            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[28...])
-        }
+    @MainActor override func setUp() async throws {
+        scheduler = DispatchQueue.test
+        store = TestStore(initialState: AppState(), reducer: appReducer, environment: .test(scheduler: scheduler))
+    }
+
+    func testShuffleCards() {
+        shuffleCards()
     }
 
     func testDrawCard() {
-        let scheduler = DispatchQueue.test
-        let store = TestStore(initialState: AppState(), reducer: appReducer, environment: .test(scheduler: scheduler))
-        let cards = [StandardDeckCard].standard52Deck
-
-        store.send(.shuffleCards) {
-            $0.piles = self.pilesAfterShuffle()
-            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[28...])
-        }
+        shuffleCards()
 
         store.send(.drawCard) {
-            var facedUpCard = cards[28]
+            var facedUpCard = self.cards[28]
             facedUpCard.isFacedUp = true
             $0.deck.upwards = IdentifiedArrayOf(uniqueElements: [facedUpCard])
-            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[29...])
+            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[29...])
         }
 
         store.send(.drawCard) {
-            let facedUpCards = cards[28...29].map { card -> Card in
+            let facedUpCards = self.cards[28...29].map { card -> Card in
                 var card = card
                 card.isFacedUp = true
                 return card
             }
             $0.deck.upwards = IdentifiedArrayOf(uniqueElements: facedUpCards)
-            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[30...])
+            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[30...])
         }
     }
 
     func testFlipDeck() {
-        let scheduler = DispatchQueue.test
-        let store = TestStore(initialState: AppState(), reducer: appReducer, environment: .test(scheduler: scheduler))
-        let cards = [StandardDeckCard].standard52Deck
-
-        store.send(.shuffleCards) {
-            $0.piles = self.pilesAfterShuffle()
-            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[28...])
-        }
+        shuffleCards()
 
         for drawCardNumber in 28...51 {
             store.send(.drawCard) {
-                let facedUpCards = cards[28...drawCardNumber].map { card -> Card in
+                let facedUpCards = self.cards[28...drawCardNumber].map { card -> Card in
                     var card = card
                     card.isFacedUp = true
                     return card
                 }
                 $0.deck.upwards = IdentifiedArrayOf(uniqueElements: facedUpCards)
-                $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[(drawCardNumber + 1)...])
+                $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[(drawCardNumber + 1)...])
             }
         }
 
         store.send(.flipDeck) {
-            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[28...])
+            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[28...])
             $0.deck.upwards = []
         }
         scheduler.advance(by: 0.4)
         store.receive(.drawCard) {
-            var facedUpCard = cards[28]
+            var facedUpCard = self.cards[28]
             facedUpCard.isFacedUp = true
             $0.deck.upwards = IdentifiedArrayOf(uniqueElements: [facedUpCard])
-            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[29...])
+            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[29...])
         }
     }
 
     func testDragCards() {
-        let scheduler = DispatchQueue.test
-        let store = TestStore(initialState: AppState(), reducer: appReducer, environment: .test(scheduler: scheduler))
-        let cards = [StandardDeckCard].standard52Deck
-
-        store.send(.shuffleCards) {
-            $0.piles = self.pilesAfterShuffle()
-            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[28...])
-        }
+        shuffleCards()
 
         let dragCards = DragCards(cardIDs: [cards[42].id], position: CGPoint(x: 123, y: 123))
         store.send(.dragCards(dragCards)) {
@@ -101,9 +82,6 @@ class AppCoreTests: XCTestCase {
 
 
     func testUpdateFrame() {
-        let scheduler = DispatchQueue.test
-        let store = TestStore(initialState: AppState(), reducer: appReducer, environment: .test(scheduler: scheduler))
-
         let frame: Frame = .pile(0, CGRect(x: 100, y: 100, width: 100, height: 200))
         store.send(.updateFrame(frame)) {
             $0.frames = IdentifiedArrayOf(uniqueElements: [frame])
@@ -111,23 +89,19 @@ class AppCoreTests: XCTestCase {
     }
 
     func testDropCardsToAnOtherPile() {
-        let scheduler = DispatchQueue.test
-        let store = TestStore(
+        store = TestStore(
             initialState: AppState(),
             reducer: appReducer,
             environment: .testEasyGame(scheduler: scheduler)
         )
-        let cards = AppEnvironment.superEasyGame.shuffleCards()
+        cards = AppEnvironment.superEasyGame.shuffleCards()
 
         let frame: Frame = .pile(5, CGRect(x: 100, y: 100, width: 100, height: 200))
         store.send(.updateFrame(frame)) {
             $0.frames = IdentifiedArrayOf(uniqueElements: [frame])
         }
 
-        store.send(.shuffleCards) {
-            $0.piles = self.pilesAfterShuffleForEasyGame()
-            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[28...])
-        }
+        shuffleCards(pilesAfterShuffle: Self.pilesAfterShuffleForEasyGame())
 
         let dragCard = Card(.ace, of: .spades, isFacedUp: true)
         let dragCards = DragCards(cardIDs: [dragCard.id], position: CGPoint(x: 123, y: 123))
@@ -154,23 +128,19 @@ class AppCoreTests: XCTestCase {
     }
 
     func testDropCardsToAFoundation() {
-        let scheduler = DispatchQueue.test
-        let store = TestStore(
+        store = TestStore(
             initialState: AppState(),
             reducer: appReducer,
             environment: .testEasyGame(scheduler: scheduler)
         )
-        let cards = AppEnvironment.superEasyGame.shuffleCards()
+        cards = AppEnvironment.superEasyGame.shuffleCards()
 
         let frame: Frame = .foundation(Suit.spades.id, CGRect(x: 100, y: 100, width: 100, height: 200))
         store.send(.updateFrame(frame)) {
             $0.frames = IdentifiedArrayOf(uniqueElements: [frame])
         }
 
-        store.send(.shuffleCards) {
-            $0.piles = self.pilesAfterShuffleForEasyGame()
-            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[28...])
-        }
+        shuffleCards(pilesAfterShuffle: Self.pilesAfterShuffleForEasyGame())
 
         let dragCard = Card(.ace, of: .spades, isFacedUp: true)
         let dragCards = DragCards(cardIDs: [dragCard.id], position: CGPoint(x: 123, y: 123))
@@ -196,7 +166,14 @@ class AppCoreTests: XCTestCase {
         }
     }
 
-    private func pilesAfterShuffle() -> IdentifiedArrayOf<Pile> {
+    private func shuffleCards(pilesAfterShuffle: IdentifiedArrayOf<Pile> = pilesAfterShuffle()) {
+        store.send(.shuffleCards) {
+            $0.piles = pilesAfterShuffle
+            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[28...])
+        }
+    }
+
+    private static func pilesAfterShuffle() -> IdentifiedArrayOf<Pile> {
         IdentifiedArrayOf(uniqueElements: [
             Pile(id: 1, cards: IdentifiedArrayOf(uniqueElements: [
                 StandardDeckCard(.ace, of: .clubs, isFacedUp: true)
@@ -243,7 +220,7 @@ class AppCoreTests: XCTestCase {
         ])
     }
 
-    private func pilesAfterShuffleForEasyGame() -> IdentifiedArrayOf<Pile> {
+    private static func pilesAfterShuffleForEasyGame() -> IdentifiedArrayOf<Pile> {
         var cards = AppEnvironment.superEasyGame.shuffleCards()
         return IdentifiedArrayOf(uniqueElements: (1...7).map {
             var pile = Pile(id: $0, cards: IdentifiedArrayOf(uniqueElements: cards[..<$0]))
