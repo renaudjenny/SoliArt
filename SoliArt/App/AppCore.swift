@@ -110,12 +110,26 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         case let .foundation(foundationID, _):
             guard
                 dragCards.cardIDs.count == 1,
-                let foundation = state.foundations[id: foundationID],
-                let card = dragCards.cardIDs.first.map({ state.card(id: $0) }),
+                var foundation = state.foundations[id: foundationID],
+                let card = dragCards.cardIDs.first.flatMap({ state.card(id: $0) }),
                 isValidScoring(card: card, onto: foundation)
             else { return .none }
 
-            print("Score!")
+            var origin = state.piles.first(where: { $0.cards.contains(card) })
+
+            foundation.cards.updateOrAppend(card)
+            state.foundations.updateOrAppend(foundation)
+
+            guard var origin = origin else { return .none }
+            origin.cards.remove(card)
+
+            guard var lastCard = origin.cards.last else {
+                state.piles.updateOrAppend(origin)
+                return .none
+            }
+            lastCard.isFacedUp = true
+            origin.cards.updateOrAppend(lastCard)
+            state.piles.updateOrAppend(origin)
             return .none
         case .none: return .none
         }

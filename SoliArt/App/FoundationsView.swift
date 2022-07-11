@@ -15,17 +15,21 @@ struct FoundationsView: View {
                         GeometryReader { geo in
                             RoundedRectangle(cornerRadius: 4)
                                 .fill(background)
-                                .frame(width: 50, height: 70)
-                                .overlay(
-                                    foundation.suit.view
-                                        .fill(style: .init(eoFill: true, antialiased: true))
-                                        .foregroundColor(suitColor)
-                                        .padding(4)
-                                )
+                                .overlay {
+                                    if let last = foundation.cards.last {
+                                        StandardDeckCardView(card: last) { EmptyView() }
+                                    } else {
+                                        foundation.suit.view
+                                            .fill(style: .init(eoFill: true, antialiased: true))
+                                            .foregroundColor(suitColor)
+                                            .padding(4)
+                                    }
+                                }
                                 .task { viewStore.send(.updateFrame(
                                     .foundation(foundation.id, geo.frame(in: .global))
                                 )) }
                         }
+                        .frame(width: 50, height: 70)
                     }
                 }
                 .frame(maxHeight: .infinity)
