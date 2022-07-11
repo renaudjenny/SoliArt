@@ -8,7 +8,7 @@ struct CardBackground: View {
     }
 }
 
-typealias Card = StandardDeckCard<CardBackground>
+typealias Card = StandardDeckCard
 
 final class CardWrapper: NSObject, NSSecureCoding {
     let card: Card
@@ -51,21 +51,4 @@ struct Pile: Equatable, Identifiable {
 struct Deck: Equatable {
     var downwards: IdentifiedArrayOf<Card>
     var upwards: IdentifiedArrayOf<Card>
-}
-
-extension StandardDeckCard: Equatable, Identifiable {
-    public var id: Int {
-        var hasher = Hasher()
-        hasher.combine(rank)
-        hasher.combine(suit)
-        return hasher.finalize()
-    }
-
-    public static func == (lhs: Self, rhs: Self) -> Bool { lhs.id == rhs.id }
-}
-
-extension Array where Element == Card {
-    static var standard52Deck: Self {
-        StandardDeckCard.standard52Deck { CardBackground() }
-    }
 }

@@ -663,7 +663,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/renaudjenny/swift-ui-card-game";
 			requirement = {
-				branch = main;
+				branch = "add-card-model-and-cardview";
 				kind = branch;
 			};
 		};

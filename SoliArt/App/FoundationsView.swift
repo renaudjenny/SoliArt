@@ -12,15 +12,24 @@ struct FoundationsView: View {
                 HStack {
                     ForEach(viewStore.foundations) { foundation in
                         let (suitColor, background) = foundationColors(foundation.suit)
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(background)
-                            .frame(width: 50, height: 70)
-                            .overlay(
-                                foundation.suit.view
-                                    .fill(style: .init(eoFill: true, antialiased: true))
-                                    .foregroundColor(suitColor)
-                                    .padding(4)
-                            )
+                        GeometryReader { geo in
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(background)
+                                .overlay {
+                                    if let last = foundation.cards.last {
+                                        StandardDeckCardView(card: last) { EmptyView() }
+                                    } else {
+                                        foundation.suit.view
+                                            .fill(style: .init(eoFill: true, antialiased: true))
+                                            .foregroundColor(suitColor)
+                                            .padding(4)
+                                    }
+                                }
+                                .task { viewStore.send(.updateFrame(
+                                    .foundation(foundation.id, geo.frame(in: .global))
+                                )) }
+                        }
+                        .frame(width: 50, height: 70)
                     }
                 }
                 .frame(maxHeight: .infinity)
@@ -28,7 +37,7 @@ struct FoundationsView: View {
                 HStack {
                     CardVerticalDeckView(
                         store: store,
-                        cards: Array(viewStore.deck.upwards.suffix(3)),
+                        cards: IdentifiedArrayOf(uniqueElements: viewStore.deck.upwards.suffix(3)),
                         cardHeight: 70,
                         facedDownSpacing: 3,
                         facedUpSpacing: 2
@@ -37,7 +46,9 @@ struct FoundationsView: View {
                         Button { viewStore.send(.drawCard) } label: {
                             CardVerticalDeckView(
                                 store: store,
-                                cards: Array(viewStore.deck.downwards.prefix(3)),
+                                cards: IdentifiedArrayOf(
+                                    uniqueElements:viewStore.deck.downwards.prefix(3)
+                                ),
                                 cardHeight: 70,
                                 facedDownSpacing: 3,
                                 facedUpSpacing: 0,

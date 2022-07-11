@@ -13,12 +13,12 @@ struct PilesView: View {
                         GeometryReader { geo in
                             CardVerticalDeckView(
                                 store: store,
-                                cards: pile.cards.elements,
+                                cards: pile.cards,
                                 cardHeight: 70,
                                 facedDownSpacing: 20,
                                 facedUpSpacing: 30
                             )
-                            .task { viewStore.send(.updateFrame(.pile(pile, geo.frame(in: .global)))) }
+                            .task { viewStore.send(.updateFrame(.pile(pile.id, geo.frame(in: .global)))) }
                         }
                     }
                 }
