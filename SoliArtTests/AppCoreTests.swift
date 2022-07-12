@@ -69,7 +69,7 @@ class AppCoreTests: XCTestCase {
     func testDragCards() {
         shuffleCards()
 
-        let dragCards = DragCards(cardIDs: [cards[42].id], position: CGPoint(x: 123, y: 123))
+        let dragCards = DragCards(origin: .pile(cardIDs: [cards[42].id]), position: CGPoint(x: 123, y: 123))
         store.send(.dragCards(dragCards)) {
             $0.draggedCards = dragCards
         }
@@ -104,7 +104,7 @@ class AppCoreTests: XCTestCase {
         shuffleCards(pilesAfterShuffle: Self.pilesAfterShuffleForEasyGame())
 
         let dragCard = Card(.ace, of: .spades, isFacedUp: true)
-        let dragCards = DragCards(cardIDs: [dragCard.id], position: CGPoint(x: 123, y: 123))
+        let dragCards = DragCards(origin: .pile(cardIDs: [dragCard.id]), position: CGPoint(x: 123, y: 123))
         store.send(.dragCards(dragCards)) {
             $0.draggedCards = dragCards
         }
@@ -143,7 +143,7 @@ class AppCoreTests: XCTestCase {
         shuffleCards(pilesAfterShuffle: Self.pilesAfterShuffleForEasyGame())
 
         let dragCard = Card(.ace, of: .spades, isFacedUp: true)
-        let dragCards = DragCards(cardIDs: [dragCard.id], position: CGPoint(x: 123, y: 123))
+        let dragCards = DragCards(origin: .pile(cardIDs: [dragCard.id]), position: CGPoint(x: 123, y: 123))
         store.send(.dragCards(dragCards)) {
             $0.draggedCards = dragCards
         }
