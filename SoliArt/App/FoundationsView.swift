@@ -11,20 +11,10 @@ struct FoundationsView: View {
             HStack {
                 HStack {
                     ForEach(viewStore.foundations) { foundation in
-                        let (suitColor, background) = foundationColors(foundation.suit)
                         GeometryReader { geo in
                             RoundedRectangle(cornerRadius: 4)
-                                .fill(background)
-                                .overlay {
-                                    if let last = foundation.cards.last {
-                                        StandardDeckCardView(card: last) { EmptyView() }
-                                    } else {
-                                        foundation.suit.view
-                                            .fill(style: .init(eoFill: true, antialiased: true))
-                                            .foregroundColor(suitColor)
-                                            .padding(4)
-                                    }
-                                }
+                                .fill(foundationColors(foundation.suit).background)
+                                .overlay { overlay(foundation: foundation) }
                                 .task { viewStore.send(.updateFrame(
                                     .foundation(foundation.id, geo.frame(in: .global))
                                 )) }
@@ -94,5 +84,48 @@ struct FoundationsView: View {
             ? Color(red: 17/255, green: 25/255, blue: 59/255)
             : Color(red: 185/255, green: 206/255, blue: 207/255)
         return (suitColor, background)
+    }
+
+    private func overlay(foundation: Foundation) -> some View {
+        WithViewStore(store) { viewStore in
+            ZStack {
+                foundation.suit.view
+                    .fill(style: .init(eoFill: true, antialiased: true))
+                    .foregroundColor(foundationColors(foundation.suit).suitColor)
+                    .padding(4)
+
+                if foundation.cards.count > 1 {
+                    let previous = foundation.cards[foundation.cards.count - 2]
+                    StandardDeckCardView(card: previous) { EmptyView() }
+                }
+
+                foundation.cards.last.map { last in
+                    StandardDeckCardView(card: last) { EmptyView() }
+                        .gesture(DragGesture(coordinateSpace: .global)
+                            .onChanged { value in
+                                if var draggedCards = viewStore.draggedCards {
+                                    draggedCards.position = value.location
+                                    viewStore.send(.dragCards(draggedCards))
+                                } else {
+                                    viewStore.send(.dragCards(
+                                        DragCards(
+                                            origin: .foundation(cardID: last.id),
+                                            position: value.location
+                                        )
+                                    ))
+                                }
+                            }
+                            .onEnded { value in
+                                viewStore.send(.dragCards(nil))
+                            }
+                        )
+                        .opacity(
+                            viewStore.actualDraggedCards?.contains(last) == true
+                            ? 0
+                            : 1
+                        )
+                }
+            }
+        }
     }
 }

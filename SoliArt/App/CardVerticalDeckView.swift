@@ -57,8 +57,8 @@ struct CardVerticalDeckView: View {
 
     private func draggedCards(from card: Card, position: CGPoint) -> DragCards {
         guard let cardIndex = cards.index(id: card.id)
-        else { return DragCards(cardIDs: [card.id], position: position) }
-        return DragCards(cardIDs: cards[cardIndex...].map(\.id), position: position)
+        else { return DragCards(origin: .pile(cardIDs: [card.id]), position: position) }
+        return DragCards(origin: .pile(cardIDs: cards[cardIndex...].map(\.id)), position: position)
     }
 }
 

@@ -87,24 +87,15 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         case let .pile(pileID, _):
             guard var pile = state.piles[id: pileID] else { return .none }
             let cards = dragCards.cardIDs.compactMap(state.card(id:))
-            guard isValidMove(cards: cards, onto: pile.cards.elements), let card = cards.first else { return .none }
+            guard isValidMove(cards: cards, onto: pile.cards.elements) else { return .none }
 
-            let origin = state.piles.first(where: { $0.cards.contains(card) })
+            switch dragCards.origin {
+            case let .pile(cardIDs): state.removeCardsFromPile(cardIDs: cardIDs)
+            case let .foundation(cardID): state.removeCardFromFoundation(cardID: cardID)
+            }
 
             pile.cards.append(contentsOf: cards)
             state.piles.updateOrAppend(pile)
-
-            guard var origin = origin else { return .none }
-
-            for card in cards { origin.cards.remove(card) }
-
-            guard var lastCard = origin.cards.last else {
-                state.piles.updateOrAppend(origin)
-                return .none
-            }
-            lastCard.isFacedUp = true
-            origin.cards.updateOrAppend(lastCard)
-            state.piles.updateOrAppend(origin)
 
             return .none
         case let .foundation(foundationID, _):
@@ -115,21 +106,14 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
                 isValidScoring(card: card, onto: foundation)
             else { return .none }
 
-            var origin = state.piles.first(where: { $0.cards.contains(card) })
+            switch dragCards.origin {
+            case let .pile(cardIDs): state.removeCardsFromPile(cardIDs: cardIDs)
+            case let .foundation(cardID): fatalError("Should never happen!")
+            }
 
             foundation.cards.updateOrAppend(card)
             state.foundations.updateOrAppend(foundation)
 
-            guard var origin = origin else { return .none }
-            origin.cards.remove(card)
-
-            guard var lastCard = origin.cards.last else {
-                state.piles.updateOrAppend(origin)
-                return .none
-            }
-            lastCard.isFacedUp = true
-            origin.cards.updateOrAppend(lastCard)
-            state.piles.updateOrAppend(origin)
             return .none
         case .none: return .none
         }
@@ -158,22 +142,52 @@ private func isValidScoring(card: Card?, onto foundation: Foundation) -> Bool {
 
 extension AppState {
     func card(id: Card.ID) -> Card? {
-        piles.flatMap(\.cards).first { $0.id == id }
+        piles.flatMap(\.cards).first { $0.id == id } ?? foundations.flatMap(\.cards).first { $0.id == id }
     }
 
     var actualDraggedCards: IdentifiedArrayOf<Card>? {
         guard let cardIDs = draggedCards?.cardIDs else { return nil }
         return IdentifiedArrayOf(uniqueElements: cardIDs.compactMap(card(id:)))
     }
+
+    mutating func removeCardsFromPile(cardIDs: [Card.ID]) {
+        guard
+            let firstCardID = cardIDs.first,
+            var origin = piles.first(where: { $0.cards.map(\.id).contains(firstCardID) })
+        else { return }
+        for cardID in cardIDs { origin.cards.remove(id: cardID) }
+
+        guard var lastCard = origin.cards.last else {
+            piles.updateOrAppend(origin)
+            return
+        }
+        lastCard.isFacedUp = true
+        origin.cards.updateOrAppend(lastCard)
+        piles.updateOrAppend(origin)
+    }
+
+    mutating func removeCardFromFoundation(cardID: Card.ID) {
+        guard var origin = foundations.first(where: { $0.cards.map(\.id).contains(cardID) }) else { return }
+        origin.cards.remove(id: cardID)
+        foundations.updateOrAppend(origin)
+    }
 }
 
 struct DragCards: Equatable {
-    let cardIDs: [Card.ID]
-    var position: CGPoint
-}
+    enum Origin: Equatable {
+        case pile(cardIDs: [Card.ID])
+        case foundation(cardID: Card.ID)
+    }
 
-enum DragOrigin: Equatable {
-    case pile(Pile.ID)
+    let origin: Origin
+    var position: CGPoint
+
+    var cardIDs: [Card.ID] {
+        switch origin {
+        case let .pile(cardIDs): return cardIDs
+        case let .foundation(cardID): return [cardID]
+        }
+    }
 }
 
 enum Frame: Equatable, Hashable, Identifiable {
