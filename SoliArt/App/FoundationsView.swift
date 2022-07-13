@@ -25,13 +25,44 @@ struct FoundationsView: View {
                 .frame(maxHeight: .infinity)
 
                 HStack {
-                    CardVerticalDeckView(
-                        store: store,
-                        cards: IdentifiedArrayOf(uniqueElements: viewStore.deck.upwards.suffix(3)),
-                        cardHeight: 70,
-                        facedDownSpacing: 3,
-                        facedUpSpacing: 2
-                    )
+                    HStack(spacing: -40) {
+                        ForEach(viewStore.deck.upwards.suffix(3)) { card in
+                            let content = StandardDeckCardView(card: card) { EmptyView() }
+                                .frame(width: 50, height: 70)
+
+                            if card == viewStore.deck.upwards.last {
+                                content
+                                    .gesture(DragGesture(coordinateSpace: .global)
+                                        .onChanged { value in
+                                            if var draggedCards = viewStore.draggedCards {
+                                                draggedCards.position = value.location
+                                                viewStore.send(.dragCards(draggedCards))
+                                            } else {
+                                                viewStore.send(.dragCards(
+                                                    DragCards(
+                                                        origin: .deck(cardID: card.id),
+                                                        position: value.location
+                                                    )
+                                                ))
+                                            }
+                                        }
+                                        .onEnded { value in
+                                            viewStore.send(.dragCards(nil))
+                                        }
+                                    )
+                                    .opacity(
+                                        viewStore.actualDraggedCards?.contains(card) == true
+                                        ? 0.5
+                                        : 1
+                                    )
+                            } else {
+                                content
+                            }
+                        }
+                    }
+                    .offset(x: -40 + 10 * Double(viewStore.deck.upwards.suffix(3).count))
+                    .frame(maxHeight: .infinity)
+
                     if viewStore.deck.downwards.count > 0 {
                         Button { viewStore.send(.drawCard) } label: {
                             CardVerticalDeckView(

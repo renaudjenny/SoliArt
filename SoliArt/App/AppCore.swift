@@ -92,6 +92,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
             switch dragCards.origin {
             case let .pile(cardIDs): state.removeCardsFromPile(cardIDs: cardIDs)
             case let .foundation(cardID): state.removeCardFromFoundation(cardID: cardID)
+            case let .deck(cardID): state.deck.upwards.remove(id: cardID)
             }
 
             pile.cards.append(contentsOf: cards)
@@ -109,6 +110,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
             switch dragCards.origin {
             case let .pile(cardIDs): state.removeCardsFromPile(cardIDs: cardIDs)
             case let .foundation(cardID): fatalError("Should never happen!")
+            case let .deck(cardID): state.deck.upwards.remove(id: cardID)
             }
 
             foundation.cards.updateOrAppend(card)
@@ -142,7 +144,9 @@ private func isValidScoring(card: Card?, onto foundation: Foundation) -> Bool {
 
 extension AppState {
     func card(id: Card.ID) -> Card? {
-        piles.flatMap(\.cards).first { $0.id == id } ?? foundations.flatMap(\.cards).first { $0.id == id }
+        piles.flatMap(\.cards).first { $0.id == id }
+            ?? foundations.flatMap(\.cards).first { $0.id == id }
+            ?? deck.upwards.first { $0.id == id }
     }
 
     var actualDraggedCards: IdentifiedArrayOf<Card>? {
@@ -177,6 +181,7 @@ struct DragCards: Equatable {
     enum Origin: Equatable {
         case pile(cardIDs: [Card.ID])
         case foundation(cardID: Card.ID)
+        case deck(cardID: Card.ID)
     }
 
     let origin: Origin
@@ -185,7 +190,7 @@ struct DragCards: Equatable {
     var cardIDs: [Card.ID] {
         switch origin {
         case let .pile(cardIDs): return cardIDs
-        case let .foundation(cardID): return [cardID]
+        case let .foundation(cardID), let .deck(cardID): return [cardID]
         }
     }
 }
