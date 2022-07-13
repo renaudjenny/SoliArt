@@ -51,6 +51,8 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         return .none
     case .drawCard:
         let cards = state.deck.downwards
+        guard cards.count > 0 else { return .none }
+
         let upwardsToAdd: [Card] = cards[..<1].map {
             var card = $0
             card.isFacedUp = true
@@ -109,7 +111,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
 
             switch dragCards.origin {
             case let .pile(cardIDs): state.removeCardsFromPile(cardIDs: cardIDs)
-            case let .foundation(cardID): fatalError("Should never happen!")
+            case let .foundation(cardID): return .none
             case let .deck(cardID): state.deck.upwards.remove(id: cardID)
             }
 
@@ -123,6 +125,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
 }
 
 private func isValidMove(cards: [Card], onto: [Card]) -> Bool {
+    if onto.count == 0, cards.first?.rank == .king { return true }
     guard let first = cards.first, let onto = onto.last, onto.isFacedUp else { return false }
 
     let isColorDifferent: Bool
