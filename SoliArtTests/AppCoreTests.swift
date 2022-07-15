@@ -57,8 +57,8 @@ class AppCoreTests: XCTestCase {
             $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[28...])
             $0.deck.upwards = []
         }
-        scheduler.advance(by: 0.4)
-        store.receive(.drawCard) {
+
+        store.send(.drawCard) {
             var facedUpCard = self.cards[28]
             facedUpCard.isFacedUp = true
             $0.deck.upwards = IdentifiedArrayOf(uniqueElements: [facedUpCard])

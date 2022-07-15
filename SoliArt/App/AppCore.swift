@@ -68,7 +68,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
             return card
         })
         state.deck.upwards = []
-        return Effect(value: .drawCard).delay(for: 0.4, scheduler: environment.mainQueue).eraseToEffect()
+        return .none
     case let .updateFrame(frame):
         state.frames.updateOrAppend(frame)
         return .none
