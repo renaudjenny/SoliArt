@@ -48,7 +48,9 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
 
         state.deck.downwards = IdentifiedArrayOf(uniqueElements: cards)
 
-        return .none
+        // TODO: remove debug code
+        return .merge(Effect(value: .drawCard), Effect(value: .drawCard), Effect(value: .drawCard))
+//                return .none
     case .drawCard:
         let cards = state.deck.downwards
         guard cards.count > 0 else { return .none }

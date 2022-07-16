@@ -9,91 +9,115 @@ struct FoundationsView: View {
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack {
-                HStack {
-                    ForEach(viewStore.foundations) { foundation in
-                        GeometryReader { geo in
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(foundationColors(foundation.suit).background)
-                                .overlay { overlay(foundation: foundation) }
-                                .task { viewStore.send(.updateFrame(
-                                    .foundation(foundation.id, geo.frame(in: .global))
-                                )) }
-                        }
-                        .frame(width: 50, height: 70)
-                    }
-                }
-                .frame(maxHeight: .infinity)
-
-                HStack {
-                    HStack(spacing: -40) {
-                        ForEach(viewStore.deck.upwards.suffix(3)) { card in
-                            let content = StandardDeckCardView(card: card) { EmptyView() }
-                                .frame(width: 50, height: 70)
-
-                            if card == viewStore.deck.upwards.last {
-                                content
-                                    .gesture(DragGesture(coordinateSpace: .global)
-                                        .onChanged { value in
-                                            if var draggedCards = viewStore.draggedCards {
-                                                draggedCards.position = value.location
-                                                viewStore.send(.dragCards(draggedCards))
-                                            } else {
-                                                viewStore.send(.dragCards(
-                                                    DragCards(
-                                                        origin: .deck(cardID: card.id),
-                                                        position: value.location
-                                                    )
-                                                ))
-                                            }
-                                        }
-                                        .onEnded { value in
-                                            viewStore.send(.dragCards(nil))
-                                        }
-                                    )
-                                    .opacity(
-                                        viewStore.actualDraggedCards?.contains(card) == true
-                                        ? 0.5
-                                        : 1
-                                    )
-                            } else {
-                                content
-                            }
-                        }
-                    }
-                    .offset(x: -40 + 10 * Double(viewStore.deck.upwards.suffix(3).count))
-                    .frame(maxHeight: .infinity)
-
-                    if viewStore.deck.downwards.count > 0 {
-                        Button { viewStore.send(.drawCard) } label: {
-                            CardVerticalDeckView(
-                                store: store,
-                                cards: IdentifiedArrayOf(
-                                    uniqueElements:viewStore.deck.downwards.prefix(3)
-                                ),
-                                cardHeight: 70,
-                                facedDownSpacing: 3,
-                                facedUpSpacing: 0,
-                                isInteractionEnabled: false
-                            )
-                        }
-                        .buttonStyle(.plain)
-                    } else {
-                        Button { viewStore.send(.flipDeck) } label: {
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(Color.green)
-                                .frame(width: 50, height: 70)
-                                .brightness(-40/100)
-                                .overlay(Text("Flip").foregroundColor(.white).padding(4))
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-                .fixedSize(horizontal: true, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .trailing)
+                foundations
+                deck
             }
             .padding()
-            .frame(height: 120)
+            .frame(height: 100)
             .background(Color.piles)
+        }
+    }
+
+    private var foundations: some View {
+        WithViewStore(store) { viewStore in
+            HStack {
+                ForEach(viewStore.foundations) { foundation in
+                    GeometryReader { geo in
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(foundationColors(foundation.suit).background)
+                            .overlay { overlay(foundation: foundation) }
+                            .task { @MainActor in
+                                viewStore.send(.updateFrame(
+                                    .foundation(foundation.id, geo.frame(in: .global))
+                                ))
+                            }
+                    }
+                    .aspectRatio(5/7, contentMode: .fit)
+                }
+            }
+        }
+    }
+
+    private var deck: some View {
+        HStack {
+            Spacer()
+            deckUpwards.frame(height: 56).offset(x: -30)
+            deckDownwards.fixedSize()
+        }
+    }
+
+    private var deckUpwards: some View {
+        WithViewStore(store) { viewStore in
+            ZStack {
+                let upwards = viewStore.deck.upwards.suffix(3)
+                ForEach(upwards) { card in
+                    let content = StandardDeckCardView(card: card) { EmptyView() }
+
+                    if card == viewStore.deck.upwards.last {
+                        content
+                            .gesture(DragGesture(coordinateSpace: .global)
+                                .onChanged { value in
+                                    if var draggedCards = viewStore.draggedCards {
+                                        draggedCards.position = value.location
+                                        viewStore.send(.dragCards(draggedCards))
+                                    } else {
+                                        viewStore.send(.dragCards(
+                                            DragCards(
+                                                origin: .deck(cardID: card.id),
+                                                position: value.location
+                                            )
+                                        ))
+                                    }
+                                }
+                                .onEnded { value in
+                                    viewStore.send(.dragCards(nil))
+                                }
+                            )
+                            .opacity(
+                                viewStore.actualDraggedCards?.contains(card) == true
+                                ? 0.5
+                                : 1
+                            )
+                            .offset(x: 10 * Double(upwards.firstIndex(of: card) ?? 0))
+                    } else {
+                        content.offset(x: 10 * Double(upwards.firstIndex(of: card) ?? 0))
+                    }
+                }
+            }
+        }
+    }
+
+    private var deckDownwards: some View {
+        WithViewStore(store) { viewStore in
+            if viewStore.deck.downwards.count > 0 {
+                Button { viewStore.send(.drawCard) } label: {
+                    CardVerticalDeckView(
+                        store: store,
+                        cards: IdentifiedArrayOf(
+                            uniqueElements:viewStore.deck.downwards.prefix(3)
+                        ),
+                        cardHeight: 56,
+                        facedDownSpacing: 3,
+                        facedUpSpacing: 0,
+                        isInteractionEnabled: false
+                    )
+                }
+                .buttonStyle(.plain)
+            } else if viewStore.deck.downwards.count == 0 && viewStore.deck.upwards.count > 3 { // TODO: test this
+                Button { viewStore.send(.flipDeck) } label: {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.green)
+                        .aspectRatio(5/7, contentMode: .fit)
+                        .brightness(-40/100)
+                        .overlay(Text("Flip").foregroundColor(.white).padding(4))
+                }
+                .buttonStyle(.plain)
+            } else {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.green)
+                    .aspectRatio(5/7, contentMode: .fit)
+                    .brightness(-40/100)
+            }
         }
     }
 

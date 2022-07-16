@@ -14,7 +14,7 @@ struct AppView: View {
                         CardVerticalDeckView(
                             store: store,
                             cards: cards,
-                            cardHeight: 70,
+                            cardHeight: 56,
                             facedDownSpacing: 0,
                             facedUpSpacing: 20,
                             ignoreDraggedCards: true

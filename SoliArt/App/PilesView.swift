@@ -14,7 +14,7 @@ struct PilesView: View {
                             CardVerticalDeckView(
                                 store: store,
                                 cards: pile.cards,
-                                cardHeight: 70,
+                                cardHeight: 56,
                                 facedDownSpacing: 20,
                                 facedUpSpacing: 30
                             )
