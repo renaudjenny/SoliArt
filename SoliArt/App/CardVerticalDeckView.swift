@@ -20,7 +20,7 @@ struct CardVerticalDeckView: View {
                     let content = StandardDeckCardView(card: card, backgroundContent: CardBackground.init)
                     .frame(height: cardHeight).offset(x: 0, y: yOffset)
 
-                    if isInteractionEnabled {
+                    if isInteractionEnabled && card.isFacedUp {
                         content
                         .gesture(DragGesture(coordinateSpace: .global)
                             .onChanged { value in
