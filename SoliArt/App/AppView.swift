@@ -9,19 +9,7 @@ struct AppView: View {
         WithViewStore(store) { viewStore in
             ZStack {
                 content
-                if let position = viewStore.draggedCards?.position, let cards = viewStore.actualDraggedCards {
-                    GeometryReader { geo in
-                        CardVerticalDeckView(
-                            store: store,
-                            cards: cards,
-                            cardHeight: 56,
-                            facedDownSpacing: 0,
-                            facedUpSpacing: 20,
-                            ignoreDraggedCards: true
-                        )
-                        .position(position.applying(CGAffineTransform(translationX: 0, y: geo.size.height/2 - 80)))
-                    }
-                }
+                draggedCards
             }
             .task { viewStore.send(.shuffleCards) }
         }
@@ -33,6 +21,23 @@ struct AppView: View {
                 ScoreView(store: store)
                 FoundationsView(store: store)
                 PilesView(store: store)
+            }
+        }
+    }
+
+    private var draggedCards: some View {
+        WithViewStore(store) { viewStore in
+            if let position = viewStore.draggedCards?.position, let cards = viewStore.actualDraggedCards {
+                GeometryReader { geo in
+                    ZStack {
+                        ForEach(cards) { card in
+                            StandardDeckCardView(card: card, backgroundContent: { EmptyView() })
+                                .frame(maxWidth: geo.size.width/8, maxHeight: geo.size.height/6)
+                                .offset(y: Double(cards.firstIndex(of: card) ?? 0) * 30)
+                        }
+                    }
+                    .position(position)
+                }
             }
         }
     }
