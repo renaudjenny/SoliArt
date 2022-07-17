@@ -42,14 +42,14 @@ struct FoundationsView: View {
         HStack {
             Spacer()
             deckUpwards.frame(height: 56).offset(x: -30)
-            deckDownwards.fixedSize()
+            deckDownwards.frame(height: 62).fixedSize()
         }
     }
 
     private var deckUpwards: some View {
         WithViewStore(store) { viewStore in
             ZStack {
-                let upwards = viewStore.deck.upwards.suffix(3)
+                let upwards = IdentifiedArrayOf(uniqueElements: viewStore.deck.upwards.suffix(3))
                 ForEach(upwards) { card in
                     let content = StandardDeckCardView(card: card) { EmptyView() }
 
@@ -91,16 +91,10 @@ struct FoundationsView: View {
         WithViewStore(store) { viewStore in
             if viewStore.deck.downwards.count > 0 {
                 Button { viewStore.send(.drawCard) } label: {
-                    CardVerticalDeckView(
-                        store: store,
-                        cards: IdentifiedArrayOf(
-                            uniqueElements:viewStore.deck.downwards.prefix(3)
-                        ),
-                        cardHeight: 56,
-                        facedDownSpacing: 3,
-                        facedUpSpacing: 0,
-                        isInteractionEnabled: false
-                    )
+                    let cards = IdentifiedArrayOf(uniqueElements:viewStore.deck.downwards.prefix(3))
+                    VStack(spacing: -50) {
+                        ForEach(cards) { card in StandardDeckCardView(card: card) { CardBackground() } }
+                    }
                 }
                 .buttonStyle(.plain)
             } else if viewStore.deck.downwards.count == 0 && viewStore.deck.upwards.count > 3 { // TODO: test this

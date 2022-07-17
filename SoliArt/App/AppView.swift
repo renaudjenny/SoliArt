@@ -28,16 +28,14 @@ struct AppView: View {
     private var draggedCards: some View {
         WithViewStore(store) { viewStore in
             if let position = viewStore.draggedCards?.position, let cards = viewStore.actualDraggedCards {
-                GeometryReader { geo in
-                    ZStack {
-                        ForEach(cards) { card in
-                            StandardDeckCardView(card: card, backgroundContent: { EmptyView() })
-                                .frame(maxWidth: geo.size.width/8, maxHeight: geo.size.height/6)
-                                .offset(y: Double(cards.firstIndex(of: card) ?? 0) * 30)
-                        }
+                VStack(spacing: -30) {
+                    ForEach(cards) { card in
+                        StandardDeckCardView(card: card, backgroundContent: { EmptyView() })
+                            .frame(height: 56)
                     }
-                    .position(position)
                 }
+                .position(position)
+                .ignoresSafeArea()
             }
         }
     }
