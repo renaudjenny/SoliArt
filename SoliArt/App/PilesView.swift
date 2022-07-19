@@ -57,8 +57,8 @@ struct PilesView: View {
     }
 
     private func yOffset(cards: IdentifiedArrayOf<Card>, card: Card) -> Double {
-        guard let index = cards.index(id: card.id), index > 0 else { return 0 }
-        let previous = cards[index - 1]
-        return (previous.isFacedUp ? 30 : 20) * Double(cards.firstIndex(of: card) ?? 0)
+        guard let index = cards.firstIndex(of: card), index > 0 else { return 0 }
+        guard let firstFacedUpIndex = cards.firstIndex(where: \.isFacedUp) else { return Double(index) * 20 }
+        return Double(index * 20) + (index > firstFacedUpIndex ? 10 : 0)
     }
 }
