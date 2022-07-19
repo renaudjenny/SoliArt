@@ -32,7 +32,7 @@ struct FoundationsView: View {
                                 ))
                             }
                     }
-                    .aspectRatio(5/7, contentMode: .fit)
+                    .frame(width: 40, height: 56)
                 }
             }
         }

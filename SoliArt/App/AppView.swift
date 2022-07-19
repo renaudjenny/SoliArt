@@ -31,10 +31,11 @@ struct AppView: View {
                 VStack(spacing: -30) {
                     ForEach(cards) { card in
                         StandardDeckCardView(card: card, backgroundContent: { EmptyView() })
-                            .frame(height: 56)
+                            .frame(height: 70)
                     }
                 }
                 .position(position)
+                .offset(y: -20)
                 .ignoresSafeArea()
             }
         }
