@@ -12,6 +12,7 @@ struct AppState: Equatable {
     var moves = 0
     var frames: IdentifiedArrayOf<Frame> = []
     var draggedCards: DragCards?
+    var isGameOver = true
 }
 
 enum AppAction: Equatable {
@@ -31,6 +32,8 @@ struct AppEnvironment {
 let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, environment in
     switch action {
     case .shuffleCards:
+        guard state.isGameOver else { return .none }
+
         var cards = environment.shuffleCards()
 
         state.piles = IdentifiedArrayOf(uniqueElements: state.piles.map {
@@ -48,6 +51,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
 
         state.deck.downwards = IdentifiedArrayOf(uniqueElements: cards)
 
+        state.isGameOver = false
         return .none
     case .drawCard:
         let cards = state.deck.downwards

@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
       "state" : {
-        "revision" : "b4a872984463070c71e2e97e5c02c73a07d0fe36",
-        "version" : "0.9.0"
+        "revision" : "a09839348486db8866f85a727b8550be1d671c50",
+        "version" : "0.9.1"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "b55977808fcc2ff75081b90f197f6e72a21214b4",
-        "version" : "0.38.1"
+        "revision" : "0a38f2c860a64a005afeb8a6fe186eb2818c9a3f",
+        "version" : "0.38.3"
       }
     },
     {
@@ -60,7 +60,7 @@
       "location" : "https://github.com/renaudjenny/swift-ui-card-game",
       "state" : {
         "branch" : "add-card-model-and-cardview",
-        "revision" : "a573f6957050e84c817d7a1cc14efd1cc9a195f1"
+        "revision" : "c2905c8e5a9f4621f5e72a3d1e5c790613752bfa"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "f821dcbac7cb6913f8e0d1a80496d0ba0199fa81",
-        "version" : "0.3.0"
+        "revision" : "ef8e14e7ce1c0c304c644c6ba365d06c468ded6b",
+        "version" : "0.3.3"
       }
     }
   ],

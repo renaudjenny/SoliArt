@@ -97,7 +97,7 @@ struct FoundationsView: View {
                     }
                 }
                 .buttonStyle(.plain)
-            } else if viewStore.deck.downwards.count == 0 && viewStore.deck.upwards.count > 3 { // TODO: test this
+            } else if viewStore.deck.downwards.count == 0 && viewStore.deck.upwards.count > 1 {
                 Button { viewStore.send(.flipDeck) } label: {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color.green)
