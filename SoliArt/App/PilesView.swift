@@ -7,28 +7,27 @@ struct PilesView: View {
 
     var body: some View {
         WithViewStore(store) { viewStore in
-            ZStack {
-                Color.board.ignoresSafeArea()
-                HStack {
-                    ForEach(viewStore.piles) { pile in
-                        GeometryReader { geo in
-                            cards(pile.cards)
+            HStack {
+                ForEach(viewStore.piles) { pile in
+                    GeometryReader { geo in
+                        cards(pileID: pile.id)
                             .task { viewStore.send(.updateFrame(.pile(pile.id, geo.frame(in: .global)))) }
-                        }
                     }
                 }
-                .padding()
             }
+            .padding()
+            .background(Color.board, ignoresSafeAreaEdges: .bottom)
         }
     }
 
-    private func cards(_ cards: IdentifiedArrayOf<Card>) -> some View {
+    private func cards(pileID: Pile.ID) -> some View {
         WithViewStore(store) { viewStore in
             ZStack(alignment: .top) {
-                ForEach(cards) { card in
+                let cards = viewStore.piles[id: pileID]?.cards ?? []
+                ForEach(cardsAndOffsets(cards: cards), id: \.card.id) { card, offset in
                     let content = StandardDeckCardView(card: card, backgroundContent: CardBackground.init)
                         .frame(height: 56)
-                        .offset(y: yOffset(cards: cards, card: card))
+                        .offset(y: offset)
 
                     content
                         .gesture(DragGesture(coordinateSpace: .global)
@@ -56,9 +55,11 @@ struct PilesView: View {
         }
     }
 
-    private func yOffset(cards: IdentifiedArrayOf<Card>, card: Card) -> Double {
-        guard let index = cards.firstIndex(of: card), index > 0 else { return 0 }
-        guard let firstFacedUpIndex = cards.firstIndex(where: \.isFacedUp) else { return Double(index) * 20 }
-        return Double(index * 20) + (index > firstFacedUpIndex ? 10 : 0)
+    private func cardsAndOffsets(cards: IdentifiedArrayOf<Card>) -> [(card: Card, yOffset: Double)] {
+        cards.reduce([]) { result, card in
+            guard let previous = result.last else { return [(card, 0)] }
+            let spacing: Double = previous.card.isFacedUp ? 20 : 5
+            return result + [(card, previous.yOffset + spacing)]
+        }
     }
 }
