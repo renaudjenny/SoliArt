@@ -16,7 +16,7 @@ struct PilesView: View {
                 }
             }
             .padding()
-            .background(Color.board, ignoresSafeAreaEdges: .bottom)
+            .background(Color.board, ignoresSafeAreaEdges: .all)
         }
     }
 

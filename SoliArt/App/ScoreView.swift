@@ -6,16 +6,14 @@ struct ScoreView: View {
     
     var body: some View {
         WithViewStore(store) { viewStore in
-            ZStack {
-                Color.toolbar.ignoresSafeArea()
-                HStack(spacing: 40) {
-                    Text("Score: \(viewStore.score) points").foregroundColor(.white)
-                    Text("Moves: \(viewStore.moves)").foregroundColor(.white)
-                    Spacer()
-                }
-                .padding()
+            HStack(spacing: 40) {
+                Text("Score: \(viewStore.score) points").foregroundColor(.white)
+                Text("Moves: \(viewStore.moves)").foregroundColor(.white)
+                Spacer()
             }
+            .padding()
             .fixedSize(horizontal: false, vertical: true)
+            .background(Color.toolbar, ignoresSafeAreaEdges: .all)
         }
     }
 }
