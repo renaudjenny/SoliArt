@@ -182,6 +182,10 @@ extension AppState {
         origin.cards.remove(id: cardID)
         foundations.updateOrAppend(origin)
     }
+
+    var cardWidth: CGFloat {
+        frames.first(where: { if case .pile = $0 { return true } else { return false } })?.rect.width ?? 0
+    }
 }
 
 struct DragCards: Equatable {

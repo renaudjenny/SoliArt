@@ -10,6 +10,7 @@ struct AppView: View {
             ZStack {
                 content
                 draggedCards
+//                debugDragFrames
             }
             .task { viewStore.send(.shuffleCards) }
         }
@@ -31,13 +32,33 @@ struct AppView: View {
                 VStack(spacing: -30) {
                     ForEach(cards) { card in
                         StandardDeckCardView(card: card, backgroundContent: { EmptyView() })
-                            .frame(height: 70)
+                            .frame(width: viewStore.cardWidth)
                     }
                 }
                 .position(position)
                 .offset(y: -20)
                 .ignoresSafeArea()
             }
+        }
+    }
+
+    private var debugDragFrames: some View {
+        WithViewStore(store) { viewStore in
+            ForEach(viewStore.frames) { frame in
+                switch frame {
+                case let .foundation(id, rect):
+                    Color.red
+                        .overlay { Text(id) }
+                        .frame(width: rect.width, height: rect.height)
+                        .position(CGPoint(x: rect.midX, y: rect.midY))
+                case let .pile(id, rect):
+                    Color.blue
+                        .overlay { Text("Pile \(id)") }
+                        .frame(width: rect.width, height: rect.height)
+                        .position(CGPoint(x: rect.midX, y: rect.midY))
+                }
+            }
+            .ignoresSafeArea()
         }
     }
 }

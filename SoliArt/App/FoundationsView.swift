@@ -13,7 +13,6 @@ struct FoundationsView: View {
                 deck
             }
             .padding()
-            .frame(height: 100)
             .background(Color.piles)
         }
     }
@@ -22,27 +21,26 @@ struct FoundationsView: View {
         WithViewStore(store) { viewStore in
             HStack {
                 ForEach(viewStore.foundations) { foundation in
-                    GeometryReader { geo in
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(foundationColors(foundation.suit).background)
-                            .overlay { overlay(foundation: foundation) }
-                            .task { @MainActor in
-                                viewStore.send(.updateFrame(
-                                    .foundation(foundation.id, geo.frame(in: .global))
-                                ))
-                            }
-                    }
-                    .frame(width: 40, height: 56)
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(foundationColors(foundation.suit).background)
+                        .overlay { overlay(foundation: foundation) }
+                        .aspectRatio(5/7, contentMode: .fit)
+                        .frame(width: viewStore.cardWidth)
+                        .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
+                            viewStore.send(.updateFrame(.foundation(foundation.id, geo.frame(in: .global))))
+                        }}}
                 }
             }
         }
     }
 
     private var deck: some View {
-        HStack {
-            Spacer()
-            deckUpwards.frame(height: 56).offset(x: -30)
-            deckDownwards.frame(height: 62).fixedSize()
+        WithViewStore(store) { viewStore in
+            HStack {
+                Spacer()
+                deckUpwards.frame(width: viewStore.cardWidth).offset(x: -10)
+                deckDownwards.frame(width: viewStore.cardWidth)
+            }
         }
     }
 
@@ -78,9 +76,9 @@ struct FoundationsView: View {
                                 ? 0.5
                                 : 1
                             )
-                            .offset(x: 10 * Double(upwards.firstIndex(of: card) ?? 0))
+                            .offset(x: 5 * Double(upwards.firstIndex(of: card) ?? 0))
                     } else {
-                        content.offset(x: 10 * Double(upwards.firstIndex(of: card) ?? 0))
+                        content.offset(x: 5 * Double(upwards.firstIndex(of: card) ?? 0))
                     }
                 }
             }
@@ -92,8 +90,11 @@ struct FoundationsView: View {
             if viewStore.deck.downwards.count > 0 {
                 Button { viewStore.send(.drawCard) } label: {
                     let cards = IdentifiedArrayOf(uniqueElements:viewStore.deck.downwards.prefix(3))
-                    VStack(spacing: -50) {
-                        ForEach(cards) { card in StandardDeckCardView(card: card) { CardBackground() } }
+                    ZStack {
+                        ForEach(cards) { card in
+                            StandardDeckCardView(card: card) { CardBackground() }
+                                .offset(y: Double(cards.firstIndex(of: card) ?? 0) * 5)
+                        }
                     }
                 }
                 .buttonStyle(.plain)
@@ -178,3 +179,30 @@ struct FoundationsView: View {
         }
     }
 }
+
+#if DEBUG
+struct FoundationsView_Previews: PreviewProvider {
+    static var previews: some View {
+        Preview()
+    }
+
+    private struct Preview: View {
+        let store = Store(
+            initialState: AppState(),
+            reducer: appReducer,
+            environment: .preview
+        )
+
+        var body: some View {
+            WithViewStore(store) { viewStore in
+                VStack(spacing: 0) {
+                    FoundationsView(store: store)
+                    PilesView(store: store)
+                }
+                .onAppear { viewStore.send(.shuffleCards) }
+                .onAppear { viewStore.send(.drawCard); viewStore.send(.drawCard); viewStore.send(.drawCard) }
+            }
+        }
+    }
+}
+#endif

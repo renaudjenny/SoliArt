@@ -11,8 +11,12 @@ struct PilesView: View {
                 ForEach(viewStore.piles) { pile in
                     GeometryReader { geo in
                         cards(pileID: pile.id)
-                            .task { viewStore.send(.updateFrame(.pile(pile.id, geo.frame(in: .global)))) }
+                            .frame(maxHeight: 2/5 * geo.size.height, alignment: .top)
+                            .task(id: viewStore.frames) {
+                                viewStore.send(.updateFrame(.pile(pile.id, geo.frame(in: .global))))
+                            }
                     }
+                    .ignoresSafeArea()
                 }
             }
             .padding()
@@ -22,14 +26,11 @@ struct PilesView: View {
 
     private func cards(pileID: Pile.ID) -> some View {
         WithViewStore(store) { viewStore in
-            ZStack(alignment: .top) {
+            ZStack {
                 let cards = viewStore.piles[id: pileID]?.cards ?? []
                 ForEach(cardsAndOffsets(cards: cards), id: \.card.id) { card, offset in
-                    let content = StandardDeckCardView(card: card, backgroundContent: CardBackground.init)
-                        .frame(height: 56)
+                    StandardDeckCardView(card: card, backgroundContent: CardBackground.init)
                         .offset(y: offset)
-
-                    content
                         .gesture(DragGesture(coordinateSpace: .global)
                             .onChanged { value in
                                 if var draggedCards = viewStore.draggedCards {
@@ -58,8 +59,30 @@ struct PilesView: View {
     private func cardsAndOffsets(cards: IdentifiedArrayOf<Card>) -> [(card: Card, yOffset: Double)] {
         cards.reduce([]) { result, card in
             guard let previous = result.last else { return [(card, 0)] }
-            let spacing: Double = previous.card.isFacedUp ? 20 : 5
+            let spacing: Double = previous.card.isFacedUp ? 30 : 5
             return result + [(card, previous.yOffset + spacing)]
         }
     }
 }
+
+#if DEBUG
+struct PilesView_Previews: PreviewProvider {
+    static var previews: some View {
+        Preview()
+    }
+
+    private struct Preview: View {
+        let store = Store(
+            initialState: AppState(),
+            reducer: appReducer,
+            environment: .preview
+        )
+
+        var body: some View {
+            WithViewStore(store) { viewStore in
+                PilesView(store: store).onAppear { viewStore.send(.shuffleCards) }
+            }
+        }
+    }
+}
+#endif
