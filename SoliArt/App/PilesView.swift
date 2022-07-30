@@ -28,7 +28,8 @@ struct PilesView: View {
         WithViewStore(store) { viewStore in
             ZStack {
                 let cards = viewStore.piles[id: pileID]?.cards ?? []
-                ForEach(cardsAndOffsets(cards: cards), id: \.card.id) { card, offset in
+                let spacing = viewStore.cardWidth * 2/5 + 4
+                ForEach(cardsAndOffsets(cards: cards, spacing: spacing), id: \.card.id) { card, offset in
                     StandardDeckCardView(card: card, backgroundContent: CardBackground.init)
                         .offset(y: offset)
                         .gesture(DragGesture(coordinateSpace: .global)
@@ -56,10 +57,10 @@ struct PilesView: View {
         }
     }
 
-    private func cardsAndOffsets(cards: IdentifiedArrayOf<Card>) -> [(card: Card, yOffset: Double)] {
+    private func cardsAndOffsets(cards: IdentifiedArrayOf<Card>, spacing: Double) -> [(card: Card, yOffset: Double)] {
         cards.reduce([]) { result, card in
             guard let previous = result.last else { return [(card, 0)] }
-            let spacing: Double = previous.card.isFacedUp ? 30 : 5
+            let spacing: Double = previous.card.isFacedUp ? spacing : 5
             return result + [(card, previous.yOffset + spacing)]
         }
     }

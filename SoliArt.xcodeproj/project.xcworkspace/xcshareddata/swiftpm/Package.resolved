@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/renaudjenny/swift-ui-card-game",
       "state" : {
-        "branch" : "add-card-model-and-cardview",
-        "revision" : "c2905c8e5a9f4621f5e72a3d1e5c790613752bfa"
+        "branch" : "main",
+        "revision" : "aba5eee8f733662d984b48d6df1645656ad491ec"
       }
     },
     {

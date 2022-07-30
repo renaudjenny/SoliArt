@@ -29,10 +29,11 @@ struct AppView: View {
     private var draggedCards: some View {
         WithViewStore(store) { viewStore in
             if let position = viewStore.draggedCards?.position, let cards = viewStore.actualDraggedCards {
-                VStack(spacing: -30) {
+                ZStack {
                     ForEach(cards) { card in
                         StandardDeckCardView(card: card, backgroundContent: { EmptyView() })
                             .frame(width: viewStore.cardWidth)
+                            .offset(y: (viewStore.cardWidth * 2/5 + 4) * CGFloat(cards.firstIndex(of: card) ?? 0))
                     }
                 }
                 .position(position)
