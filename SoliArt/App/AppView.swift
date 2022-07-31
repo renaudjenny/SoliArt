@@ -37,7 +37,7 @@ struct AppView: View {
                     }
                 }
                 .position(position)
-                .offset(y: -20)
+                .offset(y: -viewStore.cardWidth * 2/5 - 4 - 20)
                 .ignoresSafeArea()
             }
         }
