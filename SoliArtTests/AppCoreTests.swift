@@ -170,6 +170,7 @@ class AppCoreTests: XCTestCase {
         store.send(.shuffleCards) {
             $0.piles = pilesAfterShuffle
             $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[28...])
+            $0.isGameOver = false
         }
     }
 
