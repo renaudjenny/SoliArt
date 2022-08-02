@@ -73,7 +73,7 @@ struct FoundationsView: View {
                             )
                             .opacity(
                                 viewStore.actualDraggedCards?.contains(card) == true
-                                ? 0.5
+                                ? 0
                                 : 1
                             )
                             .offset(x: 5 * Double(upwards.firstIndex(of: card) ?? 0))

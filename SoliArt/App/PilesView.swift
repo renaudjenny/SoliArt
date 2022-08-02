@@ -48,10 +48,7 @@ struct PilesView: View {
                             .onEnded { value in
                                 viewStore.send(.dragCards(nil))
                             })
-                        .opacity(viewStore.actualDraggedCards?.contains(card) ?? false
-                                 ? 50/100
-                                 : 100/100
-                        )
+                        .opacity((viewStore.actualDraggedCards?.contains(card) ?? false) ? 0 : 1)
                 }
             }
         }
