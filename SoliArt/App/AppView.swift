@@ -9,7 +9,7 @@ struct AppView: View {
         WithViewStore(store) { viewStore in
             ZStack {
                 content
-                draggedCards
+//                draggedCards
 //                debugDragFrames
             }
             .task { viewStore.send(.shuffleCards) }
