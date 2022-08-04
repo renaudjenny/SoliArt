@@ -18,7 +18,7 @@ struct PilesView: View {
                     }
                     .zIndex({
                         let cards = viewStore.piles[id: pile.id]?.cards ?? []
-                        return Set(viewStore.actualDraggedCards ?? []).intersection(cards).count > 0 ? 1 : 0
+                        return Set(viewStore.draggedCards?.origin.cards ?? []).intersection(cards).count > 0 ? 1 : 0
                     }())
                     .ignoresSafeArea()
                 }
@@ -34,34 +34,16 @@ struct PilesView: View {
                 let cards = viewStore.piles[id: pileID]?.cards ?? []
                 let spacing = viewStore.cardWidth * 2/5 + 4
                 ForEach(cardsAndOffsets(cards: cards, spacing: spacing), id: \.card.id) { card, offset in
-                    StandardDeckCardView(card: card, backgroundContent: CardBackground.init)
+                    let view = StandardDeckCardView(card: card, backgroundContent: CardBackground.init)
                         .offset(y: offset)
-                        .gesture(DragGesture(coordinateSpace: .global)
-                            .onChanged { value in
-                                if var draggedCards = viewStore.draggedCards {
-                                    draggedCards.position = value.location
-                                    viewStore.send(.dragCards(draggedCards), animation: .interactiveSpring())
-                                } else {
-                                    guard let cardIndex = cards.firstIndex(of: card) else { return }
-                                    viewStore.send(
-                                        .dragCards(DragCards(
-                                            origin: .pile(cardIDs: cards[cardIndex...].map(\.id)),
-                                            position: value.location
-                                        )),
-                                        animation: .spring()
-                                    )
-                                }
-                            }
-                            .onEnded { value in
-                                viewStore.send(.dragCards(nil), animation: .spring())
-                            })
-                        .offset(viewStore.draggedCards.map { draggedCards in
-                            guard let cards = viewStore.actualDraggedCards, cards.contains(card) else { return .zero }
-                            let position = draggedCards.position
-                            let width = position.x - origin.x - viewStore.cardWidth/2
-                            let height = position.y - origin.y - viewStore.cardWidth * 7/5
-                            return CGSize(width: width, height: height)
-                        } ?? .zero)
+                    if let cardIndex = cards.firstIndex(of: card), card.isFacedUp {
+                        view.modifier(AddDragCards(
+                            store: store,
+                            origin: .pile(id: pileID, cards: Array(cards[cardIndex...]))
+                        ))
+                    } else {
+                        view
+                    }
                 }
             }
         }

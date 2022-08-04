@@ -9,7 +9,6 @@ struct AppView: View {
         WithViewStore(store) { viewStore in
             ZStack {
                 content
-//                draggedCards
 //                debugDragFrames
             }
             .task { viewStore.send(.shuffleCards) }
@@ -26,23 +25,6 @@ struct AppView: View {
         }
     }
 
-    private var draggedCards: some View {
-        WithViewStore(store) { viewStore in
-            if let position = viewStore.draggedCards?.position, let cards = viewStore.actualDraggedCards {
-                ZStack {
-                    ForEach(cards) { card in
-                        StandardDeckCardView(card: card, backgroundContent: { EmptyView() })
-                            .frame(width: viewStore.cardWidth)
-                            .offset(y: (viewStore.cardWidth * 2/5 + 4) * CGFloat(cards.firstIndex(of: card) ?? 0))
-                    }
-                }
-                .position(position)
-                .offset(y: -viewStore.cardWidth * 2/5 - 4 - 20)
-                .ignoresSafeArea()
-            }
-        }
-    }
-
     private var debugDragFrames: some View {
         WithViewStore(store) { viewStore in
             ForEach(viewStore.frames) { frame in
@@ -55,6 +37,11 @@ struct AppView: View {
                 case let .pile(id, rect):
                     Color.blue
                         .overlay { Text("Pile \(id)") }
+                        .frame(width: rect.width, height: rect.height)
+                        .position(CGPoint(x: rect.midX, y: rect.midY))
+                case let .deck(rect):
+                    Color.green
+                        .overlay { Text("Deck") }
                         .frame(width: rect.width, height: rect.height)
                         .position(CGPoint(x: rect.midX, y: rect.midY))
                 }

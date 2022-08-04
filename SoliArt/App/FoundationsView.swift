@@ -53,29 +53,10 @@ struct FoundationsView: View {
 
                     if card == viewStore.deck.upwards.last {
                         content
-                            .gesture(DragGesture(coordinateSpace: .global)
-                                .onChanged { value in
-                                    if var draggedCards = viewStore.draggedCards {
-                                        draggedCards.position = value.location
-                                        viewStore.send(.dragCards(draggedCards))
-                                    } else {
-                                        viewStore.send(.dragCards(
-                                            DragCards(
-                                                origin: .deck(cardID: card.id),
-                                                position: value.location
-                                            )
-                                        ))
-                                    }
-                                }
-                                .onEnded { value in
-                                    viewStore.send(.dragCards(nil))
-                                }
-                            )
-                            .opacity(
-                                viewStore.actualDraggedCards?.contains(card) == true
-                                ? 0
-                                : 1
-                            )
+                            .modifier(AddDragCards(store: store, origin: .deck(card: card)))
+                            .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
+                                viewStore.send(.updateFrame(.deck(geo.frame(in: .global))))
+                            }}}
                             .offset(x: 5 * Double(upwards.firstIndex(of: card) ?? 0))
                     } else {
                         content.offset(x: 5 * Double(upwards.firstIndex(of: card) ?? 0))
@@ -151,29 +132,7 @@ struct FoundationsView: View {
 
                 foundation.cards.last.map { last in
                     StandardDeckCardView(card: last) { EmptyView() }
-                        .gesture(DragGesture(coordinateSpace: .global)
-                            .onChanged { value in
-                                if var draggedCards = viewStore.draggedCards {
-                                    draggedCards.position = value.location
-                                    viewStore.send(.dragCards(draggedCards))
-                                } else {
-                                    viewStore.send(.dragCards(
-                                        DragCards(
-                                            origin: .foundation(cardID: last.id),
-                                            position: value.location
-                                        )
-                                    ))
-                                }
-                            }
-                            .onEnded { value in
-                                viewStore.send(.dragCards(nil))
-                            }
-                        )
-                        .opacity(
-                            viewStore.actualDraggedCards?.contains(last) == true
-                            ? 0
-                            : 1
-                        )
+                        .modifier(AddDragCards(store: store, origin: .foundation(id: foundation.id, card: last)))
                 }
             }
         }
