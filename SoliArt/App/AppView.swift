@@ -20,7 +20,9 @@ struct AppView: View {
             VStack(spacing: 0) {
                 ScoreView(store: store)
                 FoundationsView(store: store)
+                    .zIndex(zIndex(for: .foundation, draggedCardsOrigin: viewStore.draggedCards?.origin))
                 PilesView(store: store)
+                    .zIndex(zIndex(for: .pile, draggedCardsOrigin: viewStore.draggedCards?.origin))
             }
         }
     }
@@ -48,6 +50,18 @@ struct AppView: View {
             }
             .ignoresSafeArea()
         }
+    }
+
+    private func zIndex(for type: DragType, draggedCardsOrigin: DragCards.Origin?) -> Double {
+        guard let draggedCardsOrigin = draggedCardsOrigin else { return 0 }
+        switch draggedCardsOrigin {
+        case .pile: return type == .pile ? 1 : 0
+        case .foundation, .deck: return type == .foundation ? 1 : 0
+        }
+    }
+
+    private enum DragType {
+        case pile, foundation
     }
 }
 
