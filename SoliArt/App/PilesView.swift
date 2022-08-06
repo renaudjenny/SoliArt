@@ -34,16 +34,13 @@ struct PilesView: View {
                 let cards = viewStore.piles[id: pileID]?.cards ?? []
                 let spacing = viewStore.cardWidth * 2/5 + 4
                 ForEach(cardsAndOffsets(cards: cards, spacing: spacing), id: \.card.id) { card, offset in
-                    let view = StandardDeckCardView(card: card, backgroundContent: CardBackground.init)
+                    let cardIndex = cards.firstIndex(of: card)
+                    StandardDeckCardView(card: card, backgroundContent: CardBackground.init)
                         .offset(y: offset)
-                    if let cardIndex = cards.firstIndex(of: card), card.isFacedUp {
-                        view.modifier(AddDragCards(
+                        .modifier(AddDragCards(
                             store: store,
-                            origin: .pile(id: pileID, cards: Array(cards[cardIndex...]))
+                            origin: .pile(id: pileID, cards: cardIndex.map { Array(cards[$0...]) } ?? [])
                         ))
-                    } else {
-                        view
-                    }
                 }
             }
         }

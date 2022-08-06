@@ -77,14 +77,14 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         state.frames.updateOrAppend(frame)
         return .none
     case let .dragCards(dragCards):
-        if dragCards == nil {
+        guard let dragCards = dragCards else {
             let draggedCards = state.draggedCards
             state.draggedCards = nil
             return draggedCards.map { Effect(value: .dropCards($0)) } ?? .none
-        } else {
-            state.draggedCards = dragCards
-            return .none
         }
+        guard dragCards.origin.cards.allSatisfy({ $0.isFacedUp }) else { return .none }
+        state.draggedCards = dragCards
+        return .none
     case let .dropCards(dragCards):
         let dropFrame = state.frames.first { frame in
             frame.rect.contains(dragCards.position)
@@ -96,7 +96,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
 
             switch dragCards.origin {
             case let .pile(pileID, cards):
-                state.piles[id: pileID]?.cards.removeAll { cards.contains($0) }
+                state.removePileCards(pileID: pileID, cards: cards)
             case let .foundation(foundationID, card):
                 state.foundations[id: foundationID]?.cards.remove(card)
             case let .deck(card):
@@ -116,7 +116,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
 
             switch dragCards.origin {
             case let .pile(pileID, cards):
-                state.piles[id: pileID]?.cards.removeAll { cards.contains($0) }
+                state.removePileCards(pileID: pileID, cards: cards)
             case let .foundation(foundationID, card):
                 return .none
             case let .deck(card):
@@ -163,6 +163,14 @@ extension AppState {
 
     var cardWidth: CGFloat {
         frames.first(where: { if case .pile = $0 { return true } else { return false } })?.rect.width ?? 0
+    }
+
+    mutating func removePileCards(pileID: Pile.ID, cards: [Card]) {
+        piles[id: pileID]?.cards.removeAll { cards.contains($0) }
+        if var lastCard = piles[id: pileID]?.cards.last {
+            lastCard.isFacedUp = true
+            piles[id: pileID]?.cards.updateOrAppend(lastCard)
+        }
     }
 }
 
