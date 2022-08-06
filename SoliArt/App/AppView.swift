@@ -54,9 +54,10 @@ struct AppView: View {
 
     private func zIndex(for type: DragType, draggedCardsOrigin: DragCards.Origin?) -> Double {
         guard let draggedCardsOrigin = draggedCardsOrigin else { return 0 }
-        switch draggedCardsOrigin {
-        case .pile: return type == .pile ? 1 : 0
-        case .foundation, .deck: return type == .foundation ? 1 : 0
+        switch (draggedCardsOrigin, type) {
+        case (.pile, .pile): return 1
+        case (.foundation, .foundation), (.deck, .foundation): return 1
+        default: return 0
         }
     }
 
