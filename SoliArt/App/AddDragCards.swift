@@ -24,7 +24,7 @@ struct AddDragCards: ViewModifier {
                 })
             .offset(viewStore.draggedCards.map { draggedCards in
                 guard
-                    draggedCards.origin == origin,
+                    draggedCards.origin ~= origin,
                     let origin = origin.frame(state: viewStore.state)?.rect.origin
                 else { return .zero }
                 let position = draggedCards.position
@@ -57,6 +57,17 @@ private extension DragCards.Origin {
             }
         case .deck:
             return state.frames.first { if case .deck = $0 { return true } else { return false } }
+        }
+    }
+
+    static func ~= (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case (let .pile(lhsID, lhsCards), let .pile(rhsID, rhsCards)):
+            guard lhsID == rhsID else { return false }
+            return rhsCards.allSatisfy { lhsCards.contains($0) }
+        case (let .foundation(lhsID, _), let .foundation(rhsID, _)): return lhsID == rhsID
+        case (.deck, .deck): return true
+        case (.pile, _), (.foundation, _), (.deck, _): return false
         }
     }
 }
