@@ -13,6 +13,7 @@ struct AppState: Equatable {
     var frames: IdentifiedArrayOf<Frame> = []
     var draggedCards: DragCards?
     var isGameOver = true
+    var namespace: Namespace.ID?
 }
 
 enum AppAction: Equatable {
@@ -22,6 +23,7 @@ enum AppAction: Equatable {
     case updateFrame(Frame)
     case dragCards(DragCards?)
     case dropCards(DragCards)
+    case setNamespace(Namespace.ID)
 }
 
 struct AppEnvironment {
@@ -130,6 +132,9 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         case .deck: return .none
         case .none: return .none
         }
+    case let .setNamespace(namespace):
+        state.namespace = namespace
+        return .none
     }
 }
 

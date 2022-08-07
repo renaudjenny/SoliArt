@@ -4,6 +4,7 @@ import SwiftUICardGame
 
 struct AppView: View {
     let store: Store<AppState, AppAction>
+    @Namespace private var namespace
 
     var body: some View {
         WithViewStore(store) { viewStore in
@@ -12,6 +13,7 @@ struct AppView: View {
 //                debugDragFrames
             }
             .task { viewStore.send(.shuffleCards) }
+            .task { viewStore.send(.setNamespace(namespace)) }
         }
     }
 

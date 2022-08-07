@@ -32,6 +32,8 @@ struct AddDragCards: ViewModifier {
                 let height = position.y - origin.y - viewStore.cardWidth * 7/5
                 return CGSize(width: width, height: height)
             } ?? .zero)
+            .transition(.identity)
+            .matchedGeometryEffect(id: origin.cards, in: viewStore.namespace!)
         }
     }
 }
