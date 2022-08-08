@@ -90,13 +90,18 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         state.draggedCards = dragCards
         return Effect(value: .updateDraggedCardsOffset(origin: dragCards.origin))
     case let .dropCards(dragCards):
+        let updateDraggedCardsOffsetEffect: Effect<AppAction, Never> = Effect(
+            value: .updateDraggedCardsOffset(origin: dragCards.origin)
+        )
+
         let dropFrame = state.frames.first { frame in
             frame.rect.contains(dragCards.position)
         }
         switch dropFrame {
         case let .pile(pileID, _):
-            guard var pile = state.piles[id: pileID] else { return .none }
-            guard isValidMove(cards: dragCards.origin.cards, onto: pile.cards.elements) else { return .none }
+            guard var pile = state.piles[id: pileID],
+                  isValidMove(cards: dragCards.origin.cards, onto: pile.cards.elements)
+            else { return updateDraggedCardsOffsetEffect }
 
             switch dragCards.origin {
             case let .pile(pileID, cards):
@@ -110,13 +115,13 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
             pile.cards.append(contentsOf: dragCards.origin.cards)
             state.piles.updateOrAppend(pile)
 
-            return .none
+            return updateDraggedCardsOffsetEffect
         case let .foundation(foundationID, _):
             guard
                 var foundation = state.foundations[id: foundationID],
                 let card = dragCards.origin.cards.first,
                 isValidScoring(card: card, onto: foundation)
-            else { return .none }
+            else { return updateDraggedCardsOffsetEffect }
 
             switch dragCards.origin {
             case let .pile(pileID, cards):
@@ -130,9 +135,9 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
             foundation.cards.updateOrAppend(card)
             state.foundations.updateOrAppend(foundation)
 
-            return .none
-        case .deck: return .none
-        case .none: return .none
+            return updateDraggedCardsOffsetEffect
+        case .deck: return updateDraggedCardsOffsetEffect
+        case .none: return updateDraggedCardsOffsetEffect
         }
     case let .setNamespace(namespace):
         state.namespace = namespace
@@ -142,7 +147,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
               draggedCards.origin ~= origin,
               let frameOrigin = origin.frame(state: state)?.rect.origin
         else {
-            state.draggedCardsOffsets[origin] = .zero
+            state.draggedCardsOffsets.removeAll()
             return .none
         }
         let position = draggedCards.position
@@ -276,7 +281,7 @@ private extension Rank {
     }
 }
 
-private extension DragCards.Origin {
+extension DragCards.Origin {
     func frame(state: AppState) -> Frame? {
         switch self {
         case let .pile(id: pileID, _):

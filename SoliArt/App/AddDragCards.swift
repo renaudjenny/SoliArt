@@ -22,8 +22,7 @@ struct AddDragCards: ViewModifier {
                 .onEnded { value in
                     viewStore.send(.dragCards(nil), animation: .spring())
                 })
-            .offset(viewStore.draggedCardsOffsets[origin] ?? .zero)
-            .transition(.identity)
+            .offset(viewStore.draggedCardsOffsets.first(where: { $0.key ~= origin })?.value ?? .zero)
             .matchedGeometryEffect(id: origin.cards, in: viewStore.namespace!)
         }
     }
