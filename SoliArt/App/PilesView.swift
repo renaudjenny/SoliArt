@@ -16,10 +16,7 @@ struct PilesView: View {
                                 viewStore.send(.updateFrame(.pile(pile.id, geo.frame(in: .global))))
                             }
                     }
-                    .zIndex({
-                        let cards = viewStore.piles[id: pile.id]?.cards ?? []
-                        return Set(viewStore.draggedCards?.origin.cards ?? []).intersection(cards).count > 0 ? 1 : 0
-                    }())
+                    .zIndex(viewStore.state.zIndex(source: .pile(pile.id)))
                     .ignoresSafeArea()
                 }
             }

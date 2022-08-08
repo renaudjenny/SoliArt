@@ -14,6 +14,7 @@ struct AppState: Equatable {
     var draggedCards: DragCards?
     var isGameOver = true
     var namespace: Namespace.ID?
+    var draggedCardsOffsets: [DragCards.Origin: CGSize] = [:]
 }
 
 enum AppAction: Equatable {
@@ -24,6 +25,7 @@ enum AppAction: Equatable {
     case dragCards(DragCards?)
     case dropCards(DragCards)
     case setNamespace(Namespace.ID)
+    case updateDraggedCardsOffset(origin: DragCards.Origin)
 }
 
 struct AppEnvironment {
@@ -86,7 +88,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         }
         guard dragCards.origin.cards.allSatisfy({ $0.isFacedUp }) else { return .none }
         state.draggedCards = dragCards
-        return .none
+        return Effect(value: .updateDraggedCardsOffset(origin: dragCards.origin))
     case let .dropCards(dragCards):
         let dropFrame = state.frames.first { frame in
             frame.rect.contains(dragCards.position)
@@ -135,6 +137,19 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
     case let .setNamespace(namespace):
         state.namespace = namespace
         return .none
+    case let .updateDraggedCardsOffset(origin):
+        guard let draggedCards = state.draggedCards,
+              draggedCards.origin ~= origin,
+              let frameOrigin = origin.frame(state: state)?.rect.origin
+        else {
+            state.draggedCardsOffsets[origin] = .zero
+            return .none
+        }
+        let position = draggedCards.position
+        let width = position.x - frameOrigin.x - state.cardWidth/2
+        let height = position.y - frameOrigin.y - state.cardWidth * 7/5
+        state.draggedCardsOffsets[origin] = CGSize(width: width, height: height)
+        return .none
     }
 }
 
@@ -177,10 +192,36 @@ extension AppState {
             piles[id: pileID]?.cards.updateOrAppend(lastCard)
         }
     }
+
+    enum ZIndexSource {
+        case pile(Pile.ID?)
+        case foundation(Foundation.ID?)
+        case deck
+    }
+
+    func zIndex(source: ZIndexSource) -> Double {
+        switch source {
+        case let .pile(pileID):
+            if case let .pile(draggedPileID, _) = draggedCardsOffsets.first?.key {
+                return pileID == draggedPileID ? 2 : 1
+            }
+        case let .foundation(foundationID):
+            if case let .foundation(draggedFoundationID, _) = draggedCardsOffsets.first?.key {
+                return foundationID == draggedFoundationID ? 2 : 1
+            } else if case .deck = draggedCardsOffsets.first?.key {
+                return 1
+            }
+        case .deck:
+            if case .deck = draggedCardsOffsets.first?.key {
+                return 1
+            }
+        }
+        return 0
+    }
 }
 
 struct DragCards: Equatable {
-    enum Origin: Equatable {
+    enum Origin: Equatable, Hashable {
         case pile(id: Pile.ID, cards: [Card])
         case foundation(id: Foundation.ID, card: Card)
         case deck(card: Card)
@@ -232,5 +273,41 @@ private extension Rank {
     var lower: Rank? {
         guard let index = Rank.allCases.firstIndex(of: self) else { return nil }
         return index > 0 ? Rank.allCases[index - 1] : nil
+    }
+}
+
+private extension DragCards.Origin {
+    func frame(state: AppState) -> Frame? {
+        switch self {
+        case let .pile(id: pileID, _):
+            return state.frames.first { frame in
+                if case let .pile(id, _) = frame, id == pileID {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        case let.foundation(id: foundationID, _):
+            return state.frames.first { frame in
+                if case let .foundation(id, _) = frame, id == foundationID {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        case .deck:
+            return state.frames.first { if case .deck = $0 { return true } else { return false } }
+        }
+    }
+
+    static func ~= (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case (let .pile(lhsID, lhsCards), let .pile(rhsID, rhsCards)):
+            guard lhsID == rhsID else { return false }
+            return rhsCards.allSatisfy { lhsCards.contains($0) }
+        case (let .foundation(lhsID, _), let .foundation(rhsID, _)): return lhsID == rhsID
+        case (.deck, .deck): return true
+        case (.pile, _), (.foundation, _), (.deck, _): return false
+        }
     }
 }

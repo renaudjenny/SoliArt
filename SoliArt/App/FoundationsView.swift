@@ -9,8 +9,8 @@ struct FoundationsView: View {
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack {
-                foundations.zIndex(zIndex(for: .foundation(nil), draggedCardsOrigin: viewStore.draggedCards?.origin))
-                deck.zIndex(zIndex(for: .deck, draggedCardsOrigin: viewStore.draggedCards?.origin))
+                foundations.zIndex(viewStore.state.zIndex(source: .foundation(nil)))
+                deck.zIndex(viewStore.state.zIndex(source: .deck))
             }
             .padding()
             .background(Color.piles)
@@ -29,10 +29,7 @@ struct FoundationsView: View {
                         .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
                             viewStore.send(.updateFrame(.foundation(foundation.id, geo.frame(in: .global))))
                         }}}
-                        .zIndex(zIndex(
-                            for: .foundation(foundation.id),
-                            draggedCardsOrigin: viewStore.draggedCards?.origin
-                        ))
+                        .zIndex(viewStore.state.zIndex(source: .foundation(foundation.id)))
                 }
             }
         }
@@ -140,19 +137,6 @@ struct FoundationsView: View {
                 }
             }
         }
-    }
-
-    private func zIndex(for type: DragType, draggedCardsOrigin: DragCards.Origin?) -> Double {
-        guard let draggedCardsOrigin = draggedCardsOrigin else { return 0 }
-        switch (draggedCardsOrigin, type) {
-        case let (.foundation(id: draggedID, _), .foundation(id)): return draggedID == id ? 2 : 1
-        case (.deck, .deck): return 1
-        default: return 0
-        }
-    }
-
-    private enum DragType {
-        case foundation(Foundation.ID?), deck
     }
 }
 

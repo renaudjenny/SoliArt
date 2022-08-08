@@ -21,10 +21,8 @@ struct AppView: View {
         WithViewStore(store) { viewStore in
             VStack(spacing: 0) {
                 ScoreView(store: store)
-                FoundationsView(store: store)
-                    .zIndex(zIndex(for: .foundation, draggedCardsOrigin: viewStore.draggedCards?.origin))
-                PilesView(store: store)
-                    .zIndex(zIndex(for: .pile, draggedCardsOrigin: viewStore.draggedCards?.origin))
+                FoundationsView(store: store).zIndex(viewStore.state.zIndex(source: .foundation(nil)))
+                PilesView(store: store).zIndex(viewStore.state.zIndex(source: .pile(nil)))
             }
         }
     }
@@ -52,19 +50,6 @@ struct AppView: View {
             }
             .ignoresSafeArea()
         }
-    }
-
-    private func zIndex(for type: DragType, draggedCardsOrigin: DragCards.Origin?) -> Double {
-        guard let draggedCardsOrigin = draggedCardsOrigin else { return 0 }
-        switch (draggedCardsOrigin, type) {
-        case (.pile, .pile): return 1
-        case (.foundation, .foundation), (.deck, .foundation): return 1
-        default: return 0
-        }
-    }
-
-    private enum DragType {
-        case pile, foundation
     }
 }
 
