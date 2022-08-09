@@ -31,11 +31,10 @@ struct PilesView: View {
                 let cards = viewStore.piles[id: pileID]?.cards ?? []
                 let spacing = viewStore.cardWidth * 2/5 + 4
                 ForEach(cardsAndOffsets(cards: cards, spacing: spacing), id: \.card.id) { card, offset in
-                    let cardIndex = cards.firstIndex(of: card)
                     DraggableCardView(
                         store: store,
                         card: card,
-                        origin: .pile(id: pileID, cards: cardIndex.map { Array(cards[$0...]) } ?? [])
+                        origin: .pile(id: pileID, firstCard: card)
                     )
                     .offset(y: offset)
                 }
