@@ -32,12 +32,12 @@ struct PilesView: View {
                 let spacing = viewStore.cardWidth * 2/5 + 4
                 ForEach(cardsAndOffsets(cards: cards, spacing: spacing), id: \.card.id) { card, offset in
                     let cardIndex = cards.firstIndex(of: card)
-                    StandardDeckCardView(card: card, backgroundContent: CardBackground.init)
-                        .offset(y: offset)
-                        .modifier(AddDragCards(
-                            store: store,
-                            origin: .pile(id: pileID, cards: cardIndex.map { Array(cards[$0...]) } ?? [])
-                        ))
+                    DraggableCardView(
+                        store: store,
+                        card: card,
+                        origin: .pile(id: pileID, cards: cardIndex.map { Array(cards[$0...]) } ?? [])
+                    )
+                    .offset(y: offset)
                 }
             }
         }

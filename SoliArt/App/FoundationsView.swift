@@ -53,8 +53,7 @@ struct FoundationsView: View {
                     let content = StandardDeckCardView(card: card) { EmptyView() }
 
                     if card == viewStore.deck.upwards.last {
-                        content
-                            .modifier(AddDragCards(store: store, origin: .deck(card: card)))
+                        DraggableCardView(store: store, card: card, origin: .deck(card: card))
                             .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
                                 viewStore.send(.updateFrame(.deck(geo.frame(in: .global))))
                             }}}
@@ -132,8 +131,7 @@ struct FoundationsView: View {
                 }
 
                 foundation.cards.last.map { last in
-                    StandardDeckCardView(card: last) { EmptyView() }
-                        .modifier(AddDragCards(store: store, origin: .foundation(id: foundation.id, card: last)))
+                    DraggableCardView(store: store, card: last, origin: .foundation(id: foundation.id, card: last))
                 }
             }
         }

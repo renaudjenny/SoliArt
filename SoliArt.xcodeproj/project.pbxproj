@@ -17,7 +17,7 @@
 		4C3D196A28547D840096404F /* SoliArtUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D196928547D840096404F /* SoliArtUITests.swift */; };
 		4C3D196C28547D840096404F /* SoliArtUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D196B28547D840096404F /* SoliArtUITestsLaunchTests.swift */; };
 		4C3D197B2854BABD0096404F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 4C3D197A2854BABD0096404F /* ComposableArchitecture */; };
-		4C43E5AB289BA8080055BAE0 /* AddDragCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C43E5AA289BA8080055BAE0 /* AddDragCards.swift */; };
+		4C43E5AB289BA8080055BAE0 /* DraggableCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C43E5AA289BA8080055BAE0 /* DraggableCardView.swift */; };
 		4C6169CF286CD2D1006B4D48 /* SwiftUICardGame in Frameworks */ = {isa = PBXBuildFile; productRef = 4C6169CE286CD2D1006B4D48 /* SwiftUICardGame */; };
 		4C6169D1286CDCCD006B4D48 /* ScoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C6169D0286CDCCD006B4D48 /* ScoreView.swift */; };
 		4C6169D3286CDD6E006B4D48 /* FoundationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C6169D2286CDD6E006B4D48 /* FoundationsView.swift */; };
@@ -56,7 +56,7 @@
 		4C3D196928547D840096404F /* SoliArtUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtUITests.swift; sourceTree = "<group>"; };
 		4C3D196B28547D840096404F /* SoliArtUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoliArtUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		4C3D197828547DF60096404F /* SoliArt.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = SoliArt.xctestplan; sourceTree = "<group>"; };
-		4C43E5AA289BA8080055BAE0 /* AddDragCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDragCards.swift; sourceTree = "<group>"; };
+		4C43E5AA289BA8080055BAE0 /* DraggableCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraggableCardView.swift; sourceTree = "<group>"; };
 		4C6169D0286CDCCD006B4D48 /* ScoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreView.swift; sourceTree = "<group>"; };
 		4C6169D2286CDD6E006B4D48 /* FoundationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationsView.swift; sourceTree = "<group>"; };
 		4C6169D4286CDF34006B4D48 /* PilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PilesView.swift; sourceTree = "<group>"; };
@@ -93,13 +93,13 @@
 		4C2E2BAB285B00700095A238 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				4C3D195028547D810096404F /* AppView.swift */,
 				4C2E2BAC285B007F0095A238 /* AppCore.swift */,
+				4C3D195028547D810096404F /* AppView.swift */,
 				4C2E2BAE285B00AC0095A238 /* Deck.swift */,
-				4C6169D0286CDCCD006B4D48 /* ScoreView.swift */,
+				4C43E5AA289BA8080055BAE0 /* DraggableCardView.swift */,
 				4C6169D2286CDD6E006B4D48 /* FoundationsView.swift */,
 				4C6169D4286CDF34006B4D48 /* PilesView.swift */,
-				4C43E5AA289BA8080055BAE0 /* AddDragCards.swift */,
+				4C6169D0286CDCCD006B4D48 /* ScoreView.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -318,7 +318,7 @@
 			files = (
 				4CA0D7CE2863AEAB00EF30D1 /* Color+Assets.swift in Sources */,
 				4C2E2BAF285B00AC0095A238 /* Deck.swift in Sources */,
-				4C43E5AB289BA8080055BAE0 /* AddDragCards.swift in Sources */,
+				4C43E5AB289BA8080055BAE0 /* DraggableCardView.swift in Sources */,
 				4C2E2BAD285B007F0095A238 /* AppCore.swift in Sources */,
 				4C3D195128547D810096404F /* AppView.swift in Sources */,
 				4C6169D1286CDCCD006B4D48 /* ScoreView.swift in Sources */,

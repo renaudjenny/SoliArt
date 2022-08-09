@@ -14,7 +14,7 @@ struct AppState: Equatable {
     var draggedCards: DragCards?
     var isGameOver = true
     var namespace: Namespace.ID?
-    var draggedCardsOffsets: [DragCards.Origin: CGSize] = [:]
+    var draggedCardsOffsets: [Card: CGSize] = [:]
 }
 
 enum AppAction: Equatable {
@@ -22,10 +22,11 @@ enum AppAction: Equatable {
     case drawCard
     case flipDeck
     case updateFrame(Frame)
-    case dragCards(DragCards?)
-    case dropCards(DragCards)
+    case dragCards(DragCards)
+    case dropCards
     case setNamespace(Namespace.ID)
-    case updateDraggedCardsOffset(origin: DragCards.Origin)
+    case updateDraggedCardsOffset(cards: [Card])
+    case resetDraggedCards
 }
 
 struct AppEnvironment {
@@ -81,17 +82,14 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         state.frames.updateOrAppend(frame)
         return .none
     case let .dragCards(dragCards):
-        guard let dragCards = dragCards else {
-            let draggedCards = state.draggedCards
-            state.draggedCards = nil
-            return draggedCards.map { Effect(value: .dropCards($0)) } ?? .none
-        }
         guard dragCards.origin.cards.allSatisfy({ $0.isFacedUp }) else { return .none }
         state.draggedCards = dragCards
-        return Effect(value: .updateDraggedCardsOffset(origin: dragCards.origin))
-    case let .dropCards(dragCards):
-        let updateDraggedCardsOffsetEffect: Effect<AppAction, Never> = Effect(
-            value: .updateDraggedCardsOffset(origin: dragCards.origin)
+        return Effect(value: .updateDraggedCardsOffset(cards: dragCards.origin.cards))
+    case .dropCards:
+        guard let dragCards = state.draggedCards else { return .none }
+        let updateDraggedCardsOffsetEffect: Effect<AppAction, Never> = .merge(
+            Effect(value: .updateDraggedCardsOffset(cards: dragCards.origin.cards)),
+            Effect(value: .resetDraggedCards)
         )
 
         let dropFrame = state.frames.first { frame in
@@ -142,18 +140,23 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
     case let .setNamespace(namespace):
         state.namespace = namespace
         return .none
-    case let .updateDraggedCardsOffset(origin):
+    case let .updateDraggedCardsOffset(cards):
         guard let draggedCards = state.draggedCards,
-              draggedCards.origin ~= origin,
-              let frameOrigin = origin.frame(state: state)?.rect.origin
+              draggedCards.origin.cards.allSatisfy({ cards.contains($0) }),
+              let frameOrigin = draggedCards.origin.frame(state: state)?.rect.origin
         else {
-            state.draggedCardsOffsets.removeAll()
             return .none
         }
         let position = draggedCards.position
         let width = position.x - frameOrigin.x - state.cardWidth/2
         let height = position.y - frameOrigin.y - state.cardWidth * 7/5
-        state.draggedCardsOffsets[origin] = CGSize(width: width, height: height)
+        for card in cards {
+            state.draggedCardsOffsets[card] = CGSize(width: width, height: height)
+        }
+        return .none
+    case .resetDraggedCards:
+        state.draggedCards = nil
+        state.draggedCardsOffsets.removeAll()
         return .none
     }
 }
@@ -207,17 +210,17 @@ extension AppState {
     func zIndex(source: ZIndexSource) -> Double {
         switch source {
         case let .pile(pileID):
-            if case let .pile(draggedPileID, _) = draggedCardsOffsets.first?.key {
+            if case let .pile(draggedPileID, _) = draggedCards?.origin {
                 return pileID == draggedPileID ? 2 : 1
             }
         case let .foundation(foundationID):
-            if case let .foundation(draggedFoundationID, _) = draggedCardsOffsets.first?.key {
+            if case let .foundation(draggedFoundationID, _) = draggedCards?.origin {
                 return foundationID == draggedFoundationID ? 2 : 1
-            } else if case .deck = draggedCardsOffsets.first?.key {
+            } else if case .deck = draggedCards?.origin {
                 return 1
             }
         case .deck:
-            if case .deck = draggedCardsOffsets.first?.key {
+            if case .deck = draggedCards?.origin {
                 return 1
             }
         }
