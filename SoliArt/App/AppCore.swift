@@ -27,6 +27,7 @@ enum AppAction: Equatable {
     case setNamespace(Namespace.ID)
     case updateDraggedCardsOffset
     case resetDraggedCards
+    case resetDraggedCardsOffset
 }
 
 struct AppEnvironment {
@@ -87,7 +88,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         return Effect(value: .updateDraggedCardsOffset)
     case .dropCards:
         guard let draggingState = state.draggingState else { return .none }
-        let updateDraggedCardsOffsetEffect: Effect<AppAction, Never> = .merge(
+        let updateDraggedCardsOffsetEffect: Effect<AppAction, Never> = .concatenate(
             Effect(value: .updateDraggedCardsOffset),
             Effect(value: .resetDraggedCards)
         )
@@ -159,6 +160,12 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         return .none
     case .resetDraggedCards:
         state.draggingState = nil
+        for (key, _) in state.draggedCardsOffsets { state.draggedCardsOffsets[key] = .zero }
+        return Effect(value: .resetDraggedCardsOffset)
+            .delay(for: 0.5, scheduler: environment.mainQueue)
+            .eraseToEffect()
+            .animation(.spring())
+    case .resetDraggedCardsOffset:
         state.draggedCardsOffsets.removeAll()
         return .none
     }
