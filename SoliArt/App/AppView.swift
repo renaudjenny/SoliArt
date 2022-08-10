@@ -21,8 +21,8 @@ struct AppView: View {
         WithViewStore(store) { viewStore in
             VStack(spacing: 0) {
                 ScoreView(store: store)
-                FoundationsView(store: store).zIndex(viewStore.state.zIndex(source: .foundation(nil)))
-                PilesView(store: store).zIndex(viewStore.state.zIndex(source: .pile(nil)))
+                FoundationsView(store: store).zIndex(viewStore.state.zIndex(source: .foundation(id: nil)))
+                PilesView(store: store).zIndex(viewStore.state.zIndex(source: .pile(id: nil)))
             }
         }
     }

@@ -16,7 +16,7 @@ struct PilesView: View {
                                 viewStore.send(.updateFrame(.pile(pile.id, geo.frame(in: .global))))
                             }
                     }
-                    .zIndex(viewStore.state.zIndex(source: .pile(pile.id)))
+                    .zIndex(viewStore.state.zIndex(source: .pile(id: pile.id)))
                     .ignoresSafeArea()
                 }
             }
@@ -31,12 +31,7 @@ struct PilesView: View {
                 let cards = viewStore.piles[id: pileID]?.cards ?? []
                 let spacing = viewStore.cardWidth * 2/5 + 4
                 ForEach(cardsAndOffsets(cards: cards, spacing: spacing), id: \.card.id) { card, offset in
-                    DraggableCardView(
-                        store: store,
-                        card: card,
-                        origin: .pile(id: pileID, firstCard: card)
-                    )
-                    .offset(y: offset)
+                    DraggableCardView(store: store, card: card).offset(y: offset)
                 }
             }
         }

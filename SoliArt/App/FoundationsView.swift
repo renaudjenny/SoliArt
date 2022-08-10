@@ -9,7 +9,7 @@ struct FoundationsView: View {
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack {
-                foundations.zIndex(viewStore.state.zIndex(source: .foundation(nil)))
+                foundations.zIndex(viewStore.state.zIndex(source: .foundation(id: nil)))
                 deck.zIndex(viewStore.state.zIndex(source: .deck))
             }
             .padding()
@@ -29,7 +29,7 @@ struct FoundationsView: View {
                         .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
                             viewStore.send(.updateFrame(.foundation(foundation.id, geo.frame(in: .global))))
                         }}}
-                        .zIndex(viewStore.state.zIndex(source: .foundation(foundation.id)))
+                        .zIndex(viewStore.state.zIndex(source: .foundation(id: foundation.id)))
                 }
             }
         }
@@ -53,7 +53,7 @@ struct FoundationsView: View {
                     let content = StandardDeckCardView(card: card) { EmptyView() }
 
                     if card == viewStore.deck.upwards.last {
-                        DraggableCardView(store: store, card: card, origin: .deck(card: card))
+                        DraggableCardView(store: store, card: card)
                             .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
                                 viewStore.send(.updateFrame(.deck(geo.frame(in: .global))))
                             }}}
@@ -131,7 +131,7 @@ struct FoundationsView: View {
                 }
 
                 foundation.cards.last.map { last in
-                    DraggableCardView(store: store, card: last, origin: .foundation(id: foundation.id, card: last))
+                    DraggableCardView(store: store, card: last)
                 }
             }
         }
