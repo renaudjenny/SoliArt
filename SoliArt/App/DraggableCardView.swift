@@ -18,6 +18,7 @@ struct DraggableCardView: View {
                     })
                 .offset(viewStore.draggedCardsOffsets[card] ?? .zero)
                 .matchedGeometryEffect(id: card, in: viewStore.namespace!)
+                .transition(.identity)
         }
     }
 }

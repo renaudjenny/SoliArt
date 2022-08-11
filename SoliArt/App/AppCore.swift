@@ -88,10 +88,6 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         return Effect(value: .updateDraggedCardsOffset)
     case .dropCards:
         guard let draggingState = state.draggingState else { return .none }
-        let updateDraggedCardsOffsetEffect: Effect<AppAction, Never> = .concatenate(
-            Effect(value: .updateDraggedCardsOffset),
-            Effect(value: .resetDraggedCards)
-        )
 
         let dropFrame = state.frames.first { frame in
             frame.rect.contains(draggingState.position)
@@ -101,7 +97,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
             let draggedCards = state.draggedCards
             guard var pile = state.piles[id: pileID],
                   isValidMove(cards: draggedCards, onto: pile.cards.elements)
-            else { return updateDraggedCardsOffsetEffect }
+            else { return Effect(value: .resetDraggedCards) }
 
             switch DraggingSource.card(draggingState.card, in: state) {
             case let .pile(pileID?):
@@ -110,47 +106,45 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
                 state.foundations[id: foundationID]?.cards.remove(draggingState.card)
             case .deck:
                 state.deck.upwards.remove(draggingState.card)
-            case .pile, .foundation, .currentlyMoving:
-                return updateDraggedCardsOffsetEffect
+            case .pile, .foundation:
+                return Effect(value: .resetDraggedCards)
             }
 
             pile.cards.append(contentsOf: draggedCards)
             state.piles.updateOrAppend(pile)
 
-            return updateDraggedCardsOffsetEffect
+            return Effect(value: .resetDraggedCards)
         case let .foundation(foundationID, _):
             guard
                 var foundation = state.foundations[id: foundationID],
                 isValidScoring(card: draggingState.card, onto: foundation),
                 state.draggedCards.count == 1
-            else { return updateDraggedCardsOffsetEffect }
+            else { return Effect(value: .resetDraggedCards) }
 
             switch DraggingSource.card(draggingState.card, in: state) {
             case let .pile(pileID?):
                 state.removePileCards(pileID: pileID, cards: [draggingState.card])
             case .deck:
                 state.deck.upwards.remove(draggingState.card)
-            case .foundation, .pile, .currentlyMoving:
-                return updateDraggedCardsOffsetEffect
+            case .foundation, .pile:
+                return Effect(value: .resetDraggedCards)
             }
 
             foundation.cards.updateOrAppend(draggingState.card)
             state.foundations.updateOrAppend(foundation)
 
-            return updateDraggedCardsOffsetEffect
-        case .deck: return updateDraggedCardsOffsetEffect
-        case .none: return updateDraggedCardsOffsetEffect
+            return Effect(value: .resetDraggedCards)
+        case .deck: return Effect(value: .resetDraggedCards)
+        case .none: return Effect(value: .resetDraggedCards)
         }
     case let .setNamespace(namespace):
         state.namespace = namespace
         return .none
     case .updateDraggedCardsOffset:
-        guard let draggingState = state.draggingState,
-              let origin = state.draggingOrigin
-        else {
-            return .none
-        }
-        let position = draggingState.position
+        guard let origin = state.draggingOrigin,
+              let position = state.draggingState?.position
+        else { return .none }
+
         let width = position.x - origin.x - state.cardWidth/2
         let height = position.y - origin.y - state.cardWidth * 7/5
 
@@ -159,12 +153,11 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         }
         return .none
     case .resetDraggedCards:
+        for card in state.draggedCardsOffsets.keys { state.draggedCardsOffsets[card] = .zero }
         state.draggingState = nil
-        for (key, _) in state.draggedCardsOffsets { state.draggedCardsOffsets[key] = .zero }
         return Effect(value: .resetDraggedCardsOffset)
             .delay(for: 0.5, scheduler: environment.mainQueue)
             .eraseToEffect()
-            .animation(.spring())
     case .resetDraggedCardsOffset:
         state.draggedCardsOffsets.removeAll()
         return .none
@@ -200,7 +193,7 @@ extension AppState {
         case let .pile(id):
             guard let id = id, let pile = piles[id: id], let index = pile.cards.firstIndex(of: card) else { return [] }
             return Array(pile.cards[index...])
-        case .foundation, .deck, .currentlyMoving:
+        case .foundation, .deck:
             return [card]
         }
     }
@@ -233,7 +226,9 @@ extension AppState {
     }
 
     var draggingOrigin: CGPoint? {
-        guard let card = draggingState?.card else { return nil }
+        guard let card = draggingState?.card ?? draggedCardsOffsets.keys.first
+        else { return nil }
+
         switch DraggingSource.card(card, in: self) {
         case let .pile(pileID):
             return frames.first { frame in
@@ -253,8 +248,6 @@ extension AppState {
             }?.rect.origin
         case .deck:
             return frames.first { if case .deck = $0 { return true } else { return false } }?.rect.origin
-        case let .currentlyMoving(lastKnownPosition):
-            return lastKnownPosition
         }
     }
 }
@@ -264,11 +257,15 @@ struct DraggingState: Equatable {
     var position: CGPoint
 }
 
+struct DragCard: Equatable {
+    let origin: CGPoint
+    let offset: CGSize
+}
+
 enum DraggingSource {
     case pile(id: Pile.ID?)
     case foundation(id: Foundation.ID?)
     case deck
-    case currentlyMoving(lastKnownPosition: CGPoint)
 
     static func card(_ card: Card, in state: AppState) -> Self {
         if let pileID = state.piles.first(where: { $0.cards.contains(card) })?.id {
@@ -278,14 +275,11 @@ enum DraggingSource {
         } else if state.deck.upwards.contains(card) {
             return .deck
         }
-        guard let draggingPosition = state.draggingState?.position else {
-            #if DEBUG
-            fatalError("Shouldn't be nil")
-            #else
-            return .zero
-            #endif
-        }
-        return .currentlyMoving(lastKnownPosition: draggingPosition)
+        #if DEBUG
+        fatalError("Shouldn't be nil")
+        #else
+        return .zero
+        #endif
     }
 }
 
