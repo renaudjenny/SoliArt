@@ -106,7 +106,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
                 state.foundations[id: foundationID]?.cards.remove(draggingState.card)
             case .deck:
                 state.deck.upwards.remove(draggingState.card)
-            case .pile, .foundation:
+            case .pile, .foundation, .removed:
                 return Effect(value: .resetDraggedCards)
             }
 
@@ -126,7 +126,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
                 state.removePileCards(pileID: pileID, cards: [draggingState.card])
             case .deck:
                 state.deck.upwards.remove(draggingState.card)
-            case .foundation, .pile:
+            case .foundation, .pile, .removed:
                 return Effect(value: .resetDraggedCards)
             }
 
@@ -193,7 +193,7 @@ extension AppState {
         case let .pile(id):
             guard let id = id, let pile = piles[id: id], let index = pile.cards.firstIndex(of: card) else { return [] }
             return Array(pile.cards[index...])
-        case .foundation, .deck:
+        case .foundation, .deck, .removed:
             return [card]
         }
     }
@@ -248,6 +248,8 @@ extension AppState {
             }?.rect.origin
         case .deck:
             return frames.first { if case .deck = $0 { return true } else { return false } }?.rect.origin
+        case .removed:
+            return nil
         }
     }
 }
@@ -262,10 +264,11 @@ struct DragCard: Equatable {
     let offset: CGSize
 }
 
-enum DraggingSource {
+enum DraggingSource: Equatable {
     case pile(id: Pile.ID?)
     case foundation(id: Foundation.ID?)
     case deck
+    case removed
 
     static func card(_ card: Card, in state: AppState) -> Self {
         if let pileID = state.piles.first(where: { $0.cards.contains(card) })?.id {
@@ -275,11 +278,7 @@ enum DraggingSource {
         } else if state.deck.upwards.contains(card) {
             return .deck
         }
-        #if DEBUG
-        fatalError("Shouldn't be nil")
-        #else
-        return .zero
-        #endif
+        return .removed
     }
 }
 

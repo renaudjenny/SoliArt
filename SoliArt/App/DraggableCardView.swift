@@ -17,8 +17,7 @@ struct DraggableCardView: View {
                         viewStore.send(.dropCards, animation: .spring())
                     })
                 .offset(viewStore.draggedCardsOffsets[card] ?? .zero)
-                .matchedGeometryEffect(id: card, in: viewStore.namespace!)
-                .transition(.identity)
+                .matchedGeometryEffect(id: card, in: viewStore.namespace!, properties: .position)
         }
     }
 }
