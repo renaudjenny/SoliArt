@@ -36,7 +36,7 @@ struct AppView: View {
                 ForEach(viewStore.draggedCards) { card in
                     StandardDeckCardView(card: card, backgroundContent: EmptyView.init)
                         .frame(width: viewStore.cardWidth)
-                        .offset(y: Double(viewStore.draggedCards.firstIndex(of: card) ?? 0) * spacing)
+                        .offset(y: (-spacing * 2.5) + Double(viewStore.draggedCards.firstIndex(of: card) ?? 0) * spacing)
                         .matchedGeometryEffect(id: card, in: namespace)
                         .position(position)
                 }
