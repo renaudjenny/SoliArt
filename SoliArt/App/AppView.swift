@@ -10,6 +10,7 @@ struct AppView: View {
         WithViewStore(store) { viewStore in
             ZStack {
                 content
+                draggedCards
 //                debugDragFrames
             }
             .task { viewStore.send(.shuffleCards) }
@@ -21,12 +22,29 @@ struct AppView: View {
         WithViewStore(store) { viewStore in
             VStack(spacing: 0) {
                 ScoreView(store: store)
-                FoundationsView(store: store).zIndex(viewStore.state.zIndex(source: .foundation(id: nil)))
-                PilesView(store: store).zIndex(viewStore.state.zIndex(source: .pile(id: nil)))
+                FoundationsView(store: store)
+                PilesView(store: store)
             }
         }
     }
 
+    private var draggedCards: some View {
+        WithViewStore(store) { viewStore in
+            if let position = viewStore.draggingState?.position {
+                let spacing = viewStore.cardWidth * 2/5 + 4
+
+                ForEach(viewStore.draggedCards) { card in
+                    StandardDeckCardView(card: card, backgroundContent: EmptyView.init)
+                        .frame(width: viewStore.cardWidth)
+                        .offset(y: Double(viewStore.draggedCards.firstIndex(of: card) ?? 0) * spacing)
+                        .matchedGeometryEffect(id: card, in: namespace)
+                        .position(position)
+                }
+            }
+        }
+    }
+
+    #if DEBUG
     private var debugDragFrames: some View {
         WithViewStore(store) { viewStore in
             ForEach(viewStore.frames) { frame in
@@ -51,6 +69,7 @@ struct AppView: View {
             .ignoresSafeArea()
         }
     }
+    #endif
 }
 
 #if DEBUG

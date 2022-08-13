@@ -14,7 +14,6 @@ struct AppState: Equatable {
     var draggingState: DraggingState?
     var isGameOver = true
     var namespace: Namespace.ID?
-    var draggedCardsOffsets: [Card: CGSize] = [:]
 }
 
 enum AppAction: Equatable {
@@ -25,9 +24,6 @@ enum AppAction: Equatable {
     case dragCard(Card, position: CGPoint)
     case dropCards
     case setNamespace(Namespace.ID)
-    case updateDraggedCardsOffset
-    case resetDraggedCards
-    case resetDraggedCardsOffset
 }
 
 struct AppEnvironment {
@@ -85,7 +81,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
     case let .dragCard(card, position):
         guard card.isFacedUp else { return .none }
         state.draggingState = DraggingState(card: card, position: position)
-        return Effect(value: .updateDraggedCardsOffset)
+        return .none
     case .dropCards:
         guard let draggingState = state.draggingState else { return .none }
 
@@ -97,7 +93,10 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
             let draggedCards = state.draggedCards
             guard var pile = state.piles[id: pileID],
                   isValidMove(cards: draggedCards, onto: pile.cards.elements)
-            else { return Effect(value: .resetDraggedCards) }
+            else {
+                state.draggingState = nil
+                return .none
+            }
 
             switch DraggingSource.card(draggingState.card, in: state) {
             case let .pile(pileID?):
@@ -107,19 +106,24 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
             case .deck:
                 state.deck.upwards.remove(draggingState.card)
             case .pile, .foundation, .removed:
-                return Effect(value: .resetDraggedCards)
+                state.draggingState = nil
+                return .none
             }
 
             pile.cards.append(contentsOf: draggedCards)
             state.piles.updateOrAppend(pile)
 
-            return Effect(value: .resetDraggedCards)
+            state.draggingState = nil
+            return .none
         case let .foundation(foundationID, _):
             guard
                 var foundation = state.foundations[id: foundationID],
                 isValidScoring(card: draggingState.card, onto: foundation),
                 state.draggedCards.count == 1
-            else { return Effect(value: .resetDraggedCards) }
+            else {
+                state.draggingState = nil
+                return .none
+            }
 
             switch DraggingSource.card(draggingState.card, in: state) {
             case let .pile(pileID?):
@@ -127,39 +131,21 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
             case .deck:
                 state.deck.upwards.remove(draggingState.card)
             case .foundation, .pile, .removed:
-                return Effect(value: .resetDraggedCards)
+                state.draggingState = nil
+                return .none
             }
 
             foundation.cards.updateOrAppend(draggingState.card)
             state.foundations.updateOrAppend(foundation)
 
-            return Effect(value: .resetDraggedCards)
-        case .deck: return Effect(value: .resetDraggedCards)
-        case .none: return Effect(value: .resetDraggedCards)
+            state.draggingState = nil
+            return .none
+        case .deck, .none:
+            state.draggingState = nil
+            return .none
         }
     case let .setNamespace(namespace):
         state.namespace = namespace
-        return .none
-    case .updateDraggedCardsOffset:
-        guard let origin = state.draggingOrigin,
-              let position = state.draggingState?.position
-        else { return .none }
-
-        let width = position.x - origin.x - state.cardWidth/2
-        let height = position.y - origin.y - state.cardWidth * 7/5
-
-        for card in state.draggedCards {
-            state.draggedCardsOffsets[card] = CGSize(width: width, height: height)
-        }
-        return .none
-    case .resetDraggedCards:
-        for card in state.draggedCardsOffsets.keys { state.draggedCardsOffsets[card] = .zero }
-        state.draggingState = nil
-        return Effect(value: .resetDraggedCardsOffset)
-            .delay(for: 0.5, scheduler: environment.mainQueue)
-            .eraseToEffect()
-    case .resetDraggedCardsOffset:
-        state.draggedCardsOffsets.removeAll()
         return .none
     }
 }
@@ -207,49 +193,6 @@ extension AppState {
         if var lastCard = piles[id: pileID]?.cards.last {
             lastCard.isFacedUp = true
             piles[id: pileID]?.cards.updateOrAppend(lastCard)
-        }
-    }
-
-    func zIndex(source: DraggingSource) -> Double {
-        guard let card = draggedCardsOffsets.keys.first else { return 0 }
-        let currentlyDraggedSource = DraggingSource.card(card, in: self)
-        switch (source, currentlyDraggedSource) {
-        case let (.pile(pileID), .pile(currentlyDraggedPileID)):
-            return pileID == currentlyDraggedPileID ? 2 : 1
-        case let (.foundation(foundationID), .foundation(currentlyDraggedFoundationID)):
-            return foundationID == currentlyDraggedFoundationID ? 2 : 1
-        case (.deck, .deck), (.foundation, .deck):
-            return 1
-        default:
-            return 0
-        }
-    }
-
-    var draggingOrigin: CGPoint? {
-        guard let card = draggingState?.card ?? draggedCardsOffsets.keys.first
-        else { return nil }
-
-        switch DraggingSource.card(card, in: self) {
-        case let .pile(pileID):
-            return frames.first { frame in
-                if case let .pile(id, _) = frame, id == pileID {
-                    return true
-                } else {
-                    return false
-                }
-            }?.rect.origin
-        case let.foundation(foundationID):
-            return frames.first { frame in
-                if case let .foundation(id, _) = frame, id == foundationID {
-                    return true
-                } else {
-                    return false
-                }
-            }?.rect.origin
-        case .deck:
-            return frames.first { if case .deck = $0 { return true } else { return false } }?.rect.origin
-        case .removed:
-            return nil
         }
     }
 }

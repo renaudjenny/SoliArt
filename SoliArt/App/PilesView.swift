@@ -16,7 +16,6 @@ struct PilesView: View {
                                 viewStore.send(.updateFrame(.pile(pile.id, geo.frame(in: .global))))
                             }
                     }
-                    .zIndex(viewStore.state.zIndex(source: .pile(id: pile.id)))
                     .ignoresSafeArea()
                 }
             }
