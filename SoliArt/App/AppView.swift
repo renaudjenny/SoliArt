@@ -22,7 +22,7 @@ struct AppView: View {
         WithViewStore(store) { viewStore in
             VStack(spacing: 0) {
                 ScoreView(store: store)
-                FoundationsView(store: store)
+                FoundationsView(store: store).zIndex(foundationIndex(priority: viewStore.zIndexPriority))
                 PilesView(store: store)
             }
         }
@@ -41,6 +41,13 @@ struct AppView: View {
                         .position(position)
                 }
             }
+        }
+    }
+
+    private func foundationIndex(priority: DraggingSource) -> Double {
+        switch priority {
+        case .pile, .removed: return 0
+        case .foundation, .deck: return 1
         }
     }
 

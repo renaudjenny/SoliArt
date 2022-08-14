@@ -14,6 +14,7 @@ struct AppState: Equatable {
     var draggingState: DraggingState?
     var isGameOver = true
     var namespace: Namespace.ID?
+    var zIndexPriority: DraggingSource = .pile(id: nil)
 }
 
 enum AppAction: Equatable {
@@ -23,6 +24,7 @@ enum AppAction: Equatable {
     case updateFrame(Frame)
     case dragCard(Card, position: CGPoint)
     case dropCards
+    case resetZIndexPriority
     case setNamespace(Namespace.ID)
 }
 
@@ -81,6 +83,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
     case let .dragCard(card, position):
         guard card.isFacedUp else { return .none }
         state.draggingState = DraggingState(card: card, position: position)
+        state.zIndexPriority = DraggingSource.card(card, in: state)
         return .none
     case .dropCards:
         guard let draggingState = state.draggingState else { return .none }
@@ -88,6 +91,11 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         let dropFrame = state.frames.first { frame in
             frame.rect.contains(draggingState.position)
         }
+
+        let dropEffect = Effect<AppAction, Never>(value: .resetZIndexPriority)
+            .delay(for: 0.5, scheduler: environment.mainQueue)
+            .eraseToEffect()
+
         switch dropFrame {
         case let .pile(pileID, _):
             let draggedCards = state.draggedCards
@@ -95,7 +103,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
                   isValidMove(cards: draggedCards, onto: pile.cards.elements)
             else {
                 state.draggingState = nil
-                return .none
+                return dropEffect
             }
 
             switch DraggingSource.card(draggingState.card, in: state) {
@@ -107,14 +115,14 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
                 state.deck.upwards.remove(draggingState.card)
             case .pile, .foundation, .removed:
                 state.draggingState = nil
-                return .none
+                return dropEffect
             }
 
             pile.cards.append(contentsOf: draggedCards)
             state.piles.updateOrAppend(pile)
 
             state.draggingState = nil
-            return .none
+            return dropEffect
         case let .foundation(foundationID, _):
             guard
                 var foundation = state.foundations[id: foundationID],
@@ -122,7 +130,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
                 state.draggedCards.count == 1
             else {
                 state.draggingState = nil
-                return .none
+                return dropEffect
             }
 
             switch DraggingSource.card(draggingState.card, in: state) {
@@ -132,18 +140,21 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
                 state.deck.upwards.remove(draggingState.card)
             case .foundation, .pile, .removed:
                 state.draggingState = nil
-                return .none
+                return dropEffect
             }
 
             foundation.cards.updateOrAppend(draggingState.card)
             state.foundations.updateOrAppend(foundation)
 
             state.draggingState = nil
-            return .none
+            return dropEffect
         case .deck, .none:
             state.draggingState = nil
-            return .none
+            return dropEffect
         }
+    case .resetZIndexPriority:
+        state.zIndexPriority = .pile(id: nil)
+        return .none
     case let .setNamespace(namespace):
         state.namespace = namespace
         return .none
@@ -200,11 +211,6 @@ extension AppState {
 struct DraggingState: Equatable {
     let card: Card
     var position: CGPoint
-}
-
-struct DragCard: Equatable {
-    let origin: CGPoint
-    let offset: CGSize
 }
 
 enum DraggingSource: Equatable {

@@ -9,7 +9,7 @@ struct FoundationsView: View {
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack {
-                foundations
+                foundations.zIndex(zIndex(priority: viewStore.zIndexPriority))
                 deck
             }
             .padding()
@@ -29,6 +29,7 @@ struct FoundationsView: View {
                         .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
                             viewStore.send(.updateFrame(.foundation(foundation.id, geo.frame(in: .global))))
                         }}}
+                        .zIndex(zIndex(priority: viewStore.zIndexPriority, foundationID: foundation.id))
                 }
             }
         }
@@ -38,7 +39,7 @@ struct FoundationsView: View {
         WithViewStore(store) { viewStore in
             HStack {
                 Spacer()
-                deckUpwards.frame(width: viewStore.cardWidth).offset(x: -10)
+                deckUpwards.frame(width: viewStore.cardWidth).offset(x: -10).zIndex(1)
                 deckDownwards.frame(width: viewStore.cardWidth)
             }
         }
@@ -134,6 +135,13 @@ struct FoundationsView: View {
                 }
             }
         }
+    }
+
+    private func zIndex(priority: DraggingSource, foundationID: Foundation.ID? = nil) -> Double {
+        if case let .foundation(id) = priority {
+            return id == foundationID ? 2 : 1
+        }
+        return 0
     }
 }
 

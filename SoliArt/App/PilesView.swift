@@ -17,6 +17,7 @@ struct PilesView: View {
                             }
                     }
                     .ignoresSafeArea()
+                    .zIndex(zIndex(priority: viewStore.zIndexPriority, pileID: pile.id))
                 }
             }
             .padding()
@@ -42,6 +43,13 @@ struct PilesView: View {
             let spacing: Double = previous.card.isFacedUp ? spacing : 5
             return result + [(card, previous.yOffset + spacing)]
         }
+    }
+
+    private func zIndex(priority: DraggingSource, pileID: Pile.ID) -> Double {
+        if case let .pile(id) = priority {
+            return id == pileID ? 2 : 1
+        }
+        return 0
     }
 }
 
