@@ -6,7 +6,7 @@ import XCTest
 class AppCoreTests: XCTestCase {
     private var scheduler: TestSchedulerOf<DispatchQueue>!
     private var store: TestStore<AppState, AppState, AppAction, AppAction, AppEnvironment>!
-    private var cards = [StandardDeckCard].standard52Deck
+    private var cards: [StandardDeckCard] { cardsFromState(store.state) }
 
     @MainActor override func setUp() async throws {
         scheduler = DispatchQueue.test
@@ -54,7 +54,11 @@ class AppCoreTests: XCTestCase {
         }
 
         store.send(.flipDeck) {
-            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[28...])
+            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[28...].map {
+                var card = $0
+                card.isFacedUp = false
+                return card
+            })
             $0.deck.upwards = []
         }
 
@@ -69,15 +73,21 @@ class AppCoreTests: XCTestCase {
     func testDragCards() {
         shuffleCards()
 
-        let dragCards = DragCards(origin: .pile(cardIDs: [cards[42].id]), position: CGPoint(x: 123, y: 123))
-        store.send(.dragCards(dragCards)) {
-            $0.draggedCards = dragCards
+        let state = DraggingState(card: cards[5], position: CGPoint(x: 123, y: 123))
+        store.send(.dragCard(state.card, position: state.position)) {
+            $0.draggingState = state
+            $0.zIndexPriority = .pile(id: 3)
         }
 
-        store.send(.dragCards(nil)) {
-            $0.draggedCards = nil
+        store.send(.dropCards) {
+            $0.draggingState = nil
         }
-        store.receive(.dropCards(dragCards))
+
+        scheduler.advance(by: 0.5)
+
+        store.receive(.resetZIndexPriority) {
+            $0.zIndexPriority = .pile(id: nil)
+        }
     }
 
 
@@ -94,25 +104,25 @@ class AppCoreTests: XCTestCase {
             reducer: appReducer,
             environment: .testEasyGame(scheduler: scheduler)
         )
-        cards = AppEnvironment.superEasyGame.shuffleCards()
 
         let frame: Frame = .pile(5, CGRect(x: 100, y: 100, width: 100, height: 200))
         store.send(.updateFrame(frame)) {
             $0.frames = IdentifiedArrayOf(uniqueElements: [frame])
         }
 
-        shuffleCards(pilesAfterShuffle: Self.pilesAfterShuffleForEasyGame())
+        shuffleCards(
+            initialCards: AppEnvironment.superEasyGame.shuffleCards(),
+            pilesAfterShuffle: Self.pilesAfterShuffleForEasyGame()
+        )
 
         let dragCard = Card(.ace, of: .spades, isFacedUp: true)
-        let dragCards = DragCards(origin: .pile(cardIDs: [dragCard.id]), position: CGPoint(x: 123, y: 123))
-        store.send(.dragCards(dragCards)) {
-            $0.draggedCards = dragCards
+        let state = DraggingState(card: dragCard, position: CGPoint(x: 123, y: 123))
+        store.send(.dragCard(state.card, position: state.position)) {
+            $0.draggingState = state
+            $0.zIndexPriority = .pile(id: 4)
         }
-
-        store.send(.dragCards(nil)) {
-            $0.draggedCards = nil
-        }
-        store.receive(.dropCards(dragCards)) {
+        store.send(.dropCards) {
+            $0.draggingState = nil
             var pile4 = $0.piles[id: 4]!
             pile4.cards.remove(dragCard)
 
@@ -125,6 +135,12 @@ class AppCoreTests: XCTestCase {
             pile5.cards.updateOrAppend(dragCard)
             $0.piles.updateOrAppend(pile5)
         }
+
+        scheduler.advance(by: 0.5)
+
+        store.receive(.resetZIndexPriority) {
+            $0.zIndexPriority = .pile(id: nil)
+        }
     }
 
     func testDropCardsToAFoundation() {
@@ -133,25 +149,26 @@ class AppCoreTests: XCTestCase {
             reducer: appReducer,
             environment: .testEasyGame(scheduler: scheduler)
         )
-        cards = AppEnvironment.superEasyGame.shuffleCards()
 
         let frame: Frame = .foundation(Suit.spades.id, CGRect(x: 100, y: 100, width: 100, height: 200))
         store.send(.updateFrame(frame)) {
             $0.frames = IdentifiedArrayOf(uniqueElements: [frame])
         }
 
-        shuffleCards(pilesAfterShuffle: Self.pilesAfterShuffleForEasyGame())
+        shuffleCards(
+            initialCards: AppEnvironment.superEasyGame.shuffleCards(),
+            pilesAfterShuffle: Self.pilesAfterShuffleForEasyGame()
+        )
 
         let dragCard = Card(.ace, of: .spades, isFacedUp: true)
-        let dragCards = DragCards(origin: .pile(cardIDs: [dragCard.id]), position: CGPoint(x: 123, y: 123))
-        store.send(.dragCards(dragCards)) {
-            $0.draggedCards = dragCards
+        let state = DraggingState(card: dragCard, position: CGPoint(x: 123, y: 123))
+        store.send(.dragCard(state.card, position: state.position)) {
+            $0.draggingState = state
+            $0.zIndexPriority = .pile(id: 4)
         }
 
-        store.send(.dragCards(nil)) {
-            $0.draggedCards = nil
-        }
-        store.receive(.dropCards(dragCards)) {
+        store.send(.dropCards) {
+            $0.draggingState = nil
             var pile4 = $0.piles[id: 4]!
             pile4.cards.remove(dragCard)
 
@@ -166,10 +183,20 @@ class AppCoreTests: XCTestCase {
         }
     }
 
-    private func shuffleCards(pilesAfterShuffle: IdentifiedArrayOf<Pile> = pilesAfterShuffle()) {
+    private func cardsFromState(_ state: AppState) -> [Card] {
+        state.piles.flatMap(\.cards)
+            + state.foundations.flatMap(\.cards)
+            + state.deck.upwards.elements
+            + state.deck.downwards.elements
+    }
+
+    private func shuffleCards(
+        initialCards: [Card] = .standard52Deck,
+        pilesAfterShuffle: IdentifiedArrayOf<Pile> = pilesAfterShuffle()
+    ) {
         store.send(.shuffleCards) {
             $0.piles = pilesAfterShuffle
-            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[28...])
+            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: initialCards[28...])
             $0.isGameOver = false
         }
     }
