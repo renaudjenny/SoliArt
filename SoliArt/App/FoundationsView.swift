@@ -9,7 +9,7 @@ struct FoundationsView: View {
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack {
-                foundations
+                foundations.zIndex(zIndex(priority: viewStore.zIndexPriority))
                 deck
             }
             .padding()
@@ -29,6 +29,7 @@ struct FoundationsView: View {
                         .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
                             viewStore.send(.updateFrame(.foundation(foundation.id, geo.frame(in: .global))))
                         }}}
+                        .zIndex(zIndex(priority: viewStore.zIndexPriority, foundationID: foundation.id))
                 }
             }
         }
@@ -38,7 +39,7 @@ struct FoundationsView: View {
         WithViewStore(store) { viewStore in
             HStack {
                 Spacer()
-                deckUpwards.frame(width: viewStore.cardWidth).offset(x: -10)
+                deckUpwards.frame(width: viewStore.cardWidth).offset(x: -10).zIndex(1)
                 deckDownwards.frame(width: viewStore.cardWidth)
             }
         }
@@ -52,30 +53,10 @@ struct FoundationsView: View {
                     let content = StandardDeckCardView(card: card) { EmptyView() }
 
                     if card == viewStore.deck.upwards.last {
-                        content
-                            .gesture(DragGesture(coordinateSpace: .global)
-                                .onChanged { value in
-                                    if var draggedCards = viewStore.draggedCards {
-                                        draggedCards.position = value.location
-                                        viewStore.send(.dragCards(draggedCards))
-                                    } else {
-                                        viewStore.send(.dragCards(
-                                            DragCards(
-                                                origin: .deck(cardID: card.id),
-                                                position: value.location
-                                            )
-                                        ))
-                                    }
-                                }
-                                .onEnded { value in
-                                    viewStore.send(.dragCards(nil))
-                                }
-                            )
-                            .opacity(
-                                viewStore.actualDraggedCards?.contains(card) == true
-                                ? 0
-                                : 1
-                            )
+                        DraggableCardView(store: store, card: card)
+                            .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
+                                viewStore.send(.updateFrame(.deck(geo.frame(in: .global))))
+                            }}}
                             .offset(x: 5 * Double(upwards.firstIndex(of: card) ?? 0))
                     } else {
                         content.offset(x: 5 * Double(upwards.firstIndex(of: card) ?? 0))
@@ -150,33 +131,17 @@ struct FoundationsView: View {
                 }
 
                 foundation.cards.last.map { last in
-                    StandardDeckCardView(card: last) { EmptyView() }
-                        .gesture(DragGesture(coordinateSpace: .global)
-                            .onChanged { value in
-                                if var draggedCards = viewStore.draggedCards {
-                                    draggedCards.position = value.location
-                                    viewStore.send(.dragCards(draggedCards))
-                                } else {
-                                    viewStore.send(.dragCards(
-                                        DragCards(
-                                            origin: .foundation(cardID: last.id),
-                                            position: value.location
-                                        )
-                                    ))
-                                }
-                            }
-                            .onEnded { value in
-                                viewStore.send(.dragCards(nil))
-                            }
-                        )
-                        .opacity(
-                            viewStore.actualDraggedCards?.contains(last) == true
-                            ? 0
-                            : 1
-                        )
+                    DraggableCardView(store: store, card: last)
                 }
             }
         }
+    }
+
+    private func zIndex(priority: DraggingSource, foundationID: Foundation.ID? = nil) -> Double {
+        if case let .foundation(id) = priority {
+            return id == foundationID ? 2 : 1
+        }
+        return 0
     }
 }
 

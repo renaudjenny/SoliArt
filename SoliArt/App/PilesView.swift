@@ -10,13 +10,14 @@ struct PilesView: View {
             HStack {
                 ForEach(viewStore.piles) { pile in
                     GeometryReader { geo in
-                        cards(pileID: pile.id)
+                        cards(pileID: pile.id, origin: geo.frame(in: .global).origin)
                             .frame(maxHeight: 2/5 * geo.size.height, alignment: .top)
                             .task(id: viewStore.frames) {
                                 viewStore.send(.updateFrame(.pile(pile.id, geo.frame(in: .global))))
                             }
                     }
                     .ignoresSafeArea()
+                    .zIndex(zIndex(priority: viewStore.zIndexPriority, pileID: pile.id))
                 }
             }
             .padding()
@@ -24,31 +25,13 @@ struct PilesView: View {
         }
     }
 
-    private func cards(pileID: Pile.ID) -> some View {
+    private func cards(pileID: Pile.ID, origin: CGPoint) -> some View {
         WithViewStore(store) { viewStore in
             ZStack {
                 let cards = viewStore.piles[id: pileID]?.cards ?? []
                 let spacing = viewStore.cardWidth * 2/5 + 4
                 ForEach(cardsAndOffsets(cards: cards, spacing: spacing), id: \.card.id) { card, offset in
-                    StandardDeckCardView(card: card, backgroundContent: CardBackground.init)
-                        .offset(y: offset)
-                        .gesture(DragGesture(coordinateSpace: .global)
-                            .onChanged { value in
-                                if var draggedCards = viewStore.draggedCards {
-                                    draggedCards.position = value.location
-                                    viewStore.send(.dragCards(draggedCards))
-                                } else {
-                                    guard let cardIndex = cards.firstIndex(of: card) else { return }
-                                    viewStore.send(.dragCards(DragCards(
-                                        origin: .pile(cardIDs: cards[cardIndex...].map(\.id)),
-                                        position: value.location
-                                    )))
-                                }
-                            }
-                            .onEnded { value in
-                                viewStore.send(.dragCards(nil))
-                            })
-                        .opacity((viewStore.actualDraggedCards?.contains(card) ?? false) ? 0 : 1)
+                    DraggableCardView(store: store, card: card).offset(y: offset)
                 }
             }
         }
@@ -60,6 +43,13 @@ struct PilesView: View {
             let spacing: Double = previous.card.isFacedUp ? spacing : 5
             return result + [(card, previous.yOffset + spacing)]
         }
+    }
+
+    private func zIndex(priority: DraggingSource, pileID: Pile.ID) -> Double {
+        if case let .pile(id) = priority {
+            return id == pileID ? 2 : 1
+        }
+        return 0
     }
 }
 

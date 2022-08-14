@@ -4,6 +4,7 @@ import SwiftUICardGame
 
 struct AppView: View {
     let store: Store<AppState, AppAction>
+    @Namespace private var namespace
 
     var body: some View {
         WithViewStore(store) { viewStore in
@@ -13,6 +14,7 @@ struct AppView: View {
 //                debugDragFrames
             }
             .task { viewStore.send(.shuffleCards) }
+            .task { viewStore.send(.setNamespace(namespace)) }
         }
     }
 
@@ -20,7 +22,7 @@ struct AppView: View {
         WithViewStore(store) { viewStore in
             VStack(spacing: 0) {
                 ScoreView(store: store)
-                FoundationsView(store: store)
+                FoundationsView(store: store).zIndex(foundationIndex(priority: viewStore.zIndexPriority))
                 PilesView(store: store)
             }
         }
@@ -28,21 +30,28 @@ struct AppView: View {
 
     private var draggedCards: some View {
         WithViewStore(store) { viewStore in
-            if let position = viewStore.draggedCards?.position, let cards = viewStore.actualDraggedCards {
-                ZStack {
-                    ForEach(cards) { card in
-                        StandardDeckCardView(card: card, backgroundContent: { EmptyView() })
-                            .frame(width: viewStore.cardWidth)
-                            .offset(y: (viewStore.cardWidth * 2/5 + 4) * CGFloat(cards.firstIndex(of: card) ?? 0))
-                    }
+            if let position = viewStore.draggingState?.position {
+                let spacing = viewStore.cardWidth * 2/5 + 4
+
+                ForEach(viewStore.draggedCards) { card in
+                    StandardDeckCardView(card: card, backgroundContent: EmptyView.init)
+                        .frame(width: viewStore.cardWidth)
+                        .offset(y: (-spacing * 2.5) + Double(viewStore.draggedCards.firstIndex(of: card) ?? 0) * spacing)
+                        .matchedGeometryEffect(id: card, in: namespace)
+                        .position(position)
                 }
-                .position(position)
-                .offset(y: -viewStore.cardWidth * 2/5 - 4 - 20)
-                .ignoresSafeArea()
             }
         }
     }
 
+    private func foundationIndex(priority: DraggingSource) -> Double {
+        switch priority {
+        case .pile, .removed: return 0
+        case .foundation, .deck: return 1
+        }
+    }
+
+    #if DEBUG
     private var debugDragFrames: some View {
         WithViewStore(store) { viewStore in
             ForEach(viewStore.frames) { frame in
@@ -57,11 +66,17 @@ struct AppView: View {
                         .overlay { Text("Pile \(id)") }
                         .frame(width: rect.width, height: rect.height)
                         .position(CGPoint(x: rect.midX, y: rect.midY))
+                case let .deck(rect):
+                    Color.green
+                        .overlay { Text("Deck") }
+                        .frame(width: rect.width, height: rect.height)
+                        .position(CGPoint(x: rect.midX, y: rect.midY))
                 }
             }
             .ignoresSafeArea()
         }
     }
+    #endif
 }
 
 #if DEBUG
