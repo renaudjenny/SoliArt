@@ -181,6 +181,45 @@ class AppCoreTests: XCTestCase {
             spadesFoundation.cards.updateOrAppend(dragCard)
             $0.foundations.updateOrAppend(spadesFoundation)
         }
+
+        scheduler.advance(by: 0.5)
+
+        store.receive(.resetZIndexPriority) {
+            $0.zIndexPriority = .pile(id: nil)
+        }
+    }
+
+    func testDragAndDropCardFromAFoundation() {
+        testDropCardsToAFoundation()
+
+        let frame: Frame = .pile(5, CGRect(x: 300, y: 300, width: 100, height: 200))
+        store.send(.updateFrame(frame)) {
+            $0.frames = IdentifiedArrayOf(uniqueElements: $0.frames + [frame])
+        }
+
+        let dragCard = Card(.ace, of: .spades, isFacedUp: true)
+        let state = DraggingState(card: dragCard, position: CGPoint(x: 323, y: 323))
+        store.send(.dragCard(state.card, position: state.position)) {
+            $0.draggingState = state
+            $0.zIndexPriority = .foundation(id: Suit.spades.id)
+        }
+
+        store.send(.dropCards) {
+            $0.draggingState = nil
+            var spadesFoundation = $0.foundations[id: Suit.spades.id]!
+            spadesFoundation.cards.remove(dragCard)
+            $0.foundations.updateOrAppend(spadesFoundation)
+
+            var pile5 = $0.piles[id: 5]!
+            pile5.cards.append(dragCard)
+            $0.piles.updateOrAppend(pile5)
+        }
+
+        scheduler.advance(by: 0.5)
+
+        store.receive(.resetZIndexPriority) {
+            $0.zIndexPriority = .pile(id: nil)
+        }
     }
 
     private func cardsFromState(_ state: AppState) -> [Card] {
