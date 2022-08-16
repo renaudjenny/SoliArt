@@ -222,6 +222,37 @@ class AppCoreTests: XCTestCase {
         }
     }
 
+    func testResetGame() {
+        testDropCardsToAFoundation()
+
+        store.send(.promptResetGame) {
+            $0.resetGameAlert = .resetGame
+        }
+
+        store.send(.drawCard) {
+            var facedUpCard = self.cards[28]
+            facedUpCard.isFacedUp = true
+            $0.deck.upwards = IdentifiedArrayOf(uniqueElements: [facedUpCard])
+            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[29...])
+        }
+
+        store.send(.resetGame) {
+            $0.resetGameAlert = nil
+            $0.isGameOver = true
+        }
+
+        store.receive(.shuffleCards) {
+            $0.isGameOver = false
+            $0.foundations = IdentifiedArrayOf(
+                uniqueElements: Suit.orderedCases.map { Foundation(suit: $0, cards: []) }
+            )
+            $0.deck.upwards = []
+            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[28...])
+            $0.deck.downwards[id: self.cards[28].id]?.isFacedUp = false
+            $0.piles = Self.pilesAfterShuffleForEasyGame()
+        }
+    }
+
     private func cardsFromState(_ state: AppState) -> [Card] {
         state.piles.flatMap(\.cards)
             + state.foundations.flatMap(\.cards)

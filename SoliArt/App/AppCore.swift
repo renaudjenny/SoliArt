@@ -15,6 +15,7 @@ struct AppState: Equatable {
     var isGameOver = true
     var namespace: Namespace.ID?
     var zIndexPriority: DraggingSource = .pile(id: nil)
+    var resetGameAlert: AlertState<AppAction>?
 }
 
 enum AppAction: Equatable {
@@ -26,6 +27,9 @@ enum AppAction: Equatable {
     case dropCards
     case resetZIndexPriority
     case setNamespace(Namespace.ID)
+    case promptResetGame
+    case cancelResetGame
+    case resetGame
 }
 
 struct AppEnvironment {
@@ -53,7 +57,12 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
             return pile
         })
 
+        state.deck.upwards = []
         state.deck.downwards = IdentifiedArrayOf(uniqueElements: cards)
+
+        state.foundations = IdentifiedArrayOf(
+            uniqueElements: Suit.orderedCases.map { Foundation(suit: $0, cards: []) }
+        )
 
         state.isGameOver = false
         return .none
@@ -158,6 +167,16 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
     case let .setNamespace(namespace):
         state.namespace = namespace
         return .none
+    case .promptResetGame:
+        state.resetGameAlert = .resetGame
+        return .none
+    case .cancelResetGame:
+        state.resetGameAlert = nil
+        return .none
+    case .resetGame:
+        state.resetGameAlert = nil
+        state.isGameOver = true
+        return Effect(value: .shuffleCards)
     }
 }
 
@@ -258,7 +277,7 @@ enum Frame: Equatable, Hashable, Identifiable {
     }
 }
 
-private extension Suit {
+extension Suit {
     static var orderedCases: [Self] { [.hearts, .clubs, .diamonds, .spades] }
 }
 

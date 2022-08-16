@@ -15,6 +15,8 @@ struct AppView: View {
             }
             .task { viewStore.send(.shuffleCards) }
             .task { viewStore.send(.setNamespace(namespace)) }
+            .onTapGesture(count: 2) { viewStore.send(.promptResetGame) }
+            .alert(store.scope(state: \.resetGameAlert), dismiss: .cancelResetGame)
         }
     }
 
