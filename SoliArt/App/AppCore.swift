@@ -95,72 +95,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         state.zIndexPriority = DraggingSource.card(card, in: state)
         return .none
     case .dropCards:
-        guard let draggingState = state.draggingState else { return .none }
-
-        let dropFrame = state.frames.first { frame in
-            frame.rect.contains(draggingState.position)
-        }
-
-        let dropEffect = Effect<AppAction, Never>(value: .resetZIndexPriority)
-            .delay(for: 0.5, scheduler: environment.mainQueue)
-            .eraseToEffect()
-
-        switch dropFrame {
-        case let .pile(pileID, _):
-            let draggedCards = state.draggedCards
-            guard var pile = state.piles[id: pileID],
-                  isValidMove(cards: draggedCards, onto: pile.cards.elements)
-            else {
-                state.draggingState = nil
-                return dropEffect
-            }
-
-            switch DraggingSource.card(draggingState.card, in: state) {
-            case let .pile(pileID?):
-                state.removePileCards(pileID: pileID, cards: draggedCards)
-            case let .foundation(foundationID?):
-                state.foundations[id: foundationID]?.cards.remove(draggingState.card)
-            case .deck:
-                state.deck.upwards.remove(draggingState.card)
-            case .pile, .foundation, .removed:
-                state.draggingState = nil
-                return dropEffect
-            }
-
-            pile.cards.append(contentsOf: draggedCards)
-            state.piles.updateOrAppend(pile)
-
-            state.draggingState = nil
-            return dropEffect
-        case let .foundation(foundationID, _):
-            guard
-                var foundation = state.foundations[id: foundationID],
-                isValidScoring(card: draggingState.card, onto: foundation),
-                state.draggedCards.count == 1
-            else {
-                state.draggingState = nil
-                return dropEffect
-            }
-
-            switch DraggingSource.card(draggingState.card, in: state) {
-            case let .pile(pileID?):
-                state.removePileCards(pileID: pileID, cards: [draggingState.card])
-            case .deck:
-                state.deck.upwards.remove(draggingState.card)
-            case .foundation, .pile, .removed:
-                state.draggingState = nil
-                return dropEffect
-            }
-
-            foundation.cards.updateOrAppend(draggingState.card)
-            state.foundations.updateOrAppend(foundation)
-
-            state.draggingState = nil
-            return dropEffect
-        case .deck, .none:
-            state.draggingState = nil
-            return dropEffect
-        }
+        return state.dropCards(mainQueue: environment.mainQueue)
     case .resetZIndexPriority:
         state.zIndexPriority = .pile(id: nil)
         return .none
@@ -180,73 +115,9 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
     }
 }
 
-private func isValidMove(cards: [Card], onto: [Card]) -> Bool {
-    if onto.count == 0, cards.first?.rank == .king { return true }
-    guard let first = cards.first, let onto = onto.last, onto.isFacedUp else { return false }
-
-    let isColorDifferent: Bool
-    switch first.suit {
-    case .clubs, .spades: isColorDifferent = [.diamonds, .hearts].contains(onto.suit)
-    case .diamonds, .hearts: isColorDifferent = [.clubs, .spades].contains(onto.suit)
-    }
-
-    let isRankLower = first.rank == onto.rank.lower
-
-    return isColorDifferent && isRankLower
-}
-
-private func isValidScoring(card: Card?, onto foundation: Foundation) -> Bool {
-    guard let card = card else { return false }
-    let canScore = card.rank == .ace || card.rank.lower == foundation.cards.last?.rank
-    return card.suit == foundation.suit && canScore
-}
-
 extension AppState {
-
-    var draggedCards: [Card] {
-        guard let card = draggingState?.card else { return [] }
-        switch DraggingSource.card(card, in: self) {
-        case let .pile(id):
-            guard let id = id, let pile = piles[id: id], let index = pile.cards.firstIndex(of: card) else { return [] }
-            return Array(pile.cards[index...])
-        case .foundation, .deck, .removed:
-            return [card]
-        }
-    }
-
     var cardWidth: CGFloat {
         frames.first(where: { if case .pile = $0 { return true } else { return false } })?.rect.width ?? 0
-    }
-
-    mutating func removePileCards(pileID: Pile.ID, cards: [Card]) {
-        piles[id: pileID]?.cards.removeAll { cards.contains($0) }
-        if var lastCard = piles[id: pileID]?.cards.last {
-            lastCard.isFacedUp = true
-            piles[id: pileID]?.cards.updateOrAppend(lastCard)
-        }
-    }
-}
-
-struct DraggingState: Equatable {
-    let card: Card
-    var position: CGPoint
-}
-
-enum DraggingSource: Equatable {
-    case pile(id: Pile.ID?)
-    case foundation(id: Foundation.ID?)
-    case deck
-    case removed
-
-    static func card(_ card: Card, in state: AppState) -> Self {
-        if let pileID = state.piles.first(where: { $0.cards.contains(card) })?.id {
-            return .pile(id: pileID)
-        } else if let foundationID = state.foundations.first(where: { $0.cards.contains(card) })?.id {
-            return .foundation(id: foundationID)
-        } else if state.deck.upwards.contains(card) {
-            return .deck
-        }
-        return .removed
     }
 }
 
@@ -279,11 +150,4 @@ enum Frame: Equatable, Hashable, Identifiable {
 
 extension Suit {
     static var orderedCases: [Self] { [.hearts, .clubs, .diamonds, .spades] }
-}
-
-private extension Rank {
-    var lower: Rank? {
-        guard let index = Rank.allCases.firstIndex(of: self) else { return nil }
-        return index > 0 ? Rank.allCases[index - 1] : nil
-    }
 }
