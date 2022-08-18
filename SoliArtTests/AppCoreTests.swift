@@ -253,6 +253,23 @@ class AppCoreTests: XCTestCase {
         }
     }
 
+    func testDoubleTapCardWithoutScoring() {
+        shuffleCards()
+
+        let card = Card(.six, of: .clubs, isFacedUp: true)
+        store.send(.doubleTapCard(card))
+    }
+
+    func testDoubleTapCardToScore() {
+        shuffleCards()
+
+        let card = Card(.ace, of: .clubs, isFacedUp: true)
+        store.send(.doubleTapCard(card)) {
+            $0.foundations[id: Suit.clubs.rawValue]?.cards.append(card)
+            $0.piles[id: 1]?.cards.remove(card)
+        }
+    }
+
     private func cardsFromState(_ state: AppState) -> [Card] {
         state.piles.flatMap(\.cards)
             + state.foundations.flatMap(\.cards)

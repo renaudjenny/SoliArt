@@ -25,6 +25,7 @@ enum AppAction: Equatable {
     case updateFrame(Frame)
     case dragCard(Card, position: CGPoint)
     case dropCards
+    case doubleTapCard(Card)
     case resetZIndexPriority
     case setNamespace(Namespace.ID)
     case promptResetGame
@@ -98,6 +99,15 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment> { state, action, e
         return state.dropCards(mainQueue: environment.mainQueue)
     case .resetZIndexPriority:
         state.zIndexPriority = .pile(id: nil)
+        return .none
+    case let .doubleTapCard(card):
+        guard
+            card.isFacedUp,
+            let foundation = state.foundations.first(where: { $0.suit == card.suit })
+        else { return .none }
+
+        state.move(card: card, foundation: foundation)
+
         return .none
     case let .setNamespace(namespace):
         state.namespace = namespace

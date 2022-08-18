@@ -85,27 +85,12 @@ extension AppState {
             self.draggingState = nil
             return dropEffect
         case let .foundation(foundationID, _):
-            guard
-                var foundation = foundations[id: foundationID],
-                isValidScoring(card: draggingState.card, onto: foundation),
-                draggedCards.count == 1
-            else {
+            guard let foundation = foundations[id: foundationID], draggedCards.count == 1 else {
                 self.draggingState = nil
                 return dropEffect
             }
 
-            switch DraggingSource.card(draggingState.card, in: self) {
-            case let .pile(pileID?):
-                removePileCards(pileID: pileID, cards: [draggingState.card])
-            case .deck:
-                deck.upwards.remove(draggingState.card)
-            case .foundation, .pile, .removed:
-                self.draggingState = nil
-                return dropEffect
-            }
-
-            foundation.cards.updateOrAppend(draggingState.card)
-            foundations.updateOrAppend(foundation)
+            move(card: draggingState.card, foundation: foundation)
 
             self.draggingState = nil
             return dropEffect
@@ -113,6 +98,26 @@ extension AppState {
             self.draggingState = nil
             return dropEffect
         }
+    }
+
+    mutating func move(card: Card, foundation: Foundation) {
+        guard isValidScoring(card: card, onto: foundation) else { return }
+
+        switch DraggingSource.card(card, in: self) {
+        case let .pile(pileID?):
+            removePileCards(pileID: pileID, cards: [card])
+        case .deck:
+            deck.upwards.remove(card)
+        case .foundation, .pile, .removed:
+            self.draggingState = nil
+            return
+        }
+
+        var foundation = foundation
+        foundation.cards.updateOrAppend(card)
+        foundations.updateOrAppend(foundation)
+
+        return
     }
 }
 

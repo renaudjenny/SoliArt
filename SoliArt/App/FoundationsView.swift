@@ -58,6 +58,7 @@ struct FoundationsView: View {
                                 viewStore.send(.updateFrame(.deck(geo.frame(in: .global))))
                             }}}
                             .offset(x: 5 * Double(upwards.firstIndex(of: card) ?? 0))
+                            .onTapGesture(count: 2) { viewStore.send(.doubleTapCard(card), animation: .spring()) }
                     } else {
                         content.offset(x: 5 * Double(upwards.firstIndex(of: card) ?? 0))
                     }

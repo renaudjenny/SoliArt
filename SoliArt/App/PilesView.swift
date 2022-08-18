@@ -31,7 +31,9 @@ struct PilesView: View {
                 let cards = viewStore.piles[id: pileID]?.cards ?? []
                 let spacing = viewStore.cardWidth * 2/5 + 4
                 ForEach(cardsAndOffsets(cards: cards, spacing: spacing), id: \.card.id) { card, offset in
-                    DraggableCardView(store: store, card: card).offset(y: offset)
+                    DraggableCardView(store: store, card: card)
+                        .offset(y: offset)
+                        .onTapGesture(count: 2) { viewStore.send(.doubleTapCard(card), animation: .spring()) }
                 }
             }
         }
