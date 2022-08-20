@@ -16,6 +16,8 @@ struct ScoreEnvironment {}
 let scoreReducer = Reducer<ScoreState, ScoreAction, ScoreEnvironment> { state, action, environment in
     switch action {
     case let .score(type):
+        state.score += type.score
+        state.score = max(state.score, 0)
         return .none
     case .incrementMove:
         state.move += 1
