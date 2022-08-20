@@ -7,8 +7,8 @@ struct ScoreView: View {
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack(spacing: 40) {
-                Text("Score: \(viewStore.score) points").foregroundColor(.white)
-                Text("Moves: \(viewStore.moves)").foregroundColor(.white)
+                Text("Score: \(viewStore.score.score) points").foregroundColor(.white)
+                Text("Moves: \(viewStore.score.moves)").foregroundColor(.white)
                 Spacer()
             }
             .padding()

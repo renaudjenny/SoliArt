@@ -38,12 +38,15 @@ extension AppState {
         }
     }
 
-    mutating func removePileCards(pileID: Pile.ID, cards: [Card]) {
+    @discardableResult
+    mutating func removePileCards(pileID: Pile.ID, cards: [Card]) -> Bool {
         piles[id: pileID]?.cards.removeAll { cards.contains($0) }
         if var lastCard = piles[id: pileID]?.cards.last {
             lastCard.isFacedUp = true
             piles[id: pileID]?.cards.updateOrAppend(lastCard)
+            return true
         }
+        return false
     }
 
     mutating func dropCards(mainQueue: AnySchedulerOf<DispatchQueue>) -> Effect<AppAction, Never> {
@@ -67,13 +70,17 @@ extension AppState {
                 return dropEffect
             }
 
+            let scoringEffect: Effect<AppAction, Never>
             switch DraggingSource.card(draggingState.card, in: self) {
             case let .pile(pileID?):
-                removePileCards(pileID: pileID, cards: draggedCards)
+                let hasTurnOverCard = removePileCards(pileID: pileID, cards: draggedCards)
+                scoringEffect = hasTurnOverCard ? Effect(value: .score(.score(.turnOverPileCard))) : .none
             case let .foundation(foundationID?):
                 foundations[id: foundationID]?.cards.remove(draggingState.card)
+                scoringEffect = Effect(value: .score(.score(.moveBackFromFoundation)))
             case .deck:
                 deck.upwards.remove(draggingState.card)
+                scoringEffect = .none
             case .pile, .foundation, .removed:
                 self.draggingState = nil
                 return dropEffect
@@ -83,41 +90,40 @@ extension AppState {
             piles.updateOrAppend(pile)
 
             self.draggingState = nil
-            return dropEffect
+            return Effect.merge(dropEffect, scoringEffect)
         case let .foundation(foundationID, _):
             guard let foundation = foundations[id: foundationID], draggedCards.count == 1 else {
                 self.draggingState = nil
                 return dropEffect
             }
-
-            move(card: draggingState.card, foundation: foundation)
-
             self.draggingState = nil
-            return dropEffect
+            return Effect.merge(dropEffect, move(card: draggingState.card, foundation: foundation))
         case .deck, .none:
             self.draggingState = nil
             return dropEffect
         }
     }
 
-    mutating func move(card: Card, foundation: Foundation) {
-        guard isValidScoring(card: card, onto: foundation) else { return }
+    mutating func move(card: Card, foundation: Foundation) -> Effect<AppAction, Never> {
+        guard isValidScoring(card: card, onto: foundation) else { return .none }
 
+        let scoringEffect: Effect<AppAction, Never>
         switch DraggingSource.card(card, in: self) {
         case let .pile(pileID?):
             removePileCards(pileID: pileID, cards: [card])
+            scoringEffect = Effect(value: .score(.score(.moveToFoundation)))
         case .deck:
             deck.upwards.remove(card)
+            scoringEffect = Effect(value: .score(.score(.moveToFoundation)))
         case .foundation, .pile, .removed:
-            self.draggingState = nil
-            return
+            return .none
         }
 
         var foundation = foundation
         foundation.cards.updateOrAppend(card)
         foundations.updateOrAppend(foundation)
 
-        return
+        return scoringEffect
     }
 }
 

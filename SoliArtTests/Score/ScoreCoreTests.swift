@@ -9,15 +9,15 @@ class ScoreCoreTests: XCTestCase {
         let store = TestStore(initialState: ScoreState(), reducer: scoreReducer, environment: ScoreEnvironment())
 
         store.send(.incrementMove) {
-            $0.move = 1
+            $0.moves = 1
         }
 
         store.send(.incrementMove) {
-            $0.move = 2
+            $0.moves = 2
         }
 
         store.send(.resetMove) {
-            $0.move = 0
+            $0.moves = 0
         }
     }
 

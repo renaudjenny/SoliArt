@@ -2,7 +2,7 @@ import ComposableArchitecture
 
 struct ScoreState: Equatable {
     var score = 0
-    var move = 0
+    var moves = 0
 }
 
 enum ScoreAction: Equatable {
@@ -20,10 +20,10 @@ let scoreReducer = Reducer<ScoreState, ScoreAction, ScoreEnvironment> { state, a
         state.score = max(state.score, 0)
         return .none
     case .incrementMove:
-        state.move += 1
+        state.moves += 1
         return .none
     case .resetMove:
-        state.move = 0
+        state.moves = 0
         return .none
     }
 }

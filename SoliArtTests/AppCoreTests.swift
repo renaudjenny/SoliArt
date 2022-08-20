@@ -62,6 +62,8 @@ class AppCoreTests: XCTestCase {
             $0.deck.upwards = []
         }
 
+        store.receive(.score(.score(.recycling)))
+
         store.send(.drawCard) {
             var facedUpCard = self.cards[28]
             facedUpCard.isFacedUp = true
@@ -136,6 +138,10 @@ class AppCoreTests: XCTestCase {
             $0.piles.updateOrAppend(pile5)
         }
 
+        store.receive(.score(.score(.turnOverPileCard))) {
+            $0.score.score = 5
+        }
+
         scheduler.advance(by: 0.5)
 
         store.receive(.resetZIndexPriority) {
@@ -182,6 +188,10 @@ class AppCoreTests: XCTestCase {
             $0.foundations.updateOrAppend(spadesFoundation)
         }
 
+        store.receive(.score(.score(.moveToFoundation))) {
+            $0.score.score = 10
+        }
+
         scheduler.advance(by: 0.5)
 
         store.receive(.resetZIndexPriority) {
@@ -213,6 +223,10 @@ class AppCoreTests: XCTestCase {
             var pile5 = $0.piles[id: 5]!
             pile5.cards.append(dragCard)
             $0.piles.updateOrAppend(pile5)
+        }
+
+        store.receive(.score(.score(.moveBackFromFoundation))) {
+            $0.score.score = 0
         }
 
         scheduler.advance(by: 0.5)
