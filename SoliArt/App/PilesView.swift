@@ -42,7 +42,7 @@ struct PilesView: View {
     private func cardsAndOffsets(cards: IdentifiedArrayOf<Card>, spacing: Double) -> [(card: Card, yOffset: Double)] {
         cards.reduce([]) { result, card in
             guard let previous = result.last else { return [(card, 0)] }
-            let spacing: Double = previous.card.isFacedUp ? spacing : 5
+            let spacing: Double = previous.card.isFacedUp ? spacing : spacing/5
             return result + [(card, previous.yOffset + spacing)]
         }
     }

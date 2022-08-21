@@ -39,8 +39,8 @@ struct FoundationsView: View {
         WithViewStore(store) { viewStore in
             HStack {
                 Spacer()
-                deckUpwards.frame(width: viewStore.cardWidth).offset(x: -10).zIndex(1)
-                deckDownwards.frame(width: viewStore.cardWidth)
+                deckUpwards.frame(width: viewStore.cardWidth).padding(.trailing, viewStore.cardWidth * 1/5).zIndex(1)
+                deckDownwards.frame(width: viewStore.cardWidth).padding(.bottom, viewStore.cardWidth * 1/5)
             }
         }
     }
@@ -49,6 +49,7 @@ struct FoundationsView: View {
         WithViewStore(store) { viewStore in
             ZStack {
                 let upwards = IdentifiedArrayOf(uniqueElements: viewStore.deck.upwards.suffix(3))
+                let spacing = viewStore.cardWidth * 1/20
                 ForEach(upwards) { card in
                     let content = StandardDeckCardView(card: card) { EmptyView() }
 
@@ -57,10 +58,10 @@ struct FoundationsView: View {
                             .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
                                 viewStore.send(.updateFrame(.deck(geo.frame(in: .global))))
                             }}}
-                            .offset(x: 5 * Double(upwards.firstIndex(of: card) ?? 0))
+                            .offset(x: spacing * Double(upwards.firstIndex(of: card) ?? 0))
                             .onTapGesture(count: 2) { viewStore.send(.doubleTapCard(card), animation: .spring()) }
                     } else {
-                        content.offset(x: 5 * Double(upwards.firstIndex(of: card) ?? 0))
+                        content.offset(x: spacing * Double(upwards.firstIndex(of: card) ?? 0))
                     }
                 }
             }
@@ -75,7 +76,7 @@ struct FoundationsView: View {
                     ZStack {
                         ForEach(cards) { card in
                             StandardDeckCardView(card: card) { CardBackground() }
-                                .offset(y: Double(cards.firstIndex(of: card) ?? 0) * 5)
+                                .offset(y: Double(cards.firstIndex(of: card) ?? 0) * viewStore.cardWidth * 1/10)
                         }
                     }
                 }
