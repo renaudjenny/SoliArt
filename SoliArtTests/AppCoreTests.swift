@@ -253,6 +253,7 @@ class AppCoreTests: XCTestCase {
         store.send(.resetGame) {
             $0.resetGameAlert = nil
             $0.isGameOver = true
+            $0.score = ScoreState()
         }
 
         store.receive(.shuffleCards) {

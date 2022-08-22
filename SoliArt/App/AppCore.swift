@@ -125,6 +125,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         case .resetGame:
             state.resetGameAlert = nil
             state.isGameOver = true
+            state.score = ScoreState()
             return Effect(value: .shuffleCards)
         case .score:
             return .none
