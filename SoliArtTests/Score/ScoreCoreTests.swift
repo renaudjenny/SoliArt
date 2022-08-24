@@ -27,18 +27,30 @@ class ScoreCoreTests: XCTestCase {
         store.send(.score(.moveToFoundation)) {
             $0.score = 10
         }
+        store.receive(.incrementMove) {
+            $0.moves = 1
+        }
 
         store.send(.score(.turnOverPileCard)) {
             $0.score = 15
+        }
+        store.receive(.incrementMove) {
+            $0.moves = 2
         }
 
         store.send(.score(.moveBackFromFoundation)) {
             $0.score = 0
         }
+        store.receive(.incrementMove) {
+            $0.moves = 3
+        }
 
         for _ in 1...11 {
             store.send(.score(.moveToFoundation)) {
                 $0.score += 10
+            }
+            store.receive(.incrementMove) {
+                $0.moves += 1
             }
         }
 

@@ -141,6 +141,9 @@ class AppCoreTests: XCTestCase {
         store.receive(.score(.score(.turnOverPileCard))) {
             $0.score.score = 5
         }
+        store.receive(.score(.incrementMove)) {
+            $0.score.moves = 1
+        }
 
         scheduler.advance(by: 0.5)
 
@@ -191,6 +194,9 @@ class AppCoreTests: XCTestCase {
         store.receive(.score(.score(.moveToFoundation))) {
             $0.score.score = 10
         }
+        store.receive(.score(.incrementMove)) {
+            $0.score.moves = 1
+        }
 
         scheduler.advance(by: 0.5)
 
@@ -227,6 +233,9 @@ class AppCoreTests: XCTestCase {
 
         store.receive(.score(.score(.moveBackFromFoundation))) {
             $0.score.score = 0
+        }
+        store.receive(.score(.incrementMove)) {
+            $0.score.moves = 2
         }
 
         scheduler.advance(by: 0.5)

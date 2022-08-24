@@ -18,7 +18,7 @@ let scoreReducer = Reducer<ScoreState, ScoreAction, ScoreEnvironment> { state, a
     case let .score(type):
         state.score += type.score
         state.score = max(state.score, 0)
-        return .none
+        return type == .recycling ? .none : Effect(value: .incrementMove)
     case .incrementMove:
         state.moves += 1
         return .none

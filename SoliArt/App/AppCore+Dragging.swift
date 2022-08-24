@@ -74,13 +74,15 @@ extension AppState {
             switch DraggingSource.card(draggingState.card, in: self) {
             case let .pile(pileID?):
                 let hasTurnOverCard = removePileCards(pileID: pileID, cards: draggedCards)
-                scoringEffect = hasTurnOverCard ? Effect(value: .score(.score(.turnOverPileCard))) : .none
+                scoringEffect = hasTurnOverCard
+                ? Effect(value: .score(.score(.turnOverPileCard)))
+                : Effect(value: .score(.incrementMove))
             case let .foundation(foundationID?):
                 foundations[id: foundationID]?.cards.remove(draggingState.card)
                 scoringEffect = Effect(value: .score(.score(.moveBackFromFoundation)))
             case .deck:
                 deck.upwards.remove(draggingState.card)
-                scoringEffect = .none
+                scoringEffect = Effect(value: .score(.incrementMove))
             case .pile, .foundation, .removed:
                 self.draggingState = nil
                 return dropEffect
