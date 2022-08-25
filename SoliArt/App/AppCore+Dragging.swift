@@ -144,7 +144,7 @@ private func isValidMove(cards: [Card], onto: [Card]) -> Bool {
     return isColorDifferent && isRankLower
 }
 
-private func isValidScoring(card: Card?, onto foundation: Foundation) -> Bool {
+func isValidScoring(card: Card?, onto foundation: Foundation) -> Bool {
     guard let card = card else { return false }
     let canScore = card.rank == .ace || card.rank.lower == foundation.cards.last?.rank
     return card.suit == foundation.suit && canScore

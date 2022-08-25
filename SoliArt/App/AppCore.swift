@@ -15,6 +15,7 @@ struct AppState: Equatable {
     var namespace: Namespace.ID?
     var zIndexPriority: DraggingSource = .pile(id: nil)
     var resetGameAlert: AlertState<AppAction>?
+    var hint: Hint?
 }
 
 enum AppAction: Equatable {
@@ -31,6 +32,7 @@ enum AppAction: Equatable {
     case cancelResetGame
     case resetGame
     case score(ScoreAction)
+    case hint
 }
 
 struct AppEnvironment {
@@ -127,6 +129,21 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             state.isGameOver = true
             state.score = ScoreState()
             return Effect(value: .shuffleCards)
+        case .hint:
+            let hints: [Hint] = state.piles.flatMap { pile in
+                state.foundations.compactMap { foundation in
+                    guard let card = pile.cards.last else { return nil }
+                    return isValidScoring(card: card, onto: foundation)
+                    ? Hint(
+                        card: card,
+                        origin: .pile(id: pile.id),
+                        destination: .foundation(id: foundation.id)
+                    )
+                    : nil
+                }
+            }
+            state.hint = hints.first
+            return .none
         case .score:
             return .none
         }

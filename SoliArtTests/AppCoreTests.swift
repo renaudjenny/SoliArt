@@ -294,6 +294,27 @@ class AppCoreTests: XCTestCase {
         }
     }
 
+    func testHintToMoveFromPileToFoundation() {
+        store = TestStore(
+            initialState: AppState(),
+            reducer: appReducer,
+            environment: .testEasyGame(scheduler: scheduler)
+        )
+
+        shuffleCards(
+            initialCards: AppEnvironment.superEasyGame.shuffleCards(),
+            pilesAfterShuffle: Self.pilesAfterShuffleForEasyGame()
+        )
+
+        store.send(.hint) {
+            $0.hint = Hint(
+                card: Card(.ace, of: .clubs, isFacedUp: true),
+                origin: .pile(id: 1),
+                destination: .foundation(id: Suit.clubs.rawValue)
+            )
+        }
+    }
+
     private func cardsFromState(_ state: AppState) -> [Card] {
         state.piles.flatMap(\.cards)
             + state.foundations.flatMap(\.cards)
