@@ -315,6 +315,37 @@ class AppCoreTests: XCTestCase {
         }
     }
 
+    func testHintToMoveFromDeckToFoundation() {
+        store = TestStore(
+            initialState: AppState(),
+            reducer: appReducer,
+            environment: AppEnvironment(
+                mainQueue: scheduler.eraseToAnyScheduler(),
+                shuffleCards: { .easyFromTheDeck }
+            )
+        )
+
+        shuffleCards(
+            initialCards: .easyFromTheDeck,
+            pilesAfterShuffle: Self.pilesAfterShuffleForEasyFromTheDeck()
+        )
+
+        store.send(.drawCard) {
+            var facedUpCard = self.cards[28]
+            facedUpCard = Card(.ace, of: .clubs, isFacedUp: true)
+            $0.deck.upwards = IdentifiedArrayOf(uniqueElements: [facedUpCard])
+            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[29...])
+        }
+
+        store.send(.hint) {
+            $0.hint = Hint(
+                card: Card(.ace, of: .clubs, isFacedUp: true),
+                origin: .deck,
+                destination: .foundation(id: Suit.clubs.rawValue)
+            )
+        }
+    }
+
     private func cardsFromState(_ state: AppState) -> [Card] {
         state.piles.flatMap(\.cards)
             + state.foundations.flatMap(\.cards)
@@ -394,6 +425,21 @@ class AppCoreTests: XCTestCase {
             return pile
         })
     }
+
+    private static func pilesAfterShuffleForEasyFromTheDeck() -> IdentifiedArrayOf<Pile> {
+        var cards = [Card].easyFromTheDeck
+        return IdentifiedArrayOf(uniqueElements: (1...7).map {
+            var pile = Pile(id: $0, cards: IdentifiedArrayOf(uniqueElements: cards[..<$0]))
+            cards = Array(cards[$0...])
+
+            if var last = pile.cards.last {
+                last.isFacedUp = true
+                pile.cards.updateOrAppend(last)
+            }
+
+            return pile
+        })
+    }
 }
 
 extension AppEnvironment {
@@ -406,5 +452,18 @@ extension AppEnvironment {
             mainQueue: scheduler.eraseToAnyScheduler(),
             shuffleCards: { AppEnvironment.superEasyGame.shuffleCards() }
         )
+    }
+}
+
+private extension Array where Element == Card {
+    static var easyFromTheDeck: Self {
+        var cards = Rank.allCases.flatMap { rank in
+            Suit.allCases.map { suit in
+                StandardDeckCard(rank, of: suit, isFacedUp: false)
+            }
+        }
+        cards.swapAt(0, 28)
+        cards.swapAt(2, 29)
+        return cards
     }
 }

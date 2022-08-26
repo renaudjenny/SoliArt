@@ -130,7 +130,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             state.score = ScoreState()
             return Effect(value: .shuffleCards)
         case .hint:
-            let hints: [Hint] = state.piles.flatMap { pile in
+            let pileHints: [Hint] = state.piles.flatMap { pile in
                 state.foundations.compactMap { foundation in
                     guard let card = pile.cards.last else { return nil }
                     return isValidScoring(card: card, onto: foundation)
@@ -142,7 +142,15 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
                     : nil
                 }
             }
-            state.hint = hints.first
+
+            let deckHints: [Hint] = state.foundations.compactMap { foundation in
+                guard let card = state.deck.upwards.last else { return nil }
+                return isValidScoring(card: state.deck.upwards.last, onto: foundation)
+                ? Hint(card: card, origin: .deck, destination: .foundation(id: foundation.id))
+                : nil
+            }
+
+            state.hint = (pileHints + deckHints).first
             return .none
         case .score:
             return .none
