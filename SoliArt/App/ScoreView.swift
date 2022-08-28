@@ -10,6 +10,7 @@ struct ScoreView: View {
                 Text("Score: \(viewStore.score.score) points").foregroundColor(.white)
                 Text("Moves: \(viewStore.score.moves)").foregroundColor(.white)
                 Spacer()
+                Button("Hint") { viewStore.send(.hint, animation: .linear) }
             }
             .padding()
             .fixedSize(horizontal: false, vertical: true)

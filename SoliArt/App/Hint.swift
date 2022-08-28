@@ -4,7 +4,7 @@ struct Hint: Equatable {
     let card: Card
     let origin: Source
     let destination: Destination
-    let cardPosition: CGPoint
+    var cardPosition: CGPoint
 }
 
 extension Hint {

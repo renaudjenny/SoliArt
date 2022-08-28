@@ -11,6 +11,7 @@ struct AppView: View {
             ZStack {
                 content
                 draggedCards
+                hint
 //                debugDragFrames
             }
             .task { viewStore.send(.shuffleCards) }

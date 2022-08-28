@@ -20,13 +20,25 @@ extension AppState {
             else { return .zero }
 
             return CGPoint(x: rect.minX + cardWidth/2, y: rect.minY + cardWidth/2 * 7/5 + yOffset)
-        case .pile, .foundation, .removed: return .zero
         case .deck:
             guard let rect = frames.first(where: { if case .deck = $0 { return true } else { return false } })?.rect
             else { return .zero }
 
             let xOffset = Double(deck.upwards.firstIndex(of: card) ?? 0) * cardWidth * 1/20
             return CGPoint(x: rect.minX + cardWidth/2 - xOffset, y: rect.minY + (cardWidth * 7/5)/2)
+        case .pile, .foundation, .removed: return .zero
+        }
+    }
+
+    func destinationPosition(_ destination: Hint.Destination) -> CGPoint {
+        switch destination {
+        case let .foundation(id):
+            guard let rect = frames
+                .first(where: { if case .foundation(id, _) = $0 { return true } else { return false } })?.rect
+            else { return .zero }
+
+            return CGPoint(x: rect.midX, y: rect.midY)
+        case .pile: return .zero
         }
     }
 }

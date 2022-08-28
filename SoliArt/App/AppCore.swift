@@ -34,6 +34,7 @@ enum AppAction: Equatable {
     case score(ScoreAction)
     case hint
     case setHintCardPosition(CGPoint)
+    case removeHint
 }
 
 struct AppEnvironment {
@@ -157,9 +158,26 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
                 : nil
             }
 
-            state.hint = (pileHints + deckHints).first
-            return .none
+            guard let hint = (pileHints + deckHints).first else { return .none }
+            state.hint = hint
+
+            let initialPosition = hint.cardPosition
+            let destination = state.destinationPosition(hint.destination)
+            return .run { send in
+                try await environment.mainQueue.sleep(for: 0.5)
+                await send(.setHintCardPosition(destination), animation: .linear)
+                try await environment.mainQueue.sleep(for: 1)
+                await send(.setHintCardPosition(initialPosition))
+                try await environment.mainQueue.sleep(for: 1)
+                await send(.setHintCardPosition(destination), animation: .linear)
+                try await environment.mainQueue.sleep(for: 1)
+                await send(.removeHint)
+            }
         case let .setHintCardPosition(position):
+            state.hint?.cardPosition = position
+            return .none
+        case .removeHint:
+            state.hint = nil
             return .none
         case .score:
             return .none
