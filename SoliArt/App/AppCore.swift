@@ -33,6 +33,7 @@ enum AppAction: Equatable {
     case resetGame
     case score(ScoreAction)
     case hint
+    case setHintCardPosition(CGPoint)
 }
 
 struct AppEnvironment {
@@ -137,7 +138,8 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
                     ? Hint(
                         card: card,
                         origin: .pile(id: pile.id),
-                        destination: .foundation(id: foundation.id)
+                        destination: .foundation(id: foundation.id),
+                        cardPosition: state.cardPosition(card)
                     )
                     : nil
                 }
@@ -146,11 +148,18 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             let deckHints: [Hint] = state.foundations.compactMap { foundation in
                 guard let card = state.deck.upwards.last else { return nil }
                 return isValidScoring(card: state.deck.upwards.last, onto: foundation)
-                ? Hint(card: card, origin: .deck, destination: .foundation(id: foundation.id))
+                ? Hint(
+                    card: card,
+                    origin: .deck,
+                    destination: .foundation(id: foundation.id),
+                    cardPosition: state.cardPosition(card)
+                )
                 : nil
             }
 
             state.hint = (pileHints + deckHints).first
+            return .none
+        case let .setHintCardPosition(position):
             return .none
         case .score:
             return .none
@@ -161,33 +170,6 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
 extension AppState {
     var cardWidth: CGFloat {
         frames.first(where: { if case .pile = $0 { return true } else { return false } })?.rect.width ?? 0
-    }
-}
-
-enum Frame: Equatable, Hashable, Identifiable {
-    case pile(Pile.ID, CGRect)
-    case foundation(Foundation.ID, CGRect)
-    case deck(CGRect)
-
-    func hash(into hasher: inout Hasher) {
-        switch self {
-        case let .pile(pileID, _):
-            hasher.combine("Pile")
-            hasher.combine(pileID)
-        case let .foundation(foundationID, _):
-            hasher.combine("Foundation")
-            hasher.combine(foundationID)
-        case .deck:
-            hasher.combine("Deck")
-        }
-    }
-
-    var id: Int { hashValue }
-
-    var rect: CGRect {
-        switch self {
-        case let .pile(_, rect), let .foundation(_, rect), let .deck(rect): return rect
-        }
     }
 }
 

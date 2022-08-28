@@ -53,6 +53,18 @@ struct AppView: View {
         }
     }
 
+    private var hint: some View {
+        WithViewStore(store) { viewStore in
+            ZStack {
+                if let hint = viewStore.hint {
+                    StandardDeckCardView(card: hint.card, backgroundContent: EmptyView.init)
+                        .frame(width: viewStore.cardWidth)
+                        .position(hint.cardPosition)
+                }
+            }
+        }
+    }
+
     #if DEBUG
     private var debugDragFrames: some View {
         WithViewStore(store) { viewStore in

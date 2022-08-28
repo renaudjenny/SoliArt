@@ -10,7 +10,7 @@ struct PilesView: View {
             HStack {
                 ForEach(viewStore.piles) { pile in
                     GeometryReader { geo in
-                        cards(pileID: pile.id, origin: geo.frame(in: .global).origin)
+                        cards(pileID: pile.id)
                             .frame(maxHeight: 2/5 * geo.size.height, alignment: .top)
                             .task(id: viewStore.frames) {
                                 viewStore.send(.updateFrame(.pile(pile.id, geo.frame(in: .global))))
@@ -25,25 +25,15 @@ struct PilesView: View {
         }
     }
 
-    private func cards(pileID: Pile.ID, origin: CGPoint) -> some View {
+    private func cards(pileID: Pile.ID) -> some View {
         WithViewStore(store) { viewStore in
             ZStack {
-                let cards = viewStore.piles[id: pileID]?.cards ?? []
-                let spacing = viewStore.cardWidth * 2/5 + 4
-                ForEach(cardsAndOffsets(cards: cards, spacing: spacing), id: \.card.id) { card, offset in
+                ForEach(viewStore.state.pileCardsAndOffsets(pileID: pileID), id: \.card.id) { card, offset in
                     DraggableCardView(store: store, card: card)
                         .offset(y: offset)
                         .onTapGesture(count: 2) { viewStore.send(.doubleTapCard(card), animation: .spring()) }
                 }
             }
-        }
-    }
-
-    private func cardsAndOffsets(cards: IdentifiedArrayOf<Card>, spacing: Double) -> [(card: Card, yOffset: Double)] {
-        cards.reduce([]) { result, card in
-            guard let previous = result.last else { return [(card, 0)] }
-            let spacing: Double = previous.card.isFacedUp ? spacing : spacing/5
-            return result + [(card, previous.yOffset + spacing)]
         }
     }
 

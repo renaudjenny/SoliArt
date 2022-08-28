@@ -1,7 +1,10 @@
+import SwiftUI
+
 struct Hint: Equatable {
     let card: Card
     let origin: Source
     let destination: Destination
+    let cardPosition: CGPoint
 }
 
 extension Hint {
