@@ -14,25 +14,25 @@ struct AppView: View {
                 hint
 //                debugDragFrames
             }
-            .task { viewStore.send(.shuffleCards) }
-            .task { viewStore.send(.setNamespace(namespace)) }
-            .onTapGesture(count: 2) { viewStore.send(.promptResetGame) }
-            .alert(store.scope(state: \.resetGameAlert), dismiss: .cancelResetGame)
+            .task { viewStore.send(.game(.shuffleCards)) }
+            .task { viewStore.send(.drag(.setNamespace(namespace))) }
+            .onTapGesture(count: 2) { viewStore.send(.game(.promptResetGame)) }
+            .alert(store.scope(state: \.game.resetGameAlert), dismiss: .game(.cancelResetGame))
         }
     }
 
     private var content: some View {
         WithViewStore(store) { viewStore in
             VStack(spacing: 0) {
-                ScoreView(store: store.scope(state: \.score))
-                FoundationsView(store: store).zIndex(foundationIndex(priority: viewStore.zIndexPriority))
+                ScoreView(store: store.scope(state: \.score, action: AppAction.hint))
+                FoundationsView(store: store).zIndex(foundationIndex(priority: viewStore.drag.zIndexPriority))
                 PilesView(store: store)
             }
         }
     }
 
     private var draggedCards: some View {
-        WithViewStore(store) { viewStore in
+        WithViewStore(store.scope(state: \.drag)) { viewStore in
             if let position = viewStore.draggingState?.position {
                 let spacing = viewStore.cardWidth * 2/5 + 4
 
@@ -57,10 +57,10 @@ struct AppView: View {
     private var hint: some View {
         WithViewStore(store) { viewStore in
             ZStack {
-                if let hint = viewStore.hint {
+                if let hint = viewStore.hint.hint {
                     StandardDeckCardView(card: hint.card, backgroundContent: EmptyView.init)
-                        .frame(width: viewStore.cardWidth)
-                        .position(hint.cardPosition)
+                        .frame(width: viewStore.drag.cardWidth)
+                        .position(viewStore.hintCardPosition)
                 }
             }
             .ignoresSafeArea()
@@ -69,7 +69,7 @@ struct AppView: View {
 
     #if DEBUG
     private var debugDragFrames: some View {
-        WithViewStore(store) { viewStore in
+        WithViewStore(store.scope(state: \.drag)) { viewStore in
             ForEach(viewStore.frames) { frame in
                 switch frame {
                 case let .foundation(id, rect):
@@ -135,19 +135,21 @@ extension AppEnvironment {
 
 extension AppState {
     static let almostFinishedGame = AppState(
-        foundations: IdentifiedArrayOf(uniqueElements: Suit.allCases.map {
-            Foundation(suit: $0, cards: .allButLast(for: $0))
-        }),
-        piles: IdentifiedArrayOf<Pile>(uniqueElements: (1...7).map { Pile(id: $0, cards: []) }),
-        deck: Deck(
-            downwards: IdentifiedArrayOf(uniqueElements: [Card(.king, of: .clubs, isFacedUp: false)]),
-            upwards: IdentifiedArrayOf(uniqueElements: [
-                Card(.king, of: .diamonds, isFacedUp: true),
-                Card(.king, of: .hearts, isFacedUp: true),
-                Card(.king, of: .spades, isFacedUp: true)
-            ])
-        ),
-        isGameOver: false
+        game: GameState(
+            foundations: IdentifiedArrayOf(uniqueElements: Suit.allCases.map {
+                Foundation(suit: $0, cards: .allButLast(for: $0))
+            }),
+            piles: IdentifiedArrayOf<Pile>(uniqueElements: (1...7).map { Pile(id: $0, cards: []) }),
+            deck: Deck(
+                downwards: IdentifiedArrayOf(uniqueElements: [Card(.king, of: .clubs, isFacedUp: false)]),
+                upwards: IdentifiedArrayOf(uniqueElements: [
+                    Card(.king, of: .diamonds, isFacedUp: true),
+                    Card(.king, of: .hearts, isFacedUp: true),
+                    Card(.king, of: .spades, isFacedUp: true)
+                ])
+            ),
+            isGameOver: false
+        )
     )
 }
 

@@ -3,7 +3,7 @@ import SwiftUI
 import SwiftUICardGame
 
 struct DraggableCardView: View {
-    let store: Store<AppState, AppAction>
+    let store: Store<DragState, DragAction>
     let card: Card
 
     var body: some View {

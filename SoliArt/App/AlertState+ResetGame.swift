@@ -5,7 +5,7 @@ extension AlertState where Action == AppAction {
         AlertState(
             title: TextState("Are you sure? Your progress will be lost"),
             primaryButton: .cancel(TextState("Cancel")),
-            secondaryButton: .destructive(TextState("New game"), action: .send(.resetGame))
+            secondaryButton: .destructive(TextState("New game"), action: .send(.game(.resetGame)))
         )
     }
 }

@@ -8,17 +8,17 @@ struct DraggingState: Equatable {
 }
 
 enum DraggingSource: Equatable {
-    case pile(id: Pile.ID?)
-    case foundation(id: Foundation.ID?)
+    case pile(id: Pile.ID)
+    case foundation(id: Foundation.ID)
     case deck
     case removed
 
-    static func card(_ card: Card, in state: AppState) -> Self {
+    static func card(_ card: Card, in state: DragState) -> Self {
         if let pileID = state.piles.first(where: { $0.cards.contains(card) })?.id {
             return .pile(id: pileID)
         } else if let foundationID = state.foundations.first(where: { $0.cards.contains(card) })?.id {
             return .foundation(id: foundationID)
-        } else if state.deck.upwards.contains(card) {
+        } else if state.deckUpwards.contains(card) {
             return .deck
         }
         return .removed
@@ -26,12 +26,12 @@ enum DraggingSource: Equatable {
 }
 
 
-extension AppState {
+extension DragState {
     var draggedCards: [Card] {
         guard let card = draggingState?.card else { return [] }
         switch DraggingSource.card(card, in: self) {
         case let .pile(id):
-            guard let id = id, let pile = piles[id: id], let index = pile.cards.firstIndex(of: card) else { return [] }
+            guard let pile = piles[id: id], let index = pile.cards.firstIndex(of: card) else { return [] }
             return Array(pile.cards[index...])
         case .foundation, .deck, .removed:
             return [card]
@@ -49,14 +49,14 @@ extension AppState {
         return false
     }
 
-    mutating func dropCards(mainQueue: AnySchedulerOf<DispatchQueue>) -> Effect<AppAction, Never> {
+    mutating func dropCards(mainQueue: AnySchedulerOf<DispatchQueue>) -> Effect<DragAction, Never> {
         guard let draggingState = draggingState else { return .none }
 
         let dropFrame = frames.first { frame in
             frame.rect.contains(draggingState.position)
         }
 
-        let dropEffect = Effect<AppAction, Never>(value: .resetZIndexPriority)
+        let dropEffect = Effect<DragAction, Never>(value: .resetZIndexPriority)
             .delay(for: 0.5, scheduler: mainQueue)
             .eraseToEffect()
 
@@ -70,20 +70,20 @@ extension AppState {
                 return dropEffect
             }
 
-            let scoringEffect: Effect<AppAction, Never>
+            let scoringEffect: Effect<DragAction, Never>
             switch DraggingSource.card(draggingState.card, in: self) {
-            case let .pile(pileID?):
+            case let .pile(pileID):
                 let hasTurnOverCard = removePileCards(pileID: pileID, cards: draggedCards)
                 scoringEffect = hasTurnOverCard
                 ? Effect(value: .score(.score(.turnOverPileCard)))
                 : Effect(value: .score(.incrementMove))
-            case let .foundation(foundationID?):
+            case let .foundation(foundationID):
                 foundations[id: foundationID]?.cards.remove(draggingState.card)
                 scoringEffect = Effect(value: .score(.score(.moveBackFromFoundation)))
             case .deck:
-                deck.upwards.remove(draggingState.card)
+                deckUpwards.remove(draggingState.card)
                 scoringEffect = Effect(value: .score(.incrementMove))
-            case .pile, .foundation, .removed:
+            case .removed:
                 self.draggingState = nil
                 return dropEffect
             }
@@ -106,18 +106,18 @@ extension AppState {
         }
     }
 
-    mutating func move(card: Card, foundation: Foundation) -> Effect<AppAction, Never> {
+    mutating func move(card: Card, foundation: Foundation) -> Effect<DragAction, Never> {
         guard isValidScoring(card: card, onto: foundation) else { return .none }
 
-        let scoringEffect: Effect<AppAction, Never>
+        let scoringEffect: Effect<DragAction, Never>
         switch DraggingSource.card(card, in: self) {
-        case let .pile(pileID?):
+        case let .pile(pileID):
             removePileCards(pileID: pileID, cards: [card])
             scoringEffect = Effect(value: .score(.score(.moveToFoundation)))
         case .deck:
-            deck.upwards.remove(card)
+            deckUpwards.remove(card)
             scoringEffect = Effect(value: .score(.score(.moveToFoundation)))
-        case .foundation, .pile, .removed:
+        case .foundation, .removed:
             return .none
         }
 

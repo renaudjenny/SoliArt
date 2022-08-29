@@ -9,7 +9,7 @@ struct FoundationsView: View {
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack {
-                foundations.zIndex(zIndex(priority: viewStore.zIndexPriority))
+                foundations.zIndex(zIndex(priority: viewStore.drag.zIndexPriority))
                 deck
             }
             .padding()
@@ -18,7 +18,7 @@ struct FoundationsView: View {
     }
 
     private var foundations: some View {
-        WithViewStore(store) { viewStore in
+        WithViewStore(store.scope(state: \.drag, action: AppAction.drag)) { viewStore in
             HStack {
                 ForEach(viewStore.foundations) { foundation in
                     RoundedRectangle(cornerRadius: 4)
@@ -36,7 +36,7 @@ struct FoundationsView: View {
     }
 
     private var deck: some View {
-        WithViewStore(store) { viewStore in
+        WithViewStore(store.scope(state: \.drag)) { viewStore in
             HStack {
                 Spacer()
                 deckUpwards.frame(width: viewStore.cardWidth).padding(.trailing, viewStore.cardWidth * 1/5).zIndex(1)
@@ -46,11 +46,11 @@ struct FoundationsView: View {
     }
 
     private var deckUpwards: some View {
-        WithViewStore(store) { viewStore in
+        WithViewStore(store.scope(state: \.drag, action: AppAction.drag)) { viewStore in
             ZStack {
                 ForEach(viewStore.state.deckUpwardsCardsAndOffsets, id: \.card) { card, xOffset, isDraggable in
                     if isDraggable {
-                        DraggableCardView(store: store, card: card)
+                        DraggableCardView(store: store.scope(state: \.drag, action: AppAction.drag), card: card)
                             .onTapGesture(count: 2) { viewStore.send(.doubleTapCard(card), animation: .spring()) }
                             .offset(x: xOffset)
                     } else {
@@ -67,19 +67,19 @@ struct FoundationsView: View {
 
     private var deckDownwards: some View {
         WithViewStore(store) { viewStore in
-            if viewStore.deck.downwards.count > 0 {
-                Button { viewStore.send(.drawCard) } label: {
-                    let cards = IdentifiedArrayOf(uniqueElements:viewStore.deck.downwards.prefix(3))
+            if viewStore.game.deck.downwards.count > 0 {
+                Button { viewStore.send(.game(.drawCard)) } label: {
+                    let cards = IdentifiedArrayOf(uniqueElements:viewStore.game.deck.downwards.prefix(3))
                     ZStack {
                         ForEach(cards) { card in
                             StandardDeckCardView(card: card) { CardBackground() }
-                                .offset(y: Double(cards.firstIndex(of: card) ?? 0) * viewStore.cardWidth * 1/10)
+                                .offset(y: Double(cards.firstIndex(of: card) ?? 0) * viewStore.drag.cardWidth * 1/10)
                         }
                     }
                 }
                 .buttonStyle(.plain)
-            } else if viewStore.deck.downwards.count == 0 && viewStore.deck.upwards.count > 1 {
-                Button { viewStore.send(.flipDeck) } label: {
+            } else if viewStore.game.deck.downwards.count == 0 && viewStore.game.deck.upwards.count > 1 {
+                Button { viewStore.send(.game(.flipDeck)) } label: {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color.green)
                         .aspectRatio(5/7, contentMode: .fit)
@@ -130,7 +130,7 @@ struct FoundationsView: View {
                 }
 
                 foundation.cards.last.map { last in
-                    DraggableCardView(store: store, card: last)
+                    DraggableCardView(store: store.scope(state: \.drag, action: AppAction.drag), card: last)
                 }
             }
         }
@@ -163,8 +163,12 @@ struct FoundationsView_Previews: PreviewProvider {
                     FoundationsView(store: store)
                     PilesView(store: store)
                 }
-                .onAppear { viewStore.send(.shuffleCards) }
-                .onAppear { viewStore.send(.drawCard); viewStore.send(.drawCard); viewStore.send(.drawCard) }
+                .task { viewStore.send(.game(.shuffleCards)) }
+                .task {
+                    viewStore.send(.game(.drawCard))
+                    viewStore.send(.game(.drawCard))
+                    viewStore.send(.game(.drawCard))
+                }
             }
         }
     }

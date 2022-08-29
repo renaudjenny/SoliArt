@@ -8,16 +8,16 @@ struct PilesView: View {
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack {
-                ForEach(viewStore.piles) { pile in
+                ForEach(viewStore.game.piles) { pile in
                     GeometryReader { geo in
                         cards(pileID: pile.id)
                             .frame(maxHeight: 2/5 * geo.size.height, alignment: .top)
-                            .task(id: viewStore.frames) {
-                                viewStore.send(.updateFrame(.pile(pile.id, geo.frame(in: .global))))
+                            .task(id: viewStore.drag.frames) {
+                                viewStore.send(.drag(.updateFrame(.pile(pile.id, geo.frame(in: .global)))))
                             }
                     }
                     .ignoresSafeArea()
-                    .zIndex(zIndex(priority: viewStore.zIndexPriority, pileID: pile.id))
+                    .zIndex(zIndex(priority: viewStore.drag.zIndexPriority, pileID: pile.id))
                 }
             }
             .padding()
@@ -28,10 +28,10 @@ struct PilesView: View {
     private func cards(pileID: Pile.ID) -> some View {
         WithViewStore(store) { viewStore in
             ZStack {
-                ForEach(viewStore.state.pileCardsAndOffsets(pileID: pileID), id: \.card.id) { card, offset in
-                    DraggableCardView(store: store, card: card)
+                ForEach(viewStore.drag.pileCardsAndOffsets(pileID: pileID), id: \.card.id) { card, offset in
+                    DraggableCardView(store: store.scope(state: \.drag, action: AppAction.drag), card: card)
                         .offset(y: offset)
-                        .onTapGesture(count: 2) { viewStore.send(.doubleTapCard(card), animation: .spring()) }
+                        .onTapGesture(count: 2) { viewStore.send(.drag(.doubleTapCard(card)), animation: .spring()) }
                 }
             }
         }
@@ -60,7 +60,7 @@ struct PilesView_Previews: PreviewProvider {
 
         var body: some View {
             WithViewStore(store) { viewStore in
-                PilesView(store: store).onAppear { viewStore.send(.shuffleCards) }
+                PilesView(store: store).onAppear { viewStore.send(.game(.shuffleCards)) }
             }
         }
     }
