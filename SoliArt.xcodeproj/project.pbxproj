@@ -33,6 +33,9 @@
 		4CD881A228BCF2A1008B4619 /* GameCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881A128BCF2A1008B4619 /* GameCore.swift */; };
 		4CD881A628BCF43A008B4619 /* DragCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881A528BCF43A008B4619 /* DragCore.swift */; };
 		4CD881A928BCF572008B4619 /* HintCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881A828BCF572008B4619 /* HintCore.swift */; };
+		4CD881AC28BD5CD5008B4619 /* GameCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881AB28BD5CD5008B4619 /* GameCoreTests.swift */; };
+		4CD881AF28BD602B008B4619 /* DragCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881AE28BD602B008B4619 /* DragCoreTests.swift */; };
+		4CD881B228BD6196008B4619 /* HintCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881B128BD6196008B4619 /* HintCoreTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +84,9 @@
 		4CD881A128BCF2A1008B4619 /* GameCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCore.swift; sourceTree = "<group>"; };
 		4CD881A528BCF43A008B4619 /* DragCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragCore.swift; sourceTree = "<group>"; };
 		4CD881A828BCF572008B4619 /* HintCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintCore.swift; sourceTree = "<group>"; };
+		4CD881AB28BD5CD5008B4619 /* GameCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCoreTests.swift; sourceTree = "<group>"; };
+		4CD881AE28BD602B008B4619 /* DragCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragCoreTests.swift; sourceTree = "<group>"; };
+		4CD881B128BD6196008B4619 /* HintCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintCoreTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -171,6 +177,9 @@
 		4C3D195E28547D840096404F /* SoliArtTests */ = {
 			isa = PBXGroup;
 			children = (
+				4CD881B028BD6187008B4619 /* Hint */,
+				4CD881AD28BD601C008B4619 /* Drag */,
+				4CD881AA28BD5CBB008B4619 /* Game */,
 				4CB1CB5928B0318D0077C247 /* Score */,
 				4C3D195F28547D840096404F /* AppCoreTests.swift */,
 			);
@@ -252,6 +261,30 @@
 			children = (
 				4CD8819928B7F09C008B4619 /* Hint.swift */,
 				4CD881A828BCF572008B4619 /* HintCore.swift */,
+			);
+			path = Hint;
+			sourceTree = "<group>";
+		};
+		4CD881AA28BD5CBB008B4619 /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				4CD881AB28BD5CD5008B4619 /* GameCoreTests.swift */,
+			);
+			path = Game;
+			sourceTree = "<group>";
+		};
+		4CD881AD28BD601C008B4619 /* Drag */ = {
+			isa = PBXGroup;
+			children = (
+				4CD881AE28BD602B008B4619 /* DragCoreTests.swift */,
+			);
+			path = Drag;
+			sourceTree = "<group>";
+		};
+		4CD881B028BD6187008B4619 /* Hint */ = {
+			isa = PBXGroup;
+			children = (
+				4CD881B128BD6196008B4619 /* HintCoreTests.swift */,
 			);
 			path = Hint;
 			sourceTree = "<group>";
@@ -419,8 +452,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CD881AF28BD602B008B4619 /* DragCoreTests.swift in Sources */,
+				4CD881AC28BD5CD5008B4619 /* GameCoreTests.swift in Sources */,
 				4C3D196028547D840096404F /* AppCoreTests.swift in Sources */,
 				4CB1CB5B28B031C10077C247 /* ScoreCoreTests.swift in Sources */,
+				4CD881B228BD6196008B4619 /* HintCoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
