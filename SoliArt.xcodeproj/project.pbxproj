@@ -116,7 +116,6 @@
 				4CD8819928B7F09C008B4619 /* Hint.swift */,
 				4C6169D4286CDF34006B4D48 /* PilesView.swift */,
 				4CB1CB5628B02E8F0077C247 /* Score */,
-				4C6169D0286CDCCD006B4D48 /* ScoreView.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -200,6 +199,7 @@
 			isa = PBXGroup;
 			children = (
 				4CB1CB5728B02E980077C247 /* ScoreCore.swift */,
+				4C6169D0286CDCCD006B4D48 /* ScoreView.swift */,
 			);
 			path = Score;
 			sourceTree = "<group>";

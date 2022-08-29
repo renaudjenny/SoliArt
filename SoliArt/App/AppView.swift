@@ -24,7 +24,7 @@ struct AppView: View {
     private var content: some View {
         WithViewStore(store) { viewStore in
             VStack(spacing: 0) {
-                ScoreView(store: store)
+                ScoreView(store: store.scope(state: \.score))
                 FoundationsView(store: store).zIndex(foundationIndex(priority: viewStore.zIndexPriority))
                 PilesView(store: store)
             }

@@ -2,16 +2,24 @@ import ComposableArchitecture
 import SwiftUI
 
 struct ScoreView: View {
-    let store: Store<AppState, AppAction>
+    let store: Store<ScoreState, AppAction>
     
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack(spacing: 40) {
-                Text("Score: \(viewStore.score.score) points").foregroundColor(.white)
-                Text("Moves: \(viewStore.score.moves)").foregroundColor(.white)
+                HStack {
+                    Text("Score: \(viewStore.score) points")
+                        .foregroundColor(.white)
+                    Spacer()
+                    Text("Moves: \(viewStore.moves)")
+                        .foregroundColor(.white)
+                }
                 Spacer()
                 Button("Hint") { viewStore.send(.hint, animation: .linear) }
+                    .foregroundColor(.white)
+                    .buttonStyle(.bordered)
             }
+            .frame(maxWidth: .infinity)
             .padding()
             .fixedSize(horizontal: false, vertical: true)
             .background(Color.toolbar, ignoresSafeAreaEdges: .all)
