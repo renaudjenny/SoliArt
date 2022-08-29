@@ -63,6 +63,7 @@ struct AppView: View {
                         .position(hint.cardPosition)
                 }
             }
+            .ignoresSafeArea()
         }
     }
 

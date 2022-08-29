@@ -49,6 +49,8 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         environment: { _ in ScoreEnvironment() }
     ),
     Reducer { state, action, environment in
+        enum CancelID {}
+
         switch action {
         case .shuffleCards:
             guard state.isGameOver else { return .none }
@@ -173,6 +175,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
                 try await environment.mainQueue.sleep(for: 1)
                 await send(.removeHint)
             }
+            .cancellable(id: CancelID.self)
         case let .setHintCardPosition(position):
             state.hint?.cardPosition = position
             return .none

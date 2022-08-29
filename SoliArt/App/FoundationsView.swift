@@ -48,23 +48,20 @@ struct FoundationsView: View {
     private var deckUpwards: some View {
         WithViewStore(store) { viewStore in
             ZStack {
-                let upwards = IdentifiedArrayOf(uniqueElements: viewStore.deck.upwards.suffix(3))
-                let spacing = viewStore.cardWidth * 1/20
-                ForEach(upwards) { card in
-                    let content = StandardDeckCardView(card: card) { EmptyView() }
-
-                    if card == viewStore.deck.upwards.last {
+                ForEach(viewStore.state.deckUpwardsCardsAndOffsets, id: \.card) { card, xOffset, isDraggable in
+                    if isDraggable {
                         DraggableCardView(store: store, card: card)
-                            .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
-                                viewStore.send(.updateFrame(.deck(geo.frame(in: .global))))
-                            }}}
-                            .offset(x: spacing * Double(upwards.firstIndex(of: card) ?? 0))
                             .onTapGesture(count: 2) { viewStore.send(.doubleTapCard(card), animation: .spring()) }
+                            .offset(x: xOffset)
                     } else {
-                        content.offset(x: spacing * Double(upwards.firstIndex(of: card) ?? 0))
+                        StandardDeckCardView(card: card) { EmptyView() }
+                            .offset(x: xOffset)
                     }
                 }
             }
+            .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
+                viewStore.send(.updateFrame(.deck(geo.frame(in: .global))))
+            }}}
         }
     }
 

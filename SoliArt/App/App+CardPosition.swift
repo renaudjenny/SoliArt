@@ -11,6 +11,14 @@ extension AppState {
         }
     }
 
+    var deckUpwardsCardsAndOffsets: [(card: Card, xOffset: Double, isDraggable: Bool)] {
+        let spacing = cardWidth * 1/20
+        let cards = deck.upwards.suffix(3)
+        return cards.enumerated().map { offset, card in
+            (card, Double(offset) * spacing, isDraggable: cards.last == card)
+        }
+    }
+
     func cardPosition(_ card: Card) -> CGPoint {
         switch DraggingSource.card(card, in: self) {
         case let .pile(id?):
@@ -19,13 +27,14 @@ extension AppState {
                   let yOffset = pileCardsAndOffsets(pileID: id).first(where: { $0.card == card })?.yOffset
             else { return .zero }
 
-            return CGPoint(x: rect.minX + cardWidth/2, y: rect.minY + cardWidth/2 * 7/5 + yOffset)
+            return CGPoint(x: rect.midX, y: rect.minY + cardWidth/2 * 7/5 + yOffset)
         case .deck:
-            guard let rect = frames.first(where: { if case .deck = $0 { return true } else { return false } })?.rect
+            guard
+                let rect = frames.first(where: { if case .deck = $0 { return true } else { return false } })?.rect,
+                let xOffset = deckUpwardsCardsAndOffsets.first(where: { $0.card == card })?.xOffset
             else { return .zero }
 
-            let xOffset = Double(deck.upwards.firstIndex(of: card) ?? 0) * cardWidth * 1/20
-            return CGPoint(x: rect.minX + cardWidth/2 - xOffset, y: rect.minY + (cardWidth * 7/5)/2)
+            return CGPoint(x: rect.midX + xOffset, y: rect.midY)
         case .pile, .foundation, .removed: return .zero
         }
     }
