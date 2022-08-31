@@ -73,6 +73,8 @@ class GameCoreTests: XCTestCase {
     func testResetGame() {
         // TODO: do something that scores
 
+        shuffleCards()
+
         store.send(.promptResetGame) {
             $0.resetGameAlert = .resetGame
         }
@@ -101,19 +103,7 @@ class GameCoreTests: XCTestCase {
         }
     }
 
-
-    private func shuffleCards(
-        initialCards: [Card] = .standard52Deck,
-        pilesAfterShuffle: IdentifiedArrayOf<Pile> = pilesAfterShuffle()
-    ) {
-        store.send(.shuffleCards) {
-            $0.piles = pilesAfterShuffle
-            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: initialCards[28...])
-            $0.isGameOver = false
-        }
-    }
-
-    private static func pilesAfterShuffle() -> IdentifiedArrayOf<Pile> {
+    static func pilesAfterShuffle() -> IdentifiedArrayOf<Pile> {
         IdentifiedArrayOf(uniqueElements: [
             Pile(id: 1, cards: IdentifiedArrayOf(uniqueElements: [
                 StandardDeckCard(.ace, of: .clubs, isFacedUp: true)
@@ -160,7 +150,7 @@ class GameCoreTests: XCTestCase {
         ])
     }
 
-    private static func pilesAfterShuffleForEasyGame() -> IdentifiedArrayOf<Pile> {
+    static func pilesAfterShuffleForEasyGame() -> IdentifiedArrayOf<Pile> {
         var cards = AppEnvironment.superEasyGame.shuffleCards()
         return IdentifiedArrayOf(uniqueElements: (1...7).map {
             var pile = Pile(id: $0, cards: IdentifiedArrayOf(uniqueElements: cards[..<$0]))
@@ -175,7 +165,7 @@ class GameCoreTests: XCTestCase {
         })
     }
 
-    private static func pilesAfterShuffleForEasyFromTheDeck() -> IdentifiedArrayOf<Pile> {
+    static func pilesAfterShuffleForEasyFromTheDeck() -> IdentifiedArrayOf<Pile> {
         var cards = [Card].easyFromTheDeck
         return IdentifiedArrayOf(uniqueElements: (1...7).map {
             var pile = Pile(id: $0, cards: IdentifiedArrayOf(uniqueElements: cards[..<$0]))
@@ -188,6 +178,17 @@ class GameCoreTests: XCTestCase {
 
             return pile
         })
+    }
+
+    private func shuffleCards(
+        initialCards: [Card] = .standard52Deck,
+        pilesAfterShuffle: IdentifiedArrayOf<Pile> = pilesAfterShuffle()
+    ) {
+        store.send(.shuffleCards) {
+            $0.piles = pilesAfterShuffle
+            $0.deck.downwards = IdentifiedArrayOf(uniqueElements: initialCards[28...])
+            $0.isGameOver = false
+        }
     }
 
     private func cardsFromState(_ state: GameState) -> [Card] {

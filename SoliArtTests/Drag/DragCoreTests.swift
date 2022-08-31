@@ -10,16 +10,17 @@ class DragCoreTests: XCTestCase {
     @MainActor override func setUp() async throws {
         scheduler = DispatchQueue.test
         store = TestStore(
-            initialState: DragState(),
+            initialState: DragState(
+                piles: GameCoreTests.pilesAfterShuffle(),
+                foundations: GameState().foundations
+            ),
             reducer: dragReducer,
             environment: DragEnvironment(mainQueue: .main)
         )
     }
 
     func testDragCards() {
-        shuffleCards()
-
-        let state = DraggingState(card: cards[5], position: CGPoint(x: 123, y: 123))
+        let state = DraggingState(card: Card(.six, of: .clubs, isFacedUp: true), position: CGPoint(x: 123, y: 123))
         store.send(.dragCard(state.card, position: state.position)) {
             $0.draggingState = state
             $0.zIndexPriority = .pile(id: 3)
@@ -32,7 +33,7 @@ class DragCoreTests: XCTestCase {
         scheduler.advance(by: 0.5)
 
         store.receive(.resetZIndexPriority) {
-            $0.zIndexPriority = .pile(id: nil)
+            $0.zIndexPriority = .pile(id: 1)
         }
     }
 
@@ -46,20 +47,17 @@ class DragCoreTests: XCTestCase {
 
     func testDropCardsToAnOtherPile() {
         store = TestStore(
-            initialState: AppState(),
-            reducer: appReducer,
-            environment: .testEasyGame(scheduler: scheduler)
+            initialState: DragState(
+                piles: GameCoreTests.pilesAfterShuffleForEasyGame()
+            ),
+            reducer: dragReducer,
+            environment: DragEnvironment(mainQueue: .main)
         )
 
         let frame: Frame = .pile(5, CGRect(x: 100, y: 100, width: 100, height: 200))
         store.send(.updateFrame(frame)) {
             $0.frames = IdentifiedArrayOf(uniqueElements: [frame])
         }
-
-        shuffleCards(
-            initialCards: AppEnvironment.superEasyGame.shuffleCards(),
-            pilesAfterShuffle: Self.pilesAfterShuffleForEasyGame()
-        )
 
         let dragCard = Card(.ace, of: .spades, isFacedUp: true)
         let state = DraggingState(card: dragCard, position: CGPoint(x: 123, y: 123))
@@ -82,36 +80,30 @@ class DragCoreTests: XCTestCase {
             $0.piles.updateOrAppend(pile5)
         }
 
-        store.receive(.score(.score(.turnOverPileCard))) {
-            $0.score.score = 5
-        }
-        store.receive(.score(.incrementMove)) {
-            $0.score.moves = 1
-        }
+        store.receive(.score(.score(.turnOverPileCard)))
+        store.receive(.score(.incrementMove))
 
         scheduler.advance(by: 0.5)
 
         store.receive(.resetZIndexPriority) {
-            $0.zIndexPriority = .pile(id: nil)
+            $0.zIndexPriority = .pile(id: 1)
         }
     }
 
     func testDropCardsToAFoundation() {
         store = TestStore(
-            initialState: AppState(),
-            reducer: appReducer,
-            environment: .testEasyGame(scheduler: scheduler)
+            initialState: DragState(
+                piles: GameCoreTests.pilesAfterShuffleForEasyGame(),
+                foundations: GameState().foundations
+            ),
+            reducer: dragReducer,
+            environment: DragEnvironment(mainQueue: .main)
         )
 
         let frame: Frame = .foundation(Suit.spades.id, CGRect(x: 100, y: 100, width: 100, height: 200))
         store.send(.updateFrame(frame)) {
             $0.frames = IdentifiedArrayOf(uniqueElements: [frame])
         }
-
-        shuffleCards(
-            initialCards: AppEnvironment.superEasyGame.shuffleCards(),
-            pilesAfterShuffle: Self.pilesAfterShuffleForEasyGame()
-        )
 
         let dragCard = Card(.ace, of: .spades, isFacedUp: true)
         let state = DraggingState(card: dragCard, position: CGPoint(x: 123, y: 123))
@@ -135,17 +127,13 @@ class DragCoreTests: XCTestCase {
             $0.foundations.updateOrAppend(spadesFoundation)
         }
 
-        store.receive(.score(.score(.moveToFoundation))) {
-            $0.score.score = 10
-        }
-        store.receive(.score(.incrementMove)) {
-            $0.score.moves = 1
-        }
+        store.receive(.score(.score(.moveToFoundation)))
+        store.receive(.score(.incrementMove))
 
         scheduler.advance(by: 0.5)
 
         store.receive(.resetZIndexPriority) {
-            $0.zIndexPriority = .pile(id: nil)
+            $0.zIndexPriority = .pile(id: 1)
         }
     }
 
@@ -175,30 +163,22 @@ class DragCoreTests: XCTestCase {
             $0.piles.updateOrAppend(pile5)
         }
 
-        store.receive(.score(.score(.moveBackFromFoundation))) {
-            $0.score.score = 0
-        }
-        store.receive(.score(.incrementMove)) {
-            $0.score.moves = 2
-        }
+        store.receive(.score(.score(.moveBackFromFoundation)))
+        store.receive(.score(.incrementMove))
 
         scheduler.advance(by: 0.5)
 
         store.receive(.resetZIndexPriority) {
-            $0.zIndexPriority = .pile(id: nil)
+            $0.zIndexPriority = .pile(id: 1)
         }
     }
 
     func testDoubleTapCardWithoutScoring() {
-        shuffleCards()
-
         let card = Card(.six, of: .clubs, isFacedUp: true)
         store.send(.doubleTapCard(card))
     }
 
     func testDoubleTapCardToScore() {
-        shuffleCards()
-
         let card = Card(.ace, of: .clubs, isFacedUp: true)
         store.send(.doubleTapCard(card)) {
             $0.foundations[id: Suit.clubs.rawValue]?.cards.append(card)
