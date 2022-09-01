@@ -11,6 +11,7 @@ class HintCoreTests: XCTestCase {
         scheduler = DispatchQueue.test
         store = TestStore(
             initialState: HintState(
+                foundations: GameState().foundations,
                 piles: GameCoreTests.pilesAfterShuffleForEasyGame()
             ),
             reducer: hintReducer,
@@ -32,6 +33,7 @@ class HintCoreTests: XCTestCase {
     func testHintToMoveFromDeckToFoundation() {
         store = TestStore(
             initialState: HintState(
+                foundations: GameState().foundations,
                 piles: GameCoreTests.pilesAfterShuffleForEasyFromTheDeck(),
                 deckUpwards: IdentifiedArrayOf(uniqueElements: [
                     Card(.ace, of: .clubs, isFacedUp: true)

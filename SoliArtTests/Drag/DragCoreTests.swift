@@ -15,7 +15,7 @@ class DragCoreTests: XCTestCase {
                 foundations: GameState().foundations
             ),
             reducer: dragReducer,
-            environment: DragEnvironment(mainQueue: .main)
+            environment: DragEnvironment(mainQueue: scheduler.eraseToAnyScheduler())
         )
     }
 
@@ -51,7 +51,7 @@ class DragCoreTests: XCTestCase {
                 piles: GameCoreTests.pilesAfterShuffleForEasyGame()
             ),
             reducer: dragReducer,
-            environment: DragEnvironment(mainQueue: .main)
+            environment: DragEnvironment(mainQueue: scheduler.eraseToAnyScheduler())
         )
 
         let frame: Frame = .pile(5, CGRect(x: 100, y: 100, width: 100, height: 200))
@@ -81,7 +81,6 @@ class DragCoreTests: XCTestCase {
         }
 
         store.receive(.score(.score(.turnOverPileCard)))
-        store.receive(.score(.incrementMove))
 
         scheduler.advance(by: 0.5)
 
@@ -97,7 +96,7 @@ class DragCoreTests: XCTestCase {
                 foundations: GameState().foundations
             ),
             reducer: dragReducer,
-            environment: DragEnvironment(mainQueue: .main)
+            environment: DragEnvironment(mainQueue: scheduler.eraseToAnyScheduler())
         )
 
         let frame: Frame = .foundation(Suit.spades.id, CGRect(x: 100, y: 100, width: 100, height: 200))
@@ -128,7 +127,6 @@ class DragCoreTests: XCTestCase {
         }
 
         store.receive(.score(.score(.moveToFoundation)))
-        store.receive(.score(.incrementMove))
 
         scheduler.advance(by: 0.5)
 
@@ -164,7 +162,6 @@ class DragCoreTests: XCTestCase {
         }
 
         store.receive(.score(.score(.moveBackFromFoundation)))
-        store.receive(.score(.incrementMove))
 
         scheduler.advance(by: 0.5)
 

@@ -99,7 +99,7 @@ class GameCoreTests: XCTestCase {
             $0.deck.upwards = []
             $0.deck.downwards = IdentifiedArrayOf(uniqueElements: self.cards[28...])
             $0.deck.downwards[id: self.cards[28].id]?.isFacedUp = false
-            $0.piles = Self.pilesAfterShuffleForEasyGame()
+            $0.piles = Self.pilesAfterShuffle()
         }
     }
 
