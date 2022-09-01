@@ -1,6 +1,6 @@
 import SwiftUI
 
-extension AppState {
+extension DragState {
     func pileCardsAndOffsets(pileID: Pile.ID) -> [(card: Card, yOffset: Double)] {
         guard let cards = piles[id: pileID]?.cards else { return [] }
         let spacing = cardWidth * 2/5 + 4
@@ -13,7 +13,7 @@ extension AppState {
 
     var deckUpwardsCardsAndOffsets: [(card: Card, xOffset: Double, isDraggable: Bool)] {
         let spacing = cardWidth * 1/20
-        let cards = deck.upwards.suffix(3)
+        let cards = deckUpwards.suffix(3)
         return cards.enumerated().map { offset, card in
             (card, Double(offset) * spacing, isDraggable: cards.last == card)
         }
@@ -21,7 +21,7 @@ extension AppState {
 
     func cardPosition(_ card: Card) -> CGPoint {
         switch DraggingSource.card(card, in: self) {
-        case let .pile(id?):
+        case let .pile(id):
             guard let rect = frames
                 .first(where: { if case .pile(id, _) = $0 { return true } else { return false } })?.rect,
                   let yOffset = pileCardsAndOffsets(pileID: id).first(where: { $0.card == card })?.yOffset
@@ -35,7 +35,7 @@ extension AppState {
             else { return .zero }
 
             return CGPoint(x: rect.midX + xOffset, y: rect.midY)
-        case .pile, .foundation, .removed: return .zero
+        case .foundation, .removed: return .zero
         }
     }
 

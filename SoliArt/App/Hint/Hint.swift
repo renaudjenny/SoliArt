@@ -4,7 +4,7 @@ struct Hint: Equatable {
     let card: Card
     let origin: Source
     let destination: Destination
-    var cardPosition: CGPoint
+    var position: Position
 }
 
 extension Hint {
@@ -16,5 +16,9 @@ extension Hint {
     enum Destination: Equatable {
         case pile(id: Pile.ID)
         case foundation(id: Foundation.ID)
+    }
+
+    enum Position: Equatable {
+        case source, destination
     }
 }

@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 struct ScoreView: View {
-    let store: Store<ScoreState, AppAction>
+    let store: Store<ScoreState, HintAction>
     
     var body: some View {
         WithViewStore(store) { viewStore in
