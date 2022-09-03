@@ -12,7 +12,7 @@ class AppCoreTests: XCTestCase {
         store = TestStore(
             initialState: AppState(),
             reducer: appReducer,
-            environment: AppEnvironment(mainQueue: .main, shuffleCards: { [Card].standard52Deck })
+            environment: AppEnvironment(mainQueue: .main, shuffleCards: { [Card].standard52Deck }, now: Date.init)
         )
     }
 }

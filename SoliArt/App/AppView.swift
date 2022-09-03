@@ -24,7 +24,7 @@ struct AppView: View {
     private var content: some View {
         WithViewStore(store) { viewStore in
             VStack(spacing: 0) {
-                ScoreView(store: store.scope(state: \.score, action: AppAction.hint))
+                ScoreView(store: store.scope(state: \.score))
                 FoundationsView(store: store).zIndex(foundationIndex(priority: viewStore.drag.zIndexPriority))
                 PilesView(store: store)
             }
@@ -103,7 +103,8 @@ struct AppView_Previews: PreviewProvider {
             reducer: appReducer,
             environment: AppEnvironment(
                 mainQueue: .main,
-                shuffleCards: { .standard52Deck.shuffled() }
+                shuffleCards: { .standard52Deck.shuffled() },
+                now: Date.init
             )
         ))
     }
@@ -112,7 +113,8 @@ struct AppView_Previews: PreviewProvider {
 extension AppEnvironment {
     static let preview = AppEnvironment(
         mainQueue: .main,
-        shuffleCards: { .standard52Deck.shuffled() }
+        shuffleCards: { .standard52Deck.shuffled() },
+        now: Date.init
     )
 
     static let superEasyGame = AppEnvironment(
@@ -129,7 +131,8 @@ extension AppEnvironment {
             cards.swapAt(20, 4)
             cards.swapAt(27, 6)
             return cards
-        }
+        },
+        now: Date.init
     )
 }
 

@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 struct ScoreView: View {
-    let store: Store<ScoreState, HintAction>
+    let store: Store<ScoreState, AppAction>
     
     var body: some View {
         WithViewStore(store) { viewStore in
@@ -15,7 +15,10 @@ struct ScoreView: View {
                         .foregroundColor(.white)
                 }
                 Spacer()
-                Button("Hint") { viewStore.send(.hint, animation: .linear) }
+                Button { viewStore.send(.history(.undo), animation: .linear) } label: {
+                    Label("Undo", image: "arrow.uturn.backward")
+                }
+                Button("Hint") { viewStore.send(.hint(.hint), animation: .linear) }
                     .foregroundColor(.white)
                     .buttonStyle(.bordered)
             }
