@@ -10,17 +10,24 @@ struct ScoreView: View {
                 HStack {
                     Text("Score: \(viewStore.score) points")
                         .foregroundColor(.white)
-                    Spacer()
+                        .padding(.trailing)
                     Text("Moves: \(viewStore.moves)")
                         .foregroundColor(.white)
                 }
-                Spacer()
-                Button { viewStore.send(.history(.undo), animation: .linear) } label: {
-                    Label("Undo", image: "arrow.uturn.backward")
-                }
-                Button("Hint") { viewStore.send(.hint(.hint), animation: .linear) }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                HStack {
+                    Button { viewStore.send(.history(.undo), animation: .linear) } label: {
+                        Label("Undo", systemImage: "arrow.uturn.backward")
+                    }
                     .foregroundColor(.white)
                     .buttonStyle(.bordered)
+
+                    Button("Hint") { viewStore.send(.hint(.hint), animation: .linear) }
+                        .foregroundColor(.white)
+                        .buttonStyle(.bordered)
+                }
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
             .frame(maxWidth: .infinity)
             .padding()

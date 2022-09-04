@@ -24,6 +24,7 @@ class HistoryCoreTests: XCTestCase {
 
     func testUndo() {
         testAddEntry()
+        let firstEntry = store.state.entries.first!
 
         var state2 = GameState()
         state2.foundations.append(Foundation(suit: .clubs, cards: [Card(.ace, of: .clubs, isFacedUp: true)]))
@@ -33,11 +34,11 @@ class HistoryCoreTests: XCTestCase {
         store.environment.now = { date }
 
         store.send(.addEntry(state2)) {
-            $0.entries += [HistoryEntry(date: date, gameState: state2)]
+            $0.entries = [firstEntry, HistoryEntry(date: date, gameState: state2)]
         }
 
         store.send(.undo) {
-            $0.entries = [self.store.state.entries.first!]
+            $0.entries = [firstEntry]
         }
     }
 }

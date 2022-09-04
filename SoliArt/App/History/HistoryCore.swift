@@ -19,7 +19,8 @@ let historyReducer = Reducer<HistoryState, HistoryAction, HistoryEnvironment> { 
         state.entries.append(HistoryEntry(date: environment.now(), gameState: gameState))
         return .none
     case .undo:
-        state.entries = state.entries.dropLast()
+        guard state.entries.count > 1 else { return .none }
+        state.entries.removeLast()
         return .none
     }
 }

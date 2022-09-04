@@ -60,6 +60,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             return .none
         case .game(.shuffleCards), .game(.drawCard), .drag(.doubleTapCard), .drag(.dropCards):
             // TODO: add unit test
+            guard state.game != state.history.entries.last?.gameState else { return .none }
             return Effect(value: .history(.addEntry(state.game)))
         case .history(.undo):
             // TODO: add unit test
