@@ -62,7 +62,6 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             guard state.game != state.history.entries.last?.gameState else { return .none }
             return Effect(value: .history(.addEntry(state.game)))
         case .history(.undo):
-            // TODO: add unit test
             guard let last = state.history.entries.last else { return .none }
             state.game = last.gameState
             return .none

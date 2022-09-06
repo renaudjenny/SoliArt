@@ -86,7 +86,6 @@ class AppCoreTests: XCTestCase {
             $0.score.moves = 1
         }
 
-        // pile 5 on pile 3
         var gameStateAfterDraggingCard = gameStateAfterDoubleTappingCard
         let draggedCard = Card(.two, of: .diamonds, isFacedUp: true)
         let frame = CGRect(x: 100, y: 100, width: 200, height: 400)
@@ -116,6 +115,15 @@ class AppCoreTests: XCTestCase {
         }
         store.receive(.score(.incrementMove)) {
             $0.score.moves = 2
+        }
+    }
+
+    func testHistoryUndo() {
+        testGameActionThatUpdateState()
+
+        store.send(.history(.undo)) {
+            $0.history.entries.removeLast()
+            $0.game = $0.history.entries.last!.gameState
         }
     }
 }
