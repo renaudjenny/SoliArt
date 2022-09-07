@@ -52,4 +52,37 @@ class HintCoreTests: XCTestCase {
             )
         }
     }
+
+    func testAlertAboutAutoFinish() {
+        let almostFinishedGameState = AppState.almostFinishedGame.game
+        var lastCardInPile = almostFinishedGameState.deck.downwards.first!
+        lastCardInPile.isFacedUp = true
+        store = TestStore(
+            initialState: HintState(
+                foundations: almostFinishedGameState.foundations,
+                piles: IdentifiedArrayOf(
+                    uniqueElements: [Pile(id: 1, cards: IdentifiedArrayOf(uniqueElements: [lastCardInPile]))]
+                ),
+                deckUpwards: almostFinishedGameState.deck.upwards
+            ),
+            reducer: hintReducer,
+            environment: HintEnvironment(mainQueue: scheduler.eraseToAnyScheduler())
+        )
+        store.send(.checkForAutoFinish) {
+            $0.autoFinishAlert = .autoFinish
+        }
+    }
+
+    func testAlertAboutAutoFinishWhenItsNotPossibleToAutoFinish() {
+        store = TestStore(
+            initialState: HintState(
+                foundations: GameState().foundations,
+                piles: GameCoreTests.pilesAfterShuffle(),
+                deckUpwards: []
+            ),
+            reducer: hintReducer,
+            environment: HintEnvironment(mainQueue: scheduler.eraseToAnyScheduler())
+        )
+        store.send(.checkForAutoFinish)
+    }
 }

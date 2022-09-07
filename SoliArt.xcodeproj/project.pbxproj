@@ -38,6 +38,7 @@
 		4CD881B228BD6196008B4619 /* HintCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881B128BD6196008B4619 /* HintCoreTests.swift */; };
 		4CD881B528C2920E008B4619 /* HistoryCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881B428C29161008B4619 /* HistoryCoreTests.swift */; };
 		4CD881B728C29269008B4619 /* HistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881B628C29269008B4619 /* HistoryEntry.swift */; };
+		4CD881B928C93253008B4619 /* AlertState+AutoFinish.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881B828C93253008B4619 /* AlertState+AutoFinish.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +92,7 @@
 		4CD881B128BD6196008B4619 /* HintCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintCoreTests.swift; sourceTree = "<group>"; };
 		4CD881B428C29161008B4619 /* HistoryCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCoreTests.swift; sourceTree = "<group>"; };
 		4CD881B628C29269008B4619 /* HistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntry.swift; sourceTree = "<group>"; };
+		4CD881B828C93253008B4619 /* AlertState+AutoFinish.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlertState+AutoFinish.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -265,6 +267,7 @@
 		4CD881A728BCF55B008B4619 /* Hint */ = {
 			isa = PBXGroup;
 			children = (
+				4CD881B828C93253008B4619 /* AlertState+AutoFinish.swift */,
 				4CD8819928B7F09C008B4619 /* Hint.swift */,
 				4CD881A828BCF572008B4619 /* HintCore.swift */,
 			);
@@ -455,6 +458,7 @@
 				4C3D195128547D810096404F /* AppView.swift in Sources */,
 				4C6169D1286CDCCD006B4D48 /* ScoreView.swift in Sources */,
 				4C6169D3286CDD6E006B4D48 /* FoundationsView.swift in Sources */,
+				4CD881B928C93253008B4619 /* AlertState+AutoFinish.swift in Sources */,
 				4CD8819C28BBD75B008B4619 /* CardPosition.swift in Sources */,
 				4C6169D5286CDF34006B4D48 /* PilesView.swift in Sources */,
 				4C3D194F28547D810096404F /* SoliArtApp.swift in Sources */,

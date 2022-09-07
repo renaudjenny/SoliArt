@@ -6,12 +6,16 @@ struct HintState: Equatable {
     var foundations: IdentifiedArrayOf<Foundation> = []
     var piles: IdentifiedArrayOf<Pile> = []
     var deckUpwards: IdentifiedArrayOf<Card> = []
+    var autoFinishAlert: AlertState<HintAction>?
 }
 
 enum HintAction: Equatable {
     case hint
     case setHintCardPosition(Hint.Position)
     case removeHint
+    case checkForAutoFinish
+    case cancelAutoFinish
+    case autoFinish
 }
 
 struct HintEnvironment {
@@ -68,6 +72,16 @@ let hintReducer = Reducer<HintState, HintAction, HintEnvironment> { state, actio
         return .none
     case .removeHint:
         state.hint = nil
+        return .none
+    case .checkForAutoFinish:
+        guard state.piles.flatMap(\.cards).allSatisfy(\.isFacedUp) else { return .none }
+        state.autoFinishAlert = .autoFinish
+        return .none
+    case .cancelAutoFinish:
+        state.autoFinishAlert = nil
+        return .none
+    case .autoFinish:
+        state.autoFinishAlert = nil
         return .none
     }
 }

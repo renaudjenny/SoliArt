@@ -1,5 +1,6 @@
 import ComposableArchitecture
 
+// TODO: Use GameAction instead
 extension AlertState where Action == AppAction {
     static var resetGame: Self {
         AlertState(
