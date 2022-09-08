@@ -140,9 +140,17 @@ extension AppState {
     static let almostFinishedGame = AppState(
         game: GameState(
             foundations: IdentifiedArrayOf(uniqueElements: Suit.allCases.map {
-                Foundation(suit: $0, cards: .allButLast(for: $0))
+                Foundation(suit: $0, cards: .allButLast2(for: $0))
             }),
-            piles: IdentifiedArrayOf<Pile>(uniqueElements: (1...7).map { Pile(id: $0, cards: []) }),
+            piles: [
+                Pile(id: 1, cards: [Card(.queen, of: .clubs, isFacedUp: true)]),
+                Pile(id: 2, cards: [Card(.queen, of: .diamonds, isFacedUp: true)]),
+                Pile(id: 3, cards: [Card(.queen, of: .hearts, isFacedUp: true)]),
+                Pile(id: 4, cards: [Card(.queen, of: .spades, isFacedUp: true)]),
+                Pile(id: 5, cards: []),
+                Pile(id: 6, cards: []),
+                Pile(id: 7, cards: [])
+            ],
             deck: Deck(
                 downwards: IdentifiedArrayOf(uniqueElements: [Card(.king, of: .clubs, isFacedUp: false)]),
                 upwards: IdentifiedArrayOf(uniqueElements: [
@@ -165,10 +173,10 @@ private extension IdentifiedArray where Element == Card {
         })
     }
 
-    static func allButLast(for suit: Suit) -> IdentifiedArrayOf<Card> {
+    static func allButLast2(for suit: Suit) -> IdentifiedArrayOf<Card> {
         IdentifiedArrayOf(uniqueElements: Rank.allCases.map { rank in
             StandardDeckCard(rank, of: suit, isFacedUp: true)
-        }.dropLast())
+        }.dropLast(2))
     }
 }
 #endif

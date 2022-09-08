@@ -7,6 +7,7 @@ struct HintState: Equatable {
     var piles: IdentifiedArrayOf<Pile> = []
     var deckUpwards: IdentifiedArrayOf<Card> = []
     var autoFinishAlert: AlertState<HintAction>?
+    var autoFinishHint: Hint?
 }
 
 enum HintAction: Equatable {
@@ -16,6 +17,7 @@ enum HintAction: Equatable {
     case checkForAutoFinish
     case cancelAutoFinish
     case autoFinish
+    case setAutoFinishHint(Hint)
 }
 
 struct HintEnvironment {
@@ -23,37 +25,12 @@ struct HintEnvironment {
 }
 
 let hintReducer = Reducer<HintState, HintAction, HintEnvironment> { state, action, environment in
-    enum CancelID {}
+    enum HintCancelID {}
+    enum AutoFinishCancelID {}
 
     switch action {
     case .hint:
-        let pileHints: [Hint] = state.piles.flatMap { pile in
-            state.foundations.compactMap { foundation in
-                guard let card = pile.cards.last else { return nil }
-                return isValidScoring(card: card, onto: foundation)
-                ? Hint(
-                    card: card,
-                    origin: .pile(id: pile.id),
-                    destination: .foundation(id: foundation.id),
-                    position: .source
-                )
-                : nil
-            }
-        }
-
-        let deckHints: [Hint] = state.foundations.compactMap { foundation in
-            guard let card = state.deckUpwards.last else { return nil }
-            return isValidScoring(card: state.deckUpwards.last, onto: foundation)
-            ? Hint(
-                card: card,
-                origin: .deck,
-                destination: .foundation(id: foundation.id),
-                position: .source
-            )
-            : nil
-        }
-
-        guard let hint = (pileHints + deckHints).first else { return .none }
+        guard let hint = state.hints.first else { return .none }
         state.hint = hint
 
         return .run { send in
@@ -66,12 +43,13 @@ let hintReducer = Reducer<HintState, HintAction, HintEnvironment> { state, actio
             try await environment.mainQueue.sleep(for: 1)
             await send(.removeHint)
         }
-        .cancellable(id: CancelID.self)
+        .cancellable(id: HintCancelID.self)
     case let .setHintCardPosition(position):
         state.hint?.position = position
         return .none
     case .removeHint:
         state.hint = nil
+        state.autoFinishHint = nil
         return .none
     case .checkForAutoFinish:
         guard state.piles.flatMap(\.cards).allSatisfy(\.isFacedUp) else { return .none }
@@ -82,6 +60,14 @@ let hintReducer = Reducer<HintState, HintAction, HintEnvironment> { state, actio
         return .none
     case .autoFinish:
         state.autoFinishAlert = nil
+        guard let hint = state.hints.first else { return .none }
+        return .run { send in
+            await send(.setAutoFinishHint(hint), animation: .linear)
+            try await environment.mainQueue.sleep(for: 0.5)
+            await send(.autoFinish)
+        }
+    case let .setAutoFinishHint(hint):
+        state.autoFinishHint = hint
         return .none
     }
 }

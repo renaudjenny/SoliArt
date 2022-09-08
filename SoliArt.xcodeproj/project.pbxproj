@@ -39,6 +39,7 @@
 		4CD881B528C2920E008B4619 /* HistoryCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881B428C29161008B4619 /* HistoryCoreTests.swift */; };
 		4CD881B728C29269008B4619 /* HistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881B628C29269008B4619 /* HistoryEntry.swift */; };
 		4CD881B928C93253008B4619 /* AlertState+AutoFinish.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881B828C93253008B4619 /* AlertState+AutoFinish.swift */; };
+		4CD881BB28CA782B008B4619 /* HintState+Hints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD881BA28CA782B008B4619 /* HintState+Hints.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +94,7 @@
 		4CD881B428C29161008B4619 /* HistoryCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCoreTests.swift; sourceTree = "<group>"; };
 		4CD881B628C29269008B4619 /* HistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntry.swift; sourceTree = "<group>"; };
 		4CD881B828C93253008B4619 /* AlertState+AutoFinish.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlertState+AutoFinish.swift"; sourceTree = "<group>"; };
+		4CD881BA28CA782B008B4619 /* HintState+Hints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HintState+Hints.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -270,6 +272,7 @@
 				4CD881B828C93253008B4619 /* AlertState+AutoFinish.swift */,
 				4CD8819928B7F09C008B4619 /* Hint.swift */,
 				4CD881A828BCF572008B4619 /* HintCore.swift */,
+				4CD881BA28CA782B008B4619 /* HintState+Hints.swift */,
 			);
 			path = Hint;
 			sourceTree = "<group>";
@@ -461,6 +464,7 @@
 				4CD881B928C93253008B4619 /* AlertState+AutoFinish.swift in Sources */,
 				4CD8819C28BBD75B008B4619 /* CardPosition.swift in Sources */,
 				4C6169D5286CDF34006B4D48 /* PilesView.swift in Sources */,
+				4CD881BB28CA782B008B4619 /* HintState+Hints.swift in Sources */,
 				4C3D194F28547D810096404F /* SoliArtApp.swift in Sources */,
 				4CD881A628BCF43A008B4619 /* DragCore.swift in Sources */,
 				4CB1CB5828B02E980077C247 /* ScoreCore.swift in Sources */,

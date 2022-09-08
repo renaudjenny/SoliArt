@@ -55,14 +55,10 @@ class HintCoreTests: XCTestCase {
 
     func testAlertAboutAutoFinish() {
         let almostFinishedGameState = AppState.almostFinishedGame.game
-        var lastCardInPile = almostFinishedGameState.deck.downwards.first!
-        lastCardInPile.isFacedUp = true
         store = TestStore(
             initialState: HintState(
                 foundations: almostFinishedGameState.foundations,
-                piles: IdentifiedArrayOf(
-                    uniqueElements: [Pile(id: 1, cards: IdentifiedArrayOf(uniqueElements: [lastCardInPile]))]
-                ),
+                piles: almostFinishedGameState.piles,
                 deckUpwards: almostFinishedGameState.deck.upwards
             ),
             reducer: hintReducer,
@@ -84,5 +80,13 @@ class HintCoreTests: XCTestCase {
             environment: HintEnvironment(mainQueue: scheduler.eraseToAnyScheduler())
         )
         store.send(.checkForAutoFinish)
+    }
+
+    func testAutoFinish() {
+        testAlertAboutAutoFinish()
+
+        store.send(.autoFinish) {
+            $0.autoFinishAlert = nil
+        }
     }
 }

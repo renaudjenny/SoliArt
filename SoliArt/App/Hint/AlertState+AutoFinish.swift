@@ -5,7 +5,7 @@ extension AlertState where Action == HintAction {
         AlertState(
             title: TextState("Looks like the game is almost finished"),
             primaryButton: .cancel(TextState("Cancel")),
-            secondaryButton: .destructive(TextState("Finish now"), action: .send(.autoFinish))
+            secondaryButton: .default(TextState("Finish now"), action: .send(.autoFinish))
         )
     }
 }
