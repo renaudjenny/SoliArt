@@ -3,11 +3,11 @@ import SwiftUI
 
 struct HintState: Equatable {
     var hint: Hint?
+    var autoFinishAlert: AlertState<HintAction>?
+    var isAutoFinishing = false
     var foundations: IdentifiedArrayOf<Foundation> = []
     var piles: IdentifiedArrayOf<Pile> = []
     var deckUpwards: IdentifiedArrayOf<Card> = []
-    var autoFinishAlert: AlertState<HintAction>?
-    var autoFinishHint: Hint?
 }
 
 enum HintAction: Equatable {
@@ -18,6 +18,7 @@ enum HintAction: Equatable {
     case cancelAutoFinish
     case autoFinish
     case setAutoFinishHint(Hint)
+    case stopAutoFinish
 }
 
 struct HintEnvironment {
@@ -49,25 +50,23 @@ let hintReducer = Reducer<HintState, HintAction, HintEnvironment> { state, actio
         return .none
     case .removeHint:
         state.hint = nil
-        state.autoFinishHint = nil
         return .none
     case .checkForAutoFinish:
-        guard state.piles.flatMap(\.cards).allSatisfy(\.isFacedUp) else { return .none }
+        guard state.piles.flatMap(\.cards).allSatisfy(\.isFacedUp), !state.isAutoFinishing else { return .none }
         state.autoFinishAlert = .autoFinish
         return .none
     case .cancelAutoFinish:
         state.autoFinishAlert = nil
         return .none
     case .autoFinish:
+        state.isAutoFinishing = true
         state.autoFinishAlert = nil
-        guard let hint = state.hints.first else { return .none }
-        return .run { send in
-            await send(.setAutoFinishHint(hint), animation: .linear)
-            try await environment.mainQueue.sleep(for: 0.5)
-            await send(.autoFinish)
-        }
+        guard let hint = state.hints.first else { return Effect(value: .stopAutoFinish) }
+        return Effect(value: .setAutoFinishHint(hint))
     case let .setAutoFinishHint(hint):
-        state.autoFinishHint = hint
+        return .none
+    case .stopAutoFinish:
+        state.isAutoFinishing = false
         return .none
     }
 }
@@ -77,12 +76,22 @@ extension AppState {
         get {
             HintState(
                 hint: _hint.hint,
+                autoFinishAlert: _hint.autoFinishAlert,
+                isAutoFinishing: _hint.isAutoFinishing,
                 foundations: game.foundations,
                 piles: game.piles,
                 deckUpwards: game.deck.upwards
             )
         }
-        set { _hint.hint = newValue.hint }
+        set { (
+            _hint.hint,
+            _hint.autoFinishAlert,
+            _hint.isAutoFinishing
+        ) = (
+            newValue.hint,
+            newValue.autoFinishAlert,
+            newValue.isAutoFinishing
+        )}
     }
 
     var hintCardPosition: CGPoint {

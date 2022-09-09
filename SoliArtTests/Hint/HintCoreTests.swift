@@ -87,6 +87,7 @@ class HintCoreTests: XCTestCase {
 
         store.send(.autoFinish) {
             $0.autoFinishAlert = nil
+            $0.isAutoFinishing = true
         }
     }
 }

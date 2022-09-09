@@ -56,6 +56,7 @@ class AppCoreTests: XCTestCase {
         store.receive(.history(.addEntry(gameStateAfterShuffle))) {
             $0.history.entries = [HistoryEntry(date: self.now, gameState: gameStateAfterShuffle)]
         }
+        store.receive(.hint(.checkForAutoFinish))
 
         var gameStateAfterDrawingCard = gameStateAfterShuffle
         var drawnCard = gameStateAfterDrawingCard.deck.downwards.removeFirst()
@@ -67,6 +68,7 @@ class AppCoreTests: XCTestCase {
         store.receive(.history(.addEntry(gameStateAfterDrawingCard))) {
             $0.history.entries.append(HistoryEntry(date: self.now, gameState: gameStateAfterDrawingCard))
         }
+        store.receive(.hint(.checkForAutoFinish))
 
         var gameStateAfterDoubleTappingCard = gameStateAfterDrawingCard
         let aceOfClubs = Card(.ace, of: .clubs, isFacedUp: true)
@@ -79,6 +81,7 @@ class AppCoreTests: XCTestCase {
         store.receive(.history(.addEntry(gameStateAfterDoubleTappingCard))) {
             $0.history.entries.append(HistoryEntry(date: self.now, gameState: gameStateAfterDoubleTappingCard))
         }
+        store.receive(.hint(.checkForAutoFinish))
         store.receive(.score(.score(.moveToFoundation))) {
             $0.score.score = 10
         }
@@ -110,6 +113,7 @@ class AppCoreTests: XCTestCase {
         store.receive(.history(.addEntry(gameStateAfterDraggingCard))) {
             $0.history.entries.append(HistoryEntry(date: self.now, gameState: gameStateAfterDraggingCard))
         }
+        store.receive(.hint(.checkForAutoFinish))
         store.receive(.score(.score(.turnOverPileCard))) {
             $0.score.score = 15
         }

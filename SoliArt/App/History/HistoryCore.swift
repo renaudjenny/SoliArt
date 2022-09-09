@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Foundation
 
 struct HistoryState: Equatable {
     var entries: [HistoryEntry] = []

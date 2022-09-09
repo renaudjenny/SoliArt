@@ -11,7 +11,7 @@ struct SoliArtApp: App {
                 reducer: appReducer,
                 environment: AppEnvironment(
                     mainQueue: .main,
-                    shuffleCards: { .standard52Deck.shuffled() },
+                    shuffleCards: AppEnvironment.superEasyGame.shuffleCards,
                     now: Date.init
                 )
             ))

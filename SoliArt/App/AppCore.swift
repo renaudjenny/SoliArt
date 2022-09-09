@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Foundation
 
 struct AppState: Equatable {
     var game = GameState()
@@ -60,13 +61,36 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             return .none
         case .game(.shuffleCards), .game(.drawCard), .drag(.doubleTapCard), .drag(.dropCards):
             guard state.game != state.history.entries.last?.gameState else { return .none }
-            return Effect(value: .history(.addEntry(state.game)))
+            return Effect.concatenate(
+                Effect(value: .history(.addEntry(state.game))),
+                Effect(value: .hint(.checkForAutoFinish))
+            )
         case .history(.undo):
             guard let last = state.history.entries.last else { return .none }
             state.game = last.gameState
             return .none
         case let .drag(.score(action)):
             return Effect(value: .score(action))
+        case let .hint(.setAutoFinishHint(hint)):
+            return .run { [frames = state.drag.frames] send in
+                let position = hint.destination
+
+                let frame = frames.first { frame in
+                    switch (hint.destination, frame) {
+                    case let (.pile(destinationPileID), .pile(framePileID, _)):
+                        return destinationPileID == framePileID
+                    case let (.foundation(destinationFoundationID), .foundation(frameFoundationID, _)):
+                        return destinationFoundationID == frameFoundationID
+                    case (_, _):
+                        return false
+                    }
+                }
+                guard let frame = frame else { return }
+                await send(.drag(.dragCard(hint.card, position: frame.rect.origin)), animation: .linear)
+                await send(.drag(.dropCards), animation: .linear)
+                try await environment.mainQueue.sleep(for: 0.2)
+                await send(.hint(.autoFinish))
+            }
         case .game:
             return .none
         case .drag:

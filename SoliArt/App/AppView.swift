@@ -18,6 +18,7 @@ struct AppView: View {
             .task { viewStore.send(.drag(.setNamespace(namespace))) }
             .onTapGesture(count: 2) { viewStore.send(.game(.promptResetGame)) }
             .alert(store.scope(state: \.game.resetGameAlert), dismiss: .game(.cancelResetGame))
+            .alert(store.scope(state: { $0._hint.autoFinishAlert }, action: AppAction.hint), dismiss: .cancelAutoFinish)
         }
     }
 
