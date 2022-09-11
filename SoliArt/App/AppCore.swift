@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import SwiftUI
 
 struct AppState: Equatable {
     var game = GameState()
@@ -85,8 +86,9 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
                         return false
                     }
                 }
-                guard let frame = frame else { return }
-                await send(.drag(.dragCard(hint.card, position: frame.rect.origin)), animation: .linear)
+                guard let rect = frame?.rect else { return }
+                let dragPosition = CGPoint(x: rect.midX, y: rect.midY)
+                await send(.drag(.dragCard(hint.card, position: dragPosition)), animation: .linear)
                 await send(.drag(.dropCards), animation: .linear)
                 try await environment.mainQueue.sleep(for: 0.2)
                 await send(.hint(.autoFinish))

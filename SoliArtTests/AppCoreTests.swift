@@ -3,6 +3,7 @@ import ComposableArchitecture
 import SwiftUICardGame
 import XCTest
 
+@MainActor
 class AppCoreTests: XCTestCase {
     private var scheduler: TestSchedulerOf<DispatchQueue>!
     private var store: TestStore<AppState, AppState, AppAction, AppAction, AppEnvironment>!
@@ -129,5 +130,43 @@ class AppCoreTests: XCTestCase {
             $0.history.entries.removeLast()
             $0.game = $0.history.entries.last!.gameState
         }
+    }
+
+    func testAutoFinish() async {
+        var foundations = GameState().foundations
+        let spadesFoundation = Foundation(suit: .spades, cards: [Card(.ace, of: .spades, isFacedUp: true)])
+        foundations.updateOrAppend(spadesFoundation)
+        store = TestStore(
+            initialState: AppState(game: GameState(foundations: foundations), _hint: HintState(isAutoFinishing: true)),
+            reducer: appReducer,
+            environment: AppEnvironment(mainQueue: .main, shuffleCards: { [Card].standard52Deck }, now: { self.now })
+        )
+        let frame = CGRect(x: 10, y: 20, width: 100, height: 200)
+        await store.send(.drag(.updateFrame(.foundation(Suit.spades.id, frame)))) {
+            $0.drag.frames.updateOrAppend(.foundation(Suit.spades.id, frame))
+        }
+
+        let hint = Hint(
+            card: Card(.ace, of: .spades, isFacedUp: true),
+            origin: .pile(id: 1),
+            destination: .foundation(id: Suit.spades.id),
+            position: .destination
+        )
+        await store.send(.hint(.setAutoFinishHint(hint)))
+        let position = CGPoint(x: frame.midX, y: frame.midY)
+        await store.receive(.drag(.dragCard(hint.card, position: position))) {
+            $0.drag.draggingState = DraggingState(card: hint.card, position: position)
+            $0.drag.zIndexPriority = .foundation(id: Suit.spades.id)
+        }
+        await store.receive(.drag(.dropCards)) {
+            $0.drag.draggingState = nil
+        }
+        await scheduler.advance(by: 0.2)
+        let gameState = store.state.game
+        await store.receive(.history(.addEntry(gameState))) {
+            $0.history.entries.append(HistoryEntry(date: self.now, gameState: $0.game))
+        }
+        await store.receive(.hint(.checkForAutoFinish))
+        await store.receive(.hint(.autoFinish))
     }
 }
