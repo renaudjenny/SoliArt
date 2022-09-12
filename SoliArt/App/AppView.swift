@@ -12,7 +12,6 @@ struct AppView: View {
                 content
                 draggedCards
                 hint
-//                debugDragFrames
             }
             .task { viewStore.send(.game(.shuffleCards)) }
             .task { viewStore.send(.drag(.setNamespace(namespace))) }
@@ -25,9 +24,10 @@ struct AppView: View {
     private var content: some View {
         WithViewStore(store) { viewStore in
             VStack(spacing: 0) {
-                ScoreView(store: store.scope(state: \.score))
+                ScoreView(store: store.actionless.scope(state: \.score))
                 FoundationsView(store: store).zIndex(foundationIndex(priority: viewStore.drag.zIndexPriority))
                 PilesView(store: store)
+                AppActionsView(store: store.stateless)
             }
         }
     }
