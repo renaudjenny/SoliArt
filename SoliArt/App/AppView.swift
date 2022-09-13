@@ -51,7 +51,7 @@ struct AppView: View {
     private func foundationIndex(priority: DraggingSource) -> Double {
         switch priority {
         case .pile, .removed: return 0
-        case .foundation, .deck: return 1
+        case .foundation, .deckUpwards, .deckDownwards: return 1
         }
     }
 
@@ -72,23 +72,20 @@ struct AppView: View {
     private var debugDragFrames: some View {
         WithViewStore(store.scope(state: \.drag)) { viewStore in
             ForEach(viewStore.frames) { frame in
-                switch frame {
-                case let .foundation(id, rect):
-                    Color.red
-                        .overlay { Text(id) }
-                        .frame(width: rect.width, height: rect.height)
-                        .position(CGPoint(x: rect.midX, y: rect.midY))
-                case let .pile(id, rect):
-                    Color.blue
-                        .overlay { Text("Pile \(id)") }
-                        .frame(width: rect.width, height: rect.height)
-                        .position(CGPoint(x: rect.midX, y: rect.midY))
-                case let .deck(rect):
-                    Color.green
-                        .overlay { Text("Deck") }
-                        .frame(width: rect.width, height: rect.height)
-                        .position(CGPoint(x: rect.midX, y: rect.midY))
+                VStack {
+                    switch frame {
+                    case let .foundation(id, _):
+                        Color.red.overlay { Text(id) }
+                    case let .pile(id, _):
+                        Color.blue.overlay { Text("Pile \(id)") }
+                    case .deckUpwards:
+                        Color.green.overlay { Text("Deck U") }
+                    case .deckDownwards:
+                        Color.yellow.overlay { Text("Deck D") }
+                    }
                 }
+                .frame(width: frame.rect.width, height: frame.rect.height)
+                .position(CGPoint(x: frame.rect.midX, y: frame.rect.midY))
             }
             .ignoresSafeArea()
         }

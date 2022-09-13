@@ -15,8 +15,8 @@ extension HintState {
         }
 
         let deckHints: [Hint] = foundations.compactMap { foundation in
-            guard let card = deckUpwards.last else { return nil }
-            return isValidScoring(card: deckUpwards.last, onto: foundation)
+            guard let card = deck.upwards.last else { return nil }
+            return isValidScoring(card: deck.upwards.last, onto: foundation)
             ? Hint(
                 card: card,
                 origin: .deck,
@@ -25,6 +25,18 @@ extension HintState {
             )
             : nil
         }
-        return pileHints + deckHints
+
+        let drawCardHint = [deck.downwards.first.map {
+            var card = $0
+            card.isFacedUp = true
+            return Hint(
+                card: card,
+                origin: .deckDownwards,
+                destination: .deck,
+                position: .source
+            )
+        }].compactMap { $0 }
+
+        return pileHints + deckHints + drawCardHint
     }
 }

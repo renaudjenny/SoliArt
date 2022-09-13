@@ -10,7 +10,8 @@ struct DraggingState: Equatable {
 enum DraggingSource: Equatable {
     case pile(id: Pile.ID)
     case foundation(id: Foundation.ID)
-    case deck
+    case deckUpwards
+    case deckDownwards
     case removed
 
     static func card(_ card: Card, in state: DragState) -> Self {
@@ -18,8 +19,10 @@ enum DraggingSource: Equatable {
             return .pile(id: pileID)
         } else if let foundationID = state.foundations.first(where: { $0.cards.contains(card) })?.id {
             return .foundation(id: foundationID)
-        } else if state.deckUpwards.contains(card) {
-            return .deck
+        } else if state.deck.upwards.contains(card) {
+            return .deckUpwards
+        } else if state.deck.downwards.contains(card) {
+            return .deckDownwards
         }
         return .removed
     }
@@ -33,7 +36,7 @@ extension DragState {
         case let .pile(id):
             guard let pile = piles[id: id], let index = pile.cards.firstIndex(of: card) else { return [] }
             return Array(pile.cards[index...])
-        case .foundation, .deck, .removed:
+        case .foundation, .deckUpwards, .deckDownwards, .removed:
             return [card]
         }
     }
@@ -80,10 +83,10 @@ extension DragState {
             case let .foundation(foundationID):
                 foundations[id: foundationID]?.cards.remove(draggingState.card)
                 scoringEffect = Effect(value: .score(.score(.moveBackFromFoundation)))
-            case .deck:
-                deckUpwards.remove(draggingState.card)
+            case .deckUpwards:
+                deck.upwards.remove(draggingState.card)
                 scoringEffect = Effect(value: .score(.incrementMove))
-            case .removed:
+            case .deckDownwards, .removed:
                 self.draggingState = nil
                 return dropEffect
             }
@@ -100,7 +103,7 @@ extension DragState {
             }
             self.draggingState = nil
             return Effect.merge(dropEffect, move(card: draggingState.card, foundation: foundation))
-        case .deck, .none:
+        case .deckUpwards, .deckDownwards, .none:
             self.draggingState = nil
             return dropEffect
         }
@@ -114,10 +117,10 @@ extension DragState {
         case let .pile(pileID):
             removePileCards(pileID: pileID, cards: [card])
             scoringEffect = Effect(value: .score(.score(.moveToFoundation)))
-        case .deck:
-            deckUpwards.remove(card)
+        case .deckUpwards:
+            deck.upwards.remove(card)
             scoringEffect = Effect(value: .score(.score(.moveToFoundation)))
-        case .foundation, .removed:
+        case .foundation, .deckDownwards, .removed:
             return .none
         }
 

@@ -8,7 +8,7 @@ struct DragState: Equatable {
     var namespace: Namespace.ID?
     var piles: IdentifiedArrayOf<Pile> = []
     var foundations: IdentifiedArrayOf<Foundation> = []
-    var deckUpwards: IdentifiedArrayOf<Card> = []
+    var deck = Deck(downwards: [], upwards: [])
 }
 
 enum DragAction: Equatable {
@@ -71,7 +71,7 @@ extension AppState {
                 namespace: _drag.namespace,
                 piles: game.piles,
                 foundations: game.foundations,
-                deckUpwards: game.deck.upwards
+                deck: game.deck
             )
         }
         set {
@@ -83,7 +83,7 @@ extension AppState {
 
                 game.piles,
                 game.foundations,
-                game.deck.upwards
+                game.deck
             ) = (
                 newValue.frames,
                 newValue.draggingState,
@@ -92,7 +92,7 @@ extension AppState {
 
                 newValue.piles,
                 newValue.foundations,
-                newValue.deckUpwards
+                newValue.deck
             )
         }
     }

@@ -60,7 +60,7 @@ struct FoundationsView: View {
                 }
             }
             .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
-                viewStore.send(.updateFrame(.deck(geo.frame(in: .global))))
+                viewStore.send(.updateFrame(.deckUpwards(geo.frame(in: .global))))
             }}}
         }
     }
@@ -78,6 +78,9 @@ struct FoundationsView: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.drag.cardWidth) { @MainActor in
+                    viewStore.send(.drag(.updateFrame(.deckDownwards(geo.frame(in: .global)))))
+                }}}
             } else if viewStore.game.deck.downwards.count == 0 && viewStore.game.deck.upwards.count > 1 {
                 Button { viewStore.send(.game(.flipDeck)) } label: {
                     RoundedRectangle(cornerRadius: 4)

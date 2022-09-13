@@ -7,7 +7,7 @@ struct HintState: Equatable {
     var isAutoFinishing = false
     var foundations: IdentifiedArrayOf<Foundation> = []
     var piles: IdentifiedArrayOf<Pile> = []
-    var deckUpwards: IdentifiedArrayOf<Card> = []
+    var deck = Deck(downwards: [], upwards: [])
 }
 
 enum HintAction: Equatable {
@@ -80,7 +80,7 @@ extension AppState {
                 isAutoFinishing: _hint.isAutoFinishing,
                 foundations: game.foundations,
                 piles: game.piles,
-                deckUpwards: game.deck.upwards
+                deck: game.deck
             )
         }
         set { (

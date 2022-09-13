@@ -13,7 +13,7 @@ extension DragState {
 
     var deckUpwardsCardsAndOffsets: [(card: Card, xOffset: Double, isDraggable: Bool)] {
         let spacing = cardWidth * 1/20
-        let cards = deckUpwards.suffix(3)
+        let cards = deck.upwards.suffix(3)
         return cards.enumerated().map { offset, card in
             (card, Double(offset) * spacing, isDraggable: cards.last == card)
         }
@@ -28,13 +28,21 @@ extension DragState {
             else { return .zero }
 
             return CGPoint(x: rect.midX, y: rect.minY + cardWidth/2 * 7/5 + yOffset)
-        case .deck:
+        case .deckUpwards:
             guard
-                let rect = frames.first(where: { if case .deck = $0 { return true } else { return false } })?.rect,
+                let rect = frames.first(
+                    where: { if case .deckUpwards = $0 { return true } else { return false } }
+                )?.rect,
                 let xOffset = deckUpwardsCardsAndOffsets.first(where: { $0.card == card })?.xOffset
             else { return .zero }
 
             return CGPoint(x: rect.midX + xOffset, y: rect.midY)
+        case .deckDownwards:
+            guard let rect = frames.first(
+                where: { if case .deckDownwards = $0 { return true } else { return false } }
+            )?.rect
+            else { return .zero }
+            return CGPoint(x: rect.midX, y: rect.midY)
         case .foundation, .removed: return .zero
         }
     }
@@ -48,6 +56,12 @@ extension DragState {
 
             return CGPoint(x: rect.midX, y: rect.midY)
         case .pile: return .zero
+        case .deck:
+            guard let rect = frames.first(
+                where: { if case .deckUpwards = $0 { return true } else { return false } }
+            )?.rect
+            else { return .zero }
+            return CGPoint(x: rect.midX, y: rect.midY)
         }
     }
 }
@@ -55,7 +69,8 @@ extension DragState {
 enum Frame: Equatable, Hashable, Identifiable {
     case pile(Pile.ID, CGRect)
     case foundation(Foundation.ID, CGRect)
-    case deck(CGRect)
+    case deckUpwards(CGRect)
+    case deckDownwards(CGRect)
 
     func hash(into hasher: inout Hasher) {
         switch self {
@@ -65,8 +80,10 @@ enum Frame: Equatable, Hashable, Identifiable {
         case let .foundation(foundationID, _):
             hasher.combine("Foundation")
             hasher.combine(foundationID)
-        case .deck:
-            hasher.combine("Deck")
+        case .deckUpwards:
+            hasher.combine("DeckUpwards")
+        case .deckDownwards:
+            hasher.combine("DeckDownwards")
         }
     }
 
@@ -74,7 +91,7 @@ enum Frame: Equatable, Hashable, Identifiable {
 
     var rect: CGRect {
         switch self {
-        case let .pile(_, rect), let .foundation(_, rect), let .deck(rect): return rect
+        case let .pile(_, rect), let .foundation(_, rect), let .deckUpwards(rect), let .deckDownwards(rect): return rect
         }
     }
 }

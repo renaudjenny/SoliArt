@@ -12,7 +12,7 @@ struct AppActionsView: View {
                 }
                 .foregroundColor(.white)
                 .buttonStyle(.bordered)
-                .padding()
+                .padding([.vertical, .leading])
 
                 Button("Hint") { viewStore.send(.hint(.hint), animation: .linear) }
                     .foregroundColor(.white)
