@@ -35,9 +35,9 @@ class HintCoreTests: XCTestCase {
             initialState: HintState(
                 foundations: GameState().foundations,
                 piles: GameCoreTests.pilesAfterShuffleForEasyFromTheDeck(),
-                deckUpwards: IdentifiedArrayOf(uniqueElements: [
+                deck: Deck(downwards: [], upwards: IdentifiedArrayOf(uniqueElements: [
                     Card(.ace, of: .clubs, isFacedUp: true)
-                ])
+                ]))
             ),
             reducer: hintReducer,
             environment: HintEnvironment(mainQueue: scheduler.eraseToAnyScheduler())
@@ -59,7 +59,7 @@ class HintCoreTests: XCTestCase {
             initialState: HintState(
                 foundations: almostFinishedGameState.foundations,
                 piles: almostFinishedGameState.piles,
-                deckUpwards: almostFinishedGameState.deck.upwards
+                deck: almostFinishedGameState.deck
             ),
             reducer: hintReducer,
             environment: HintEnvironment(mainQueue: scheduler.eraseToAnyScheduler())
@@ -74,7 +74,7 @@ class HintCoreTests: XCTestCase {
             initialState: HintState(
                 foundations: GameState().foundations,
                 piles: GameCoreTests.pilesAfterShuffle(),
-                deckUpwards: []
+                deck: Deck(downwards: [], upwards: [])
             ),
             reducer: hintReducer,
             environment: HintEnvironment(mainQueue: scheduler.eraseToAnyScheduler())
