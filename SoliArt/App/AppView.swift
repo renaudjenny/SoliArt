@@ -27,7 +27,7 @@ struct AppView: View {
                 ScoreView(store: store.actionless.scope(state: \.score))
                 FoundationsView(store: store).zIndex(foundationIndex(priority: viewStore.drag.zIndexPriority))
                 PilesView(store: store)
-                AppActionsView(store: store.stateless)
+                AppActionsView(store: store.scope(state: \.hint))
             }
         }
     }

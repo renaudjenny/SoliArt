@@ -39,4 +39,8 @@ extension HintState {
 
         return pileHints + deckHints + drawCardHint
     }
+
+    var isAutoFinishAvailable: Bool {
+        piles.flatMap(\.cards).allSatisfy(\.isFacedUp) && !isAutoFinishing
+    }
 }

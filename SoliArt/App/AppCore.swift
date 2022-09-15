@@ -62,10 +62,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             return .none
         case .game(.shuffleCards), .game(.drawCard), .drag(.doubleTapCard), .drag(.dropCards):
             guard state.game != state.history.entries.last?.gameState else { return .none }
-            return Effect.concatenate(
-                Effect(value: .history(.addEntry(state.game))),
-                Effect(value: .hint(.checkForAutoFinish))
-            )
+            return Effect(value: .history(.addEntry(state.game)))
         case .history(.undo):
             guard let last = state.history.entries.last else { return .none }
             state.game = last.gameState

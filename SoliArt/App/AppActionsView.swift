@@ -2,11 +2,22 @@ import ComposableArchitecture
 import SwiftUI
 
 struct AppActionsView: View {
-    let store: Store<Void, AppAction>
+    let store: Store<HintState, AppAction>
 
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack {
+                if viewStore.isAutoFinishAvailable {
+                    Button { viewStore.send(.hint(.checkForAutoFinish)) } label: {
+                        Label("Auto finish", systemImage: "wand.and.stars")
+                    }
+                    .foregroundColor(.white)
+                    .buttonStyle(.bordered)
+                    .padding()
+                }
+
+                Spacer()
+
                 Button { viewStore.send(.history(.undo), animation: .linear) } label: {
                     Label("Undo", systemImage: "arrow.uturn.backward")
                 }
@@ -32,7 +43,7 @@ struct AppActionsView_Previews: PreviewProvider {
             initialState: AppState(),
             reducer: appReducer,
             environment: .preview
-        ).stateless)
+        ).scope(state: \.hint))
     }
 }
 #endif

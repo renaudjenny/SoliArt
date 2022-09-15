@@ -52,7 +52,7 @@ let hintReducer = Reducer<HintState, HintAction, HintEnvironment> { state, actio
         state.hint = nil
         return .none
     case .checkForAutoFinish:
-        guard state.piles.flatMap(\.cards).allSatisfy(\.isFacedUp), !state.isAutoFinishing else { return .none }
+        guard state.isAutoFinishAvailable else { return .none }
         state.autoFinishAlert = .autoFinish
         return .none
     case .cancelAutoFinish:

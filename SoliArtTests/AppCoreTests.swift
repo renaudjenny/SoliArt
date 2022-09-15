@@ -57,7 +57,6 @@ class AppCoreTests: XCTestCase {
         store.receive(.history(.addEntry(gameStateAfterShuffle))) {
             $0.history.entries = [HistoryEntry(date: self.now, gameState: gameStateAfterShuffle)]
         }
-        store.receive(.hint(.checkForAutoFinish))
 
         var gameStateAfterDrawingCard = gameStateAfterShuffle
         var drawnCard = gameStateAfterDrawingCard.deck.downwards.removeFirst()
@@ -69,7 +68,6 @@ class AppCoreTests: XCTestCase {
         store.receive(.history(.addEntry(gameStateAfterDrawingCard))) {
             $0.history.entries.append(HistoryEntry(date: self.now, gameState: gameStateAfterDrawingCard))
         }
-        store.receive(.hint(.checkForAutoFinish))
 
         var gameStateAfterDoubleTappingCard = gameStateAfterDrawingCard
         let aceOfClubs = Card(.ace, of: .clubs, isFacedUp: true)
@@ -82,7 +80,6 @@ class AppCoreTests: XCTestCase {
         store.receive(.history(.addEntry(gameStateAfterDoubleTappingCard))) {
             $0.history.entries.append(HistoryEntry(date: self.now, gameState: gameStateAfterDoubleTappingCard))
         }
-        store.receive(.hint(.checkForAutoFinish))
         store.receive(.score(.score(.moveToFoundation))) {
             $0.score.score = 10
         }
@@ -114,7 +111,6 @@ class AppCoreTests: XCTestCase {
         store.receive(.history(.addEntry(gameStateAfterDraggingCard))) {
             $0.history.entries.append(HistoryEntry(date: self.now, gameState: gameStateAfterDraggingCard))
         }
-        store.receive(.hint(.checkForAutoFinish))
         store.receive(.score(.score(.turnOverPileCard))) {
             $0.score.score = 15
         }
@@ -142,7 +138,7 @@ class AppCoreTests: XCTestCase {
             environment: AppEnvironment(mainQueue: .main, shuffleCards: { [Card].standard52Deck }, now: { self.now })
         )
         let frame = CGRect(x: 10, y: 20, width: 100, height: 200)
-        await store.send(.drag(.updateFrame(.foundation(Suit.spades.id, frame)))) {
+        _ = await store.send(.drag(.updateFrame(.foundation(Suit.spades.id, frame)))) {
             $0.drag.frames.updateOrAppend(.foundation(Suit.spades.id, frame))
         }
 
@@ -152,7 +148,7 @@ class AppCoreTests: XCTestCase {
             destination: .foundation(id: Suit.spades.id),
             position: .destination
         )
-        await store.send(.hint(.setAutoFinishHint(hint)))
+        _ = await store.send(.hint(.setAutoFinishHint(hint)))
         let position = CGPoint(x: frame.midX, y: frame.midY)
         await store.receive(.drag(.dragCard(hint.card, position: position))) {
             $0.drag.draggingState = DraggingState(card: hint.card, position: position)
@@ -166,7 +162,7 @@ class AppCoreTests: XCTestCase {
         await store.receive(.history(.addEntry(gameState))) {
             $0.history.entries.append(HistoryEntry(date: self.now, gameState: $0.game))
         }
-        await store.receive(.hint(.checkForAutoFinish))
+        _ = await store.send(.hint(.checkForAutoFinish))
         await store.receive(.hint(.autoFinish))
     }
 }
