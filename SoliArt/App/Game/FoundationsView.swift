@@ -40,8 +40,9 @@ struct FoundationsView: View {
             HStack {
                 Spacer()
                 deckUpwards.frame(width: viewStore.cardWidth).padding(.trailing, viewStore.cardWidth * 1/5).zIndex(1)
-                deckDownwards.frame(width: viewStore.cardWidth).padding(.bottom, viewStore.cardWidth * 1/5)
+                deckDownwards.frame(width: viewStore.cardWidth)
             }
+            .frame(minHeight: viewStore.cardWidth * 17/10)
         }
     }
 

@@ -36,14 +36,16 @@ struct AppView: View {
         WithViewStore(store.scope(state: \.drag)) { viewStore in
             if let position = viewStore.draggingState?.position {
                 let spacing = viewStore.cardWidth * 2/5 + 4
+                let yOffset = viewStore.cardWidth * 7/15
 
                 ForEach(viewStore.draggedCards) { card in
                     StandardDeckCardView(card: card, backgroundContent: EmptyView.init)
                         .frame(width: viewStore.cardWidth)
-                        .offset(y: (-spacing * 2.5) + Double(viewStore.draggedCards.firstIndex(of: card) ?? 0) * spacing)
+                        .offset(y: (-yOffset) + Double(viewStore.draggedCards.firstIndex(of: card) ?? 0) * spacing)
                         .matchedGeometryEffect(id: card, in: namespace)
                         .position(position)
                 }
+                .ignoresSafeArea()
             }
         }
     }
