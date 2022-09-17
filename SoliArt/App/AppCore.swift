@@ -73,6 +73,11 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             return .run { [frames = state.drag.frames] send in
                 let position = hint.destination
 
+                guard position != .deck else {
+                    await send(.game(.drawCard))
+                    return
+                }
+
                 let frame = frames.first { frame in
                     switch (hint.destination, frame) {
                     case let (.pile(destinationPileID), .pile(framePileID, _)):
