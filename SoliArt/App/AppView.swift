@@ -35,12 +35,12 @@ struct AppView: View {
     private var draggedCards: some View {
         WithViewStore(store.scope(state: \.drag)) { viewStore in
             if let position = viewStore.draggingState?.position {
-                let spacing = viewStore.cardWidth * 2/5 + 4
-                let yOffset = viewStore.cardWidth * 7/15
+                let spacing = viewStore.cardSize.width * 2/5 + 4
+                let yOffset = viewStore.cardSize.width * 7/15
 
                 ForEach(viewStore.draggedCards) { card in
                     StandardDeckCardView(card: card, backgroundContent: EmptyView.init)
-                        .frame(width: viewStore.cardWidth)
+                        .frame(width: viewStore.cardSize.width, height: viewStore.cardSize.height)
                         .offset(y: (-yOffset) + Double(viewStore.draggedCards.firstIndex(of: card) ?? 0) * spacing)
                         .matchedGeometryEffect(id: card, in: namespace)
                         .position(position)
@@ -62,7 +62,7 @@ struct AppView: View {
             ZStack {
                 if let hint = viewStore.hint.hint {
                     StandardDeckCardView(card: hint.card, backgroundContent: EmptyView.init)
-                        .frame(width: viewStore.drag.cardWidth)
+                        .frame(width: viewStore.drag.cardSize.width, height: viewStore.drag.cardSize.height)
                         .position(viewStore.hintCardPosition)
                 }
             }

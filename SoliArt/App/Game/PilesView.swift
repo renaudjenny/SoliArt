@@ -12,7 +12,10 @@ struct PilesView: View {
                     GeometryReader { geo in
                         cards(pileID: pile.id)
                             .frame(maxHeight: 2/5 * geo.size.height, alignment: .top)
-                            .task(id: viewStore.drag.frames) {
+                            .onChange(of: geo.frame(in: .global)) { frame in
+                                viewStore.send(.drag(.updateFrame(.pile(pile.id, frame))))
+                            }
+                            .task {
                                 viewStore.send(.drag(.updateFrame(.pile(pile.id, geo.frame(in: .global)))))
                             }
                     }
@@ -60,7 +63,7 @@ struct PilesView_Previews: PreviewProvider {
 
         var body: some View {
             WithViewStore(store) { viewStore in
-                PilesView(store: store).onAppear { viewStore.send(.game(.shuffleCards)) }
+                PilesView(store: store).task { viewStore.send(.game(.shuffleCards)) }
             }
         }
     }

@@ -25,9 +25,9 @@ struct FoundationsView: View {
                         .fill(foundationColors(foundation.suit).background)
                         .overlay { overlay(foundation: foundation) }
                         .aspectRatio(5/7, contentMode: .fit)
-                        .frame(width: viewStore.cardWidth)
-                        .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
-                            viewStore.send(.updateFrame(.foundation(foundation.id, geo.frame(in: .global))))
+                        .frame(width: viewStore.cardSize.width, height: viewStore.cardSize.height)
+                        .overlay { GeometryReader { geo in Color.clear.onChange(of: geo.frame(in: .global)) { frame in
+                            viewStore.send(.updateFrame(.foundation(foundation.id, frame)))
                         }}}
                         .zIndex(zIndex(priority: viewStore.zIndexPriority, foundationID: foundation.id))
                 }
@@ -39,10 +39,13 @@ struct FoundationsView: View {
         WithViewStore(store.scope(state: \.drag)) { viewStore in
             HStack {
                 Spacer()
-                deckUpwards.frame(width: viewStore.cardWidth).padding(.trailing, viewStore.cardWidth * 1/5).zIndex(1)
-                deckDownwards.frame(width: viewStore.cardWidth)
+                deckUpwards
+                    .frame(width: viewStore.cardSize.width, height: viewStore.cardSize.height)
+                    .padding(.trailing, viewStore.cardSize.width * 1/5)
+                    .zIndex(1)
+                deckDownwards.frame(width: viewStore.cardSize.width, height: viewStore.cardSize.height)
             }
-            .frame(minHeight: viewStore.cardWidth * 17/10)
+            .frame(minHeight: viewStore.cardSize.width * 17/10)
         }
     }
 
@@ -60,8 +63,8 @@ struct FoundationsView: View {
                     }
                 }
             }
-            .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.cardWidth) { @MainActor in
-                viewStore.send(.updateFrame(.deckUpwards(geo.frame(in: .global))))
+            .overlay { GeometryReader { geo in Color.clear.onChange(of: geo.frame(in: .global)) { frame in
+                viewStore.send(.updateFrame(.deckUpwards(frame)))
             }}}
         }
     }
@@ -73,14 +76,15 @@ struct FoundationsView: View {
                     let cards = IdentifiedArrayOf(uniqueElements:viewStore.game.deck.downwards.prefix(3))
                     ZStack {
                         ForEach(cards) { card in
-                            StandardDeckCardView(card: card) { CardBackground() }
-                                .offset(y: Double(cards.firstIndex(of: card) ?? 0) * viewStore.drag.cardWidth * 1/10)
+                            StandardDeckCardView(card: card) { CardBackground() }.offset(
+                                y: Double(cards.firstIndex(of: card) ?? 0) * viewStore.drag.cardSize.width * 1/10
+                            )
                         }
                     }
                 }
                 .buttonStyle(.plain)
-                .overlay { GeometryReader { geo in Color.clear.task(id: viewStore.drag.cardWidth) { @MainActor in
-                    viewStore.send(.drag(.updateFrame(.deckDownwards(geo.frame(in: .global)))))
+                .overlay { GeometryReader { geo in Color.clear.onChange(of: geo.frame(in: .global)) { frame in
+                    viewStore.send(.drag(.updateFrame(.deckDownwards(frame))))
                 }}}
             } else if viewStore.game.deck.downwards.count == 0 && viewStore.game.deck.upwards.count > 1 {
                 Button { viewStore.send(.game(.flipDeck)) } label: {
