@@ -56,11 +56,6 @@ let dragReducer = Reducer<DragState, DragAction, DragEnvironment> { state, actio
 }
 
 extension DragState {
-    @available(*, deprecated)
-    var cardWidth: CGFloat {
-        cardSize.width
-    }
-
     var cardSize: CGSize {
         guard let width = frames.first(where: { if case .pile = $0 { return true } else { return false } })?.rect.width
         else { return .zero }

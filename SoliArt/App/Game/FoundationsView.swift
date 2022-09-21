@@ -12,6 +12,7 @@ struct FoundationsView: View {
                 foundations.zIndex(zIndex(priority: viewStore.drag.zIndexPriority))
                 deck
             }
+            .frame(height: viewStore.drag.cardSize.height * 1.2)
             .padding()
             .background(Color.piles)
         }
@@ -23,9 +24,8 @@ struct FoundationsView: View {
                 ForEach(viewStore.foundations) { foundation in
                     RoundedRectangle(cornerRadius: 4)
                         .fill(foundationColors(foundation.suit).background)
-                        .overlay { overlay(foundation: foundation) }
-                        .aspectRatio(5/7, contentMode: .fit)
                         .frame(width: viewStore.cardSize.width, height: viewStore.cardSize.height)
+                        .overlay { overlay(foundation: foundation) }
                         .overlay { GeometryReader { geo in Color.clear.onChange(of: geo.frame(in: .global)) { frame in
                             viewStore.send(.updateFrame(.foundation(foundation.id, frame)))
                         }}}
@@ -45,7 +45,6 @@ struct FoundationsView: View {
                     .zIndex(1)
                 deckDownwards.frame(width: viewStore.cardSize.width, height: viewStore.cardSize.height)
             }
-            .frame(minHeight: viewStore.cardSize.width * 17/10)
         }
     }
 
@@ -90,7 +89,6 @@ struct FoundationsView: View {
                 Button { viewStore.send(.game(.flipDeck)) } label: {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color.green)
-                        .aspectRatio(5/7, contentMode: .fit)
                         .brightness(-40/100)
                         .overlay(Text("Flip").foregroundColor(.white).padding(4))
                 }
@@ -98,7 +96,6 @@ struct FoundationsView: View {
             } else {
                 RoundedRectangle(cornerRadius: 4)
                     .fill(Color.green)
-                    .aspectRatio(5/7, contentMode: .fit)
                     .brightness(-40/100)
             }
         }
