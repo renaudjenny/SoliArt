@@ -59,7 +59,12 @@ extension DragState {
     var cardSize: CGSize {
         guard let rect = frames.first(where: { if case .pile = $0 { return true } else { return false } })?.rect
         else { return .zero }
-        let height = max(100, min(rect.height/3, rect.width * 7/5))
+        let height: CGFloat
+        if ProcessInfo.processInfo.isiOSAppOnMac {
+            height = max(100, min(rect.height/3, rect.width * 7/5))
+        } else {
+            height = min(rect.height/3, rect.width * 7/5)
+        }
         return CGSize(width: height * 5/7, height: height)
     }
 }
