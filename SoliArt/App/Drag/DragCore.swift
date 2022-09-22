@@ -57,9 +57,10 @@ let dragReducer = Reducer<DragState, DragAction, DragEnvironment> { state, actio
 
 extension DragState {
     var cardSize: CGSize {
-        guard let width = frames.first(where: { if case .pile = $0 { return true } else { return false } })?.rect.width
+        guard let rect = frames.first(where: { if case .pile = $0 { return true } else { return false } })?.rect
         else { return .zero }
-        return CGSize(width: width, height: width * 7/5)
+        let height = max(100, min(rect.height/3, rect.width * 7/5))
+        return CGSize(width: height * 5/7, height: height)
     }
 }
 

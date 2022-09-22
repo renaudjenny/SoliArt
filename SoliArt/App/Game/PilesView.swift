@@ -10,9 +10,12 @@ struct PilesView: View {
             HStack {
                 ForEach(viewStore.game.piles) { pile in
                     GeometryReader { geo in
-                        cards(pileID: pile.id)
-                            .frame(maxHeight: 2/5 * geo.size.height, alignment: .top)
-                            .preference(key: PileFramesPreferenceKey.self, value: [pile.id: geo.frame(in: .global)])
+                        VStack {
+                            cards(pileID: pile.id)
+                                .frame(minHeight: 100)
+                                .padding(.bottom, viewStore.drag.cardSize.height * 2)
+                                .preference(key: PileFramesPreferenceKey.self, value: [pile.id: geo.frame(in: .global)])
+                        }
                     }
                     .ignoresSafeArea()
                     .zIndex(zIndex(priority: viewStore.drag.zIndexPriority, pileID: pile.id))
@@ -23,7 +26,7 @@ struct PilesView: View {
             .onPreferenceChange(PileFramesPreferenceKey.self) { frames in
                 // TODO: Optimise that in one call
                 for (id, rect) in frames {
-                    viewStore.send(.drag(.updateFrame(.pile(id, rect))))
+                    viewStore.send(.drag(.updateFrame(.pile(id, rect))), animation: .none)
                 }
             }
         }

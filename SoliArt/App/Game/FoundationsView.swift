@@ -12,7 +12,6 @@ struct FoundationsView: View {
                 foundations.zIndex(zIndex(priority: viewStore.drag.zIndexPriority))
                 deck
             }
-            .frame(height: viewStore.drag.cardSize.height * 1.2)
             .padding()
             .background(Color.piles)
         }
@@ -43,7 +42,8 @@ struct FoundationsView: View {
                     .frame(width: viewStore.cardSize.width, height: viewStore.cardSize.height)
                     .padding(.trailing, viewStore.cardSize.width * 1/5)
                     .zIndex(1)
-                deckDownwards.frame(width: viewStore.cardSize.width, height: viewStore.cardSize.height)
+                deckDownwards
+                    .frame(width: viewStore.cardSize.width, height: viewStore.cardSize.height * 1.3)
             }
         }
     }
