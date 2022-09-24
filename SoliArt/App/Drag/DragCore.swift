@@ -12,7 +12,9 @@ struct DragState: Equatable {
 }
 
 enum DragAction: Equatable {
+    @available(*, deprecated)
     case updateFrame(Frame)
+    case updateFrames(IdentifiedArrayOf<Frame>)
     case dragCard(Card, position: CGPoint)
     case dropCards
     case doubleTapCard(Card)
@@ -29,6 +31,9 @@ let dragReducer = Reducer<DragState, DragAction, DragEnvironment> { state, actio
     switch action {
     case let .updateFrame(frame):
         state.frames.updateOrAppend(frame)
+        return .none
+    case let .updateFrames(frames):
+        state.frames = frames
         return .none
     case let .dragCard(card, position):
         guard card.isFacedUp else { return .none }

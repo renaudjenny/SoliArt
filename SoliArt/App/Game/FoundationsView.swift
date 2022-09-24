@@ -13,7 +13,6 @@ struct FoundationsView: View {
                 deck
             }
             .padding()
-            .background(Color.piles)
         }
     }
 
@@ -25,9 +24,12 @@ struct FoundationsView: View {
                         .fill(foundationColors(foundation.suit).background)
                         .frame(width: viewStore.cardSize.width, height: viewStore.cardSize.height)
                         .overlay { overlay(foundation: foundation) }
-                        .overlay { GeometryReader { geo in Color.clear.onChange(of: geo.frame(in: .global)) { frame in
-                            viewStore.send(.updateFrame(.foundation(foundation.id, frame)))
-                        }}}
+                        .overlay { GeometryReader { geo in Color.clear.preference(
+                            key: FramesPreferenceKey.self,
+                            value: IdentifiedArrayOf(
+                                uniqueElements: [.foundation(foundation.id, geo.frame(in: .global))]
+                            )
+                        )}}
                         .zIndex(zIndex(priority: viewStore.zIndexPriority, foundationID: foundation.id))
                 }
             }
@@ -62,9 +64,10 @@ struct FoundationsView: View {
                     }
                 }
             }
-            .overlay { GeometryReader { geo in Color.clear.onChange(of: geo.frame(in: .global)) { frame in
-                viewStore.send(.updateFrame(.deckUpwards(frame)))
-            }}}
+            .overlay { GeometryReader { geo in Color.clear.preference(
+                key: FramesPreferenceKey.self,
+                value: IdentifiedArrayOf(uniqueElements: [.deckUpwards(geo.frame(in: .global))])
+            )}}
         }
     }
 
@@ -82,9 +85,10 @@ struct FoundationsView: View {
                     }
                 }
                 .buttonStyle(.plain)
-                .overlay { GeometryReader { geo in Color.clear.onChange(of: geo.frame(in: .global)) { frame in
-                    viewStore.send(.drag(.updateFrame(.deckDownwards(frame))))
-                }}}
+                .overlay { GeometryReader { geo in Color.clear.preference(
+                    key: FramesPreferenceKey.self,
+                    value: IdentifiedArrayOf(uniqueElements: [.deckDownwards(geo.frame(in: .global))])
+                )}}
             } else if viewStore.game.deck.downwards.count == 0 && viewStore.game.deck.upwards.count > 1 {
                 Button { viewStore.send(.game(.flipDeck)) } label: {
                     RoundedRectangle(cornerRadius: 4)

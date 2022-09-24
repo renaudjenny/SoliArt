@@ -23,11 +23,20 @@ struct AppView: View {
 
     private var content: some View {
         WithViewStore(store) { viewStore in
-            VStack(spacing: 0) {
-                ScoreView(store: store.actionless.scope(state: \.score))
-                FoundationsView(store: store).zIndex(foundationIndex(priority: viewStore.drag.zIndexPriority))
-                PilesView(store: store)
-                AppActionsView(store: store.scope(state: \.hint))
+            GeometryReader { geo in
+                VStack(spacing: 0) {
+                    ScoreView(store: store.actionless.scope(state: \.score))
+                    FoundationsView(store: store)
+                        .frame(height: geo.size.height * 3/8)
+                        .background(Color.piles)
+                        .zIndex(foundationIndex(priority: viewStore.drag.zIndexPriority))
+                    PilesView(store: store)
+
+                    AppActionsView(store: store.scope(state: \.hint))
+                }
+            }
+            .onPreferenceChange(FramesPreferenceKey.self) { frames in
+                viewStore.send(.drag(.updateFrames(frames)))
             }
         }
     }
@@ -93,6 +102,17 @@ struct AppView: View {
         }
     }
     #endif
+}
+
+struct FramesPreferenceKey: PreferenceKey {
+    static var defaultValue: IdentifiedArrayOf<Frame> = []
+    static func reduce(value: inout IdentifiedArrayOf<Frame>, nextValue: () -> IdentifiedArrayOf<Frame>) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
+private extension Frame {
+    var isPile: Bool { if case .pile = self { return true } else { return false } }
 }
 
 #if DEBUG

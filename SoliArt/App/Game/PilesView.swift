@@ -14,7 +14,10 @@ struct PilesView: View {
                             cards(pileID: pile.id)
                                 .frame(minHeight: 100)
                                 .padding(.bottom, viewStore.drag.cardSize.height * 2)
-                                .preference(key: PileFramesPreferenceKey.self, value: [pile.id: geo.frame(in: .global)])
+                                .preference(
+                                    key: FramesPreferenceKey.self,
+                                    value: IdentifiedArrayOf(uniqueElements: [.pile(pile.id, geo.frame(in: .global))])
+                                )
                         }
                     }
                     .ignoresSafeArea()
@@ -23,12 +26,6 @@ struct PilesView: View {
             }
             .padding()
             .background(Color.board, ignoresSafeAreaEdges: .all)
-            .onPreferenceChange(PileFramesPreferenceKey.self) { frames in
-                // TODO: Optimise that in one call
-                for (id, rect) in frames {
-                    viewStore.send(.drag(.updateFrame(.pile(id, rect))), animation: .none)
-                }
-            }
         }
     }
 
@@ -49,13 +46,6 @@ struct PilesView: View {
             return id == pileID ? 2 : 1
         }
         return 0
-    }
-}
-
-struct PileFramesPreferenceKey: PreferenceKey {
-    static var defaultValue: [Pile.ID: CGRect] = [:]
-    static func reduce(value: inout [Pile.ID : CGRect], nextValue: () -> [Pile.ID : CGRect]) {
-        value.merge(nextValue(), uniquingKeysWith: { $1 })
     }
 }
 
