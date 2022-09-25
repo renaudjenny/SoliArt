@@ -13,6 +13,7 @@ struct FoundationsView: View {
                 deck
             }
             .padding()
+            .background(Color.piles)
         }
     }
 

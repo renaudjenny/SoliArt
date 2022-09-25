@@ -3,6 +3,7 @@ import SwiftUI
 
 struct DragState: Equatable {
     var frames: IdentifiedArrayOf<Frame> = []
+    var windowSize: CGSize = .zero
     var draggingState: DraggingState?
     var zIndexPriority: DraggingSource = .pile(id: 1)
     var namespace: Namespace.ID?
@@ -12,9 +13,8 @@ struct DragState: Equatable {
 }
 
 enum DragAction: Equatable {
-    @available(*, deprecated)
-    case updateFrame(Frame)
     case updateFrames(IdentifiedArrayOf<Frame>)
+    case updateWindowSize(CGSize)
     case dragCard(Card, position: CGPoint)
     case dropCards
     case doubleTapCard(Card)
@@ -29,11 +29,11 @@ struct DragEnvironment {
 
 let dragReducer = Reducer<DragState, DragAction, DragEnvironment> { state, action, environment in
     switch action {
-    case let .updateFrame(frame):
-        state.frames.updateOrAppend(frame)
-        return .none
     case let .updateFrames(frames):
         state.frames = frames
+        return .none
+    case let .updateWindowSize(size):
+        state.windowSize = size
         return .none
     case let .dragCard(card, position):
         guard card.isFacedUp else { return .none }
@@ -62,14 +62,7 @@ let dragReducer = Reducer<DragState, DragAction, DragEnvironment> { state, actio
 
 extension DragState {
     var cardSize: CGSize {
-        guard let rect = frames.first(where: { if case .pile = $0 { return true } else { return false } })?.rect
-        else { return .zero }
-        let height: CGFloat
-        if ProcessInfo.processInfo.isiOSAppOnMac {
-            height = max(100, min(rect.height/3, rect.width * 7/5))
-        } else {
-            height = min(rect.height/3, rect.width * 7/5)
-        }
+        let height = min(windowSize.height * 16/100, windowSize.width * 15/100)
         return CGSize(width: height * 5/7, height: height)
     }
 }
@@ -79,6 +72,7 @@ extension AppState {
         get {
             DragState(
                 frames: _drag.frames,
+                windowSize: _drag.windowSize,
                 draggingState: _drag.draggingState,
                 zIndexPriority: _drag.zIndexPriority,
                 namespace: _drag.namespace,
@@ -90,6 +84,7 @@ extension AppState {
         set {
             (
                 _drag.frames,
+                _drag.windowSize,
                 _drag.draggingState,
                 _drag.zIndexPriority,
                 _drag.namespace,
@@ -99,6 +94,7 @@ extension AppState {
                 game.deck
             ) = (
                 newValue.frames,
+                newValue.windowSize,
                 newValue.draggingState,
                 newValue.zIndexPriority,
                 newValue.namespace,

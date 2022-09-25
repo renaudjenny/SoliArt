@@ -26,17 +26,17 @@ struct AppView: View {
             GeometryReader { geo in
                 VStack(spacing: 0) {
                     ScoreView(store: store.actionless.scope(state: \.score))
-                    FoundationsView(store: store)
-                        .frame(height: geo.size.height * 3/8)
-                        .background(Color.piles)
-                        .zIndex(foundationIndex(priority: viewStore.drag.zIndexPriority))
+                    FoundationsView(store: store).zIndex(foundationIndex(priority: viewStore.drag.zIndexPriority))
                     PilesView(store: store)
-
                     AppActionsView(store: store.scope(state: \.hint))
                 }
+                .preference(key: WindowSizePreferenceKey.self, value: geo.size)
             }
             .onPreferenceChange(FramesPreferenceKey.self) { frames in
                 viewStore.send(.drag(.updateFrames(frames)))
+            }
+            .onPreferenceChange(WindowSizePreferenceKey.self) { size in
+                viewStore.send(.drag(.updateWindowSize(size)))
             }
         }
     }
@@ -108,6 +108,13 @@ struct FramesPreferenceKey: PreferenceKey {
     static var defaultValue: IdentifiedArrayOf<Frame> = []
     static func reduce(value: inout IdentifiedArrayOf<Frame>, nextValue: () -> IdentifiedArrayOf<Frame>) {
         value.append(contentsOf: nextValue())
+    }
+}
+
+struct WindowSizePreferenceKey: PreferenceKey {
+    static var defaultValue: CGSize = .zero
+    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+        value = nextValue()
     }
 }
 

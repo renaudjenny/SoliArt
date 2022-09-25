@@ -10,15 +10,13 @@ struct PilesView: View {
             HStack {
                 ForEach(viewStore.game.piles) { pile in
                     GeometryReader { geo in
-                        VStack {
-                            cards(pileID: pile.id)
-                                .frame(minHeight: 100)
-                                .padding(.bottom, viewStore.drag.cardSize.height * 2)
-                                .preference(
-                                    key: FramesPreferenceKey.self,
-                                    value: IdentifiedArrayOf(uniqueElements: [.pile(pile.id, geo.frame(in: .global))])
-                                )
-                        }
+                        cards(pileID: pile.id)
+                            .padding(.bottom, viewStore.drag.cardSize.height * 2)
+                            .frame(maxWidth: .infinity)
+                            .preference(
+                                key: FramesPreferenceKey.self,
+                                value: IdentifiedArrayOf(uniqueElements: [.pile(pile.id, geo.frame(in: .global))])
+                            )
                     }
                     .ignoresSafeArea()
                     .zIndex(zIndex(priority: viewStore.drag.zIndexPriority, pileID: pile.id))
@@ -34,6 +32,7 @@ struct PilesView: View {
             ZStack {
                 ForEach(viewStore.drag.pileCardsAndOffsets(pileID: pileID), id: \.card.id) { card, offset in
                     DraggableCardView(store: store.scope(state: \.drag, action: AppAction.drag), card: card)
+                        .frame(width: viewStore.drag.cardSize.width, height: viewStore.drag.cardSize.height)
                         .offset(y: offset)
                         .onTapGesture(count: 2) { viewStore.send(.drag(.doubleTapCard(card)), animation: .spring()) }
                 }
