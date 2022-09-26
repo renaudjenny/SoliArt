@@ -90,7 +90,7 @@ class AppCoreTests: XCTestCase {
         var gameStateAfterDraggingCard = gameStateAfterDoubleTappingCard
         let draggedCard = Card(.two, of: .diamonds, isFacedUp: true)
         let frame = CGRect(x: 100, y: 100, width: 200, height: 400)
-        store.send(.drag(.updateFrame(.pile(2, frame)))) {
+        store.send(.drag(.updateFrames([.pile(2, frame)]))) {
             $0.drag.frames.updateOrAppend(.pile(2, frame))
         }
         let dropPosition = CGPoint(x: 110, y: 110)
@@ -138,7 +138,7 @@ class AppCoreTests: XCTestCase {
             environment: AppEnvironment(mainQueue: .main, shuffleCards: { [Card].standard52Deck }, now: { self.now })
         )
         let frame = CGRect(x: 10, y: 20, width: 100, height: 200)
-        _ = await store.send(.drag(.updateFrame(.foundation(Suit.spades.id, frame)))) {
+        _ = await store.send(.drag(.updateFrames([.foundation(Suit.spades.id, frame)]))) {
             $0.drag.frames.updateOrAppend(.foundation(Suit.spades.id, frame))
         }
 

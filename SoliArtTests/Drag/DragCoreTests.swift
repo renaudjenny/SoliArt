@@ -40,7 +40,7 @@ class DragCoreTests: XCTestCase {
 
     func testUpdateFrame() {
         let frame: Frame = .pile(0, CGRect(x: 100, y: 100, width: 100, height: 200))
-        store.send(.updateFrame(frame)) {
+        store.send(.updateFrames([frame])) {
             $0.frames = IdentifiedArrayOf(uniqueElements: [frame])
         }
     }
@@ -55,7 +55,7 @@ class DragCoreTests: XCTestCase {
         )
 
         let frame: Frame = .pile(5, CGRect(x: 100, y: 100, width: 100, height: 200))
-        store.send(.updateFrame(frame)) {
+        store.send(.updateFrames([frame])) {
             $0.frames = IdentifiedArrayOf(uniqueElements: [frame])
         }
 
@@ -100,7 +100,7 @@ class DragCoreTests: XCTestCase {
         )
 
         let frame: Frame = .foundation(Suit.spades.id, CGRect(x: 100, y: 100, width: 100, height: 200))
-        store.send(.updateFrame(frame)) {
+        store.send(.updateFrames([frame])) {
             $0.frames = IdentifiedArrayOf(uniqueElements: [frame])
         }
 
@@ -139,8 +139,9 @@ class DragCoreTests: XCTestCase {
         testDropCardsToAFoundation()
 
         let frame: Frame = .pile(5, CGRect(x: 300, y: 300, width: 100, height: 200))
-        store.send(.updateFrame(frame)) {
-            $0.frames = IdentifiedArrayOf(uniqueElements: $0.frames + [frame])
+        let frames = IdentifiedArrayOf(uniqueElements: store.state.frames + [frame])
+        store.send(.updateFrames(frames)) {
+            $0.frames = frames
         }
 
         let dragCard = Card(.ace, of: .spades, isFacedUp: true)
