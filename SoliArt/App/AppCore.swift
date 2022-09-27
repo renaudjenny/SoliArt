@@ -75,6 +75,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
 
                 guard position != .deck else {
                     await send(.game(.drawCard))
+                    await send(.hint(.autoFinish))
                     return
                 }
 

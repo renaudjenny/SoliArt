@@ -11,6 +11,7 @@ struct AppActionsView: View {
                     Button { viewStore.send(.hint(.checkForAutoFinish)) } label: {
                         Label("Auto finish", systemImage: "wand.and.stars")
                     }
+                    .disabled(viewStore.isAutoFinishing)
                     .foregroundColor(.white)
                     .buttonStyle(.bordered)
                     .padding()
