@@ -7,19 +7,31 @@ struct PilesView: View {
 
     var body: some View {
         WithViewStore(store) { viewStore in
-            HStack {
-                ForEach(viewStore.game.piles) { pile in
-                    GeometryReader { geo in
-                        cards(pileID: pile.id)
-                            .padding(.bottom, viewStore.drag.cardSize.height * 2)
-                            .frame(maxWidth: .infinity)
-                            .preference(
-                                key: FramesPreferenceKey.self,
-                                value: IdentifiedArrayOf(uniqueElements: [.pile(pile.id, geo.frame(in: .global))])
-                            )
+            ZStack {
+                if viewStore.game.isWinDisplayed {
+                    VStack {
+                        Text("Congratulation! You finished this game.").font(.title).multilineTextAlignment(.center)
+                        Button { viewStore.send(.game(.resetGame)) } label: {
+                            Label("New game", systemImage: "suit.spade.fill").foregroundColor(.white)
+                        }
+                        .padding()
+                        .buttonStyle(.bordered)
                     }
-                    .ignoresSafeArea()
-                    .zIndex(zIndex(priority: viewStore.drag.zIndexPriority, pileID: pile.id))
+                }
+                HStack {
+                    ForEach(viewStore.game.piles) { pile in
+                        GeometryReader { geo in
+                            cards(pileID: pile.id)
+                                .padding(.bottom, viewStore.drag.cardSize.height * 2)
+                                .frame(maxWidth: .infinity)
+                                .preference(
+                                    key: FramesPreferenceKey.self,
+                                    value: IdentifiedArrayOf(uniqueElements: [.pile(pile.id, geo.frame(in: .global))])
+                                )
+                        }
+                        .ignoresSafeArea()
+                        .zIndex(zIndex(priority: viewStore.drag.zIndexPriority, pileID: pile.id))
+                    }
                 }
             }
             .padding()
@@ -66,6 +78,16 @@ struct PilesView_Previews: PreviewProvider {
                 PilesView(store: store).task { viewStore.send(.game(.shuffleCards)) }
             }
         }
+    }
+}
+
+struct PilesWinView_Previews: PreviewProvider {
+    static var previews: some View {
+        PilesView(store: Store(
+            initialState: .finishedGame,
+            reducer: appReducer,
+            environment: .preview
+        ))
     }
 }
 #endif

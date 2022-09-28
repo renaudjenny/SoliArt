@@ -189,6 +189,18 @@ extension AppState {
             isGameOver: false
         )
     )
+
+    static let finishedGame = AppState(game: GameState(
+        foundations: IdentifiedArrayOf(uniqueElements: Suit.allCases.map { suit in
+            Foundation(
+                suit: suit,
+                cards: IdentifiedArrayOf(uniqueElements: Rank.allCases.map { rank in
+                    StandardDeckCard(rank, of: suit, isFacedUp: true)
+                })
+            )
+        }),
+        isGameOver: false
+    ))
 }
 
 private extension IdentifiedArray where Element == Card {

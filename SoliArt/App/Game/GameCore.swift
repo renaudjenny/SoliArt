@@ -91,3 +91,9 @@ let gameReducer = Reducer<GameState, GameAction, GameEnvironment> { state, actio
 extension Suit {
     static var orderedCases: [Self] { [.hearts, .clubs, .diamonds, .spades] }
 }
+
+extension GameState {
+    var isWinDisplayed: Bool {
+        foundations.allSatisfy { $0.cards.last?.rank == .king }
+    }
+}
