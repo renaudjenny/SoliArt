@@ -10,13 +10,16 @@ struct PilesView: View {
             ZStack {
                 if viewStore.game.isWinDisplayed {
                     VStack {
-                        Text("Congratulation! You finished this game.").font(.title).multilineTextAlignment(.center)
+                        Text("Congratulation!").font(.title).padding()
+                        Text("You finished this game.").font(.title2)
                         Button { viewStore.send(.game(.resetGame)) } label: {
                             Label("New game", systemImage: "suit.spade.fill").foregroundColor(.white)
                         }
                         .padding()
                         .buttonStyle(.bordered)
                     }
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
                 }
                 HStack {
                     ForEach(viewStore.game.piles) { pile in
@@ -63,21 +66,11 @@ struct PilesView: View {
 #if DEBUG
 struct PilesView_Previews: PreviewProvider {
     static var previews: some View {
-        Preview()
-    }
-
-    private struct Preview: View {
-        let store = Store(
-            initialState: AppState(),
+        PilesView(store: Store(
+            initialState: .startedGame,
             reducer: appReducer,
             environment: .preview
-        )
-
-        var body: some View {
-            WithViewStore(store) { viewStore in
-                PilesView(store: store).task { viewStore.send(.game(.shuffleCards)) }
-            }
-        }
+        ))
     }
 }
 

@@ -7,7 +7,7 @@ struct SoliArtApp: App {
     var body: some Scene {
         WindowGroup {
             AppView(store: Store(
-                initialState: AppState(),
+                initialState: .startedGame,
                 reducer: appReducer,
                 environment: AppEnvironment(
                     mainQueue: .main,

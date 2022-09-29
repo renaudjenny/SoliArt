@@ -128,11 +128,7 @@ struct AppView_Previews: PreviewProvider {
         AppView(store: Store(
             initialState: AppState(),
             reducer: appReducer,
-            environment: AppEnvironment(
-                mainQueue: .main,
-                shuffleCards: { .standard52Deck.shuffled() },
-                now: Date.init
-            )
+            environment: .preview
         ))
     }
 }
@@ -166,8 +162,13 @@ extension AppEnvironment {
 extension AppState {
     static let almostFinishedGame = AppState(
         game: GameState(
-            foundations: IdentifiedArrayOf(uniqueElements: Suit.allCases.map {
-                Foundation(suit: $0, cards: .allButLast2(for: $0))
+            foundations: IdentifiedArrayOf(uniqueElements: Suit.allCases.map { suit in
+                Foundation(
+                    suit: suit,
+                    cards: IdentifiedArrayOf(uniqueElements: Rank.allCases.map { rank in
+                        StandardDeckCard(rank, of: suit, isFacedUp: true)
+                    }.dropLast(2))
+                )
             }),
             piles: [
                 Pile(id: 1, cards: [Card(.queen, of: .clubs, isFacedUp: true)]),
@@ -201,21 +202,113 @@ extension AppState {
         }),
         isGameOver: false
     ))
+
+    static let startedGame = AppState(
+        game: GameState(foundations: .startedGame, piles: .startedGame, deck: .startedGame, isGameOver: false),
+        _drag: DragState(windowSize: CGSize(width: 300, height: 500), namespace: namespace)
+    )
+
+    @Namespace private static var namespace: Namespace.ID
 }
 
-private extension IdentifiedArray where Element == Card {
-    static var all: IdentifiedArrayOf<Card> {
-        IdentifiedArrayOf(uniqueElements: Suit.allCases.flatMap { suit in
-            Rank.allCases.map { rank in
-                StandardDeckCard(rank, of: suit, isFacedUp: true)
-            }
-        })
-    }
+private extension IdentifiedArray<Foundation.ID, Foundation> {
+    static let startedGame: Self = IdentifiedArrayOf(uniqueElements: [
+        Foundation(
+            suit: .hearts,
+            cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.ace, of: .hearts, isFacedUp: true),
+            ])
+        ),
+        Foundation(suit: .clubs, cards: []),
+        Foundation(
+            suit: .diamonds,
+            cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.ace, of: .diamonds, isFacedUp: true),
+                StandardDeckCard(.two, of: .diamonds, isFacedUp: true),
+            ])
+        ),
+        Foundation(
+            suit: .spades,
+            cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.ace, of: .spades, isFacedUp: true),
+                StandardDeckCard(.two, of: .spades, isFacedUp: true),
+                StandardDeckCard(.three, of: .spades, isFacedUp: true),
+                StandardDeckCard(.four, of: .spades, isFacedUp: true),
+            ])
+        ),
+    ])
+}
 
-    static func allButLast2(for suit: Suit) -> IdentifiedArrayOf<Card> {
-        IdentifiedArrayOf(uniqueElements: Rank.allCases.map { rank in
-            StandardDeckCard(rank, of: suit, isFacedUp: true)
-        }.dropLast(2))
-    }
+private extension IdentifiedArray<Pile.ID, Pile> {
+    static let startedGame: Self = IdentifiedArrayOf(uniqueElements: [
+        Pile(
+            id: 1,
+            cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.four, of: .hearts, isFacedUp: true),
+            ])
+        ),
+        Pile(
+            id: 2,
+            cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.two, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.ace, of: .clubs, isFacedUp: true),
+            ])
+        ),
+        Pile(
+            id: 3,
+            cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.five, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.four, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.three, of: .clubs, isFacedUp: true),
+            ])
+        ),
+        Pile(
+            id: 4,
+            cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.king, of: .clubs, isFacedUp: true),
+                StandardDeckCard(.queen, of: .hearts, isFacedUp: true),
+                StandardDeckCard(.jack, of: .clubs, isFacedUp: true),
+                StandardDeckCard(.ten, of: .hearts, isFacedUp: true),
+                StandardDeckCard(.nine, of: .clubs, isFacedUp: true),
+            ])
+        ),
+        Pile(
+            id: 5,
+            cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.king, of: .spades, isFacedUp: true),
+                StandardDeckCard(.queen, of: .diamonds, isFacedUp: true),
+                StandardDeckCard(.jack, of: .spades, isFacedUp: true),
+                StandardDeckCard(.ten, of: .diamonds, isFacedUp: true),
+                StandardDeckCard(.nine, of: .spades, isFacedUp: true),
+            ])
+        ),
+        Pile(id: 6, cards: []),
+        Pile(
+            id: 7,
+            cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.eight, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.seven, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.six, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.eight, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.seven, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.six, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.five, of: .hearts, isFacedUp: true),
+            ])
+        ),
+    ])
+}
+
+private extension Deck {
+    static let startedGame = Deck(
+        downwards: IdentifiedArrayOf(uniqueElements: [Card].standard52Deck.filter { card in
+            !IdentifiedArray<Foundation.ID, Foundation>.startedGame.flatMap(\.cards).contains(where: {
+                $0.rank == card.rank && $0.suit == card.suit
+            })
+            && !IdentifiedArray<Pile.ID, Pile>.startedGame.flatMap(\.cards).contains(where: {
+                $0.rank == card.rank && $0.suit == card.suit
+            })
+        }),
+        upwards: []
+    )
 }
 #endif
