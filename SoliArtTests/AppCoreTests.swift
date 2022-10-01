@@ -21,8 +21,9 @@ class AppCoreTests: XCTestCase {
     func testFlipDeck() {
         store.send(.game(.flipDeck))
 
-        store.receive(.history(.addEntry(GameState()))) {
-            $0.history.entries.append(HistoryEntry(date: self.now, gameState: GameState()))
+        let historyEntry = HistoryEntry(date: self.now, gameState: GameState(), scoreState: ScoreState())
+        store.receive(.history(.addEntry(historyEntry))) {
+            $0.history.entries.append(historyEntry)
         }
 
         store.receive(.score(.score(.recycling)))
@@ -54,8 +55,13 @@ class AppCoreTests: XCTestCase {
         store.send(.game(.shuffleCards)) {
             $0.game = gameStateAfterShuffle
         }
-        store.receive(.history(.addEntry(gameStateAfterShuffle))) {
-            $0.history.entries = [HistoryEntry(date: self.now, gameState: gameStateAfterShuffle)]
+        let afterShuffleHistoryEntry = HistoryEntry(
+            date: self.now,
+            gameState: gameStateAfterShuffle,
+            scoreState: ScoreState()
+        )
+        store.receive(.history(.addEntry(afterShuffleHistoryEntry))) {
+            $0.history.entries = [afterShuffleHistoryEntry]
         }
 
         var gameStateAfterDrawingCard = gameStateAfterShuffle
@@ -65,8 +71,13 @@ class AppCoreTests: XCTestCase {
         store.send(.game(.drawCard)) {
             $0.game = gameStateAfterDrawingCard
         }
-        store.receive(.history(.addEntry(gameStateAfterDrawingCard))) {
-            $0.history.entries.append(HistoryEntry(date: self.now, gameState: gameStateAfterDrawingCard))
+        let afterDrawingCardHistoryEntry = HistoryEntry(
+            date: self.now,
+            gameState: gameStateAfterDrawingCard,
+            scoreState: ScoreState()
+        )
+        store.receive(.history(.addEntry(afterDrawingCardHistoryEntry))) {
+            $0.history.entries.append(afterDrawingCardHistoryEntry)
         }
 
         var gameStateAfterDoubleTappingCard = gameStateAfterDrawingCard
@@ -77,8 +88,13 @@ class AppCoreTests: XCTestCase {
             $0.game = gameStateAfterDoubleTappingCard
         }
         store.receive(.drag(.score(.score(.moveToFoundation))))
-        store.receive(.history(.addEntry(gameStateAfterDoubleTappingCard))) {
-            $0.history.entries.append(HistoryEntry(date: self.now, gameState: gameStateAfterDoubleTappingCard))
+        let afterDoubleTappingCardHistoryEntry = HistoryEntry(
+            date: self.now,
+            gameState: gameStateAfterDoubleTappingCard,
+            scoreState: ScoreState()
+        )
+        store.receive(.history(.addEntry(afterDoubleTappingCardHistoryEntry))) {
+            $0.history.entries.append(afterDoubleTappingCardHistoryEntry)
         }
         store.receive(.score(.score(.moveToFoundation))) {
             $0.score.score = 10
@@ -108,8 +124,13 @@ class AppCoreTests: XCTestCase {
             $0.game = gameStateAfterDraggingCard
         }
         store.receive(.drag(.score(.score(.turnOverPileCard))))
-        store.receive(.history(.addEntry(gameStateAfterDraggingCard))) {
-            $0.history.entries.append(HistoryEntry(date: self.now, gameState: gameStateAfterDraggingCard))
+        let afterDraggingCardHistoryEntry = HistoryEntry(
+            date: self.now,
+            gameState: gameStateAfterDraggingCard,
+            scoreState: ScoreState(score: 10, moves: 1)
+        )
+        store.receive(.history(.addEntry(afterDraggingCardHistoryEntry))) {
+            $0.history.entries.append(afterDraggingCardHistoryEntry)
         }
         store.receive(.score(.score(.turnOverPileCard))) {
             $0.score.score = 15
@@ -125,6 +146,7 @@ class AppCoreTests: XCTestCase {
         store.send(.history(.undo)) {
             $0.history.entries.removeLast()
             $0.game = $0.history.entries.last!.gameState
+            $0.score = ScoreState(score: 0, moves: 0)
         }
     }
 
@@ -158,9 +180,9 @@ class AppCoreTests: XCTestCase {
             $0.drag.draggingState = nil
         }
         await scheduler.advance(by: 0.2)
-        let gameState = store.state.game
-        await store.receive(.history(.addEntry(gameState))) {
-            $0.history.entries.append(HistoryEntry(date: self.now, gameState: $0.game))
+        let historyEntry = HistoryEntry(date: self.now, gameState: store.state.game, scoreState: store.state.score)
+        await store.receive(.history(.addEntry(historyEntry))) {
+            $0.history.entries.append(historyEntry)
         }
         _ = await store.send(.hint(.checkForAutoFinish))
         await store.receive(.hint(.autoFinish))

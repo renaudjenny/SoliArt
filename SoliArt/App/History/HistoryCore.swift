@@ -6,18 +6,16 @@ struct HistoryState: Equatable {
 }
 
 enum HistoryAction: Equatable {
-    case addEntry(GameState)
+    case addEntry(HistoryEntry)
     case undo
 }
 
-struct HistoryEnvironment {
-    var now: () -> Date
-}
+struct HistoryEnvironment {}
 
 let historyReducer = Reducer<HistoryState, HistoryAction, HistoryEnvironment> { state, action, environment in
     switch action {
-    case let .addEntry(gameState):
-        state.entries.append(HistoryEntry(date: environment.now(), gameState: gameState))
+    case let .addEntry(entry):
+        state.entries.append(entry)
         return .none
     case .undo:
         guard state.entries.count > 1 else { return .none }

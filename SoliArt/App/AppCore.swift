@@ -48,13 +48,17 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     historyReducer.pullback(
         state: \.history,
         action: /AppAction.history,
-        environment: { HistoryEnvironment(now: $0.now) }
+        environment: { _ in HistoryEnvironment() }
     ),
     Reducer { state, action, environment in
         switch action {
         case .game(.flipDeck):
             return Effect.merge(
-                Effect(value: .history(.addEntry(state.game))),
+                Effect(value: .history(.addEntry(HistoryEntry(
+                    date: environment.now(),
+                    gameState: state.game,
+                    scoreState: state.score
+                )))),
                 Effect(value: .score(.score(.recycling)))
             )
         case .game(.resetGame):
@@ -62,10 +66,15 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             return .none
         case .game(.shuffleCards), .game(.drawCard), .drag(.doubleTapCard), .drag(.dropCards):
             guard state.game != state.history.entries.last?.gameState else { return .none }
-            return Effect(value: .history(.addEntry(state.game)))
+            return Effect(value: .history(.addEntry(HistoryEntry(
+                date: environment.now(),
+                gameState: state.game,
+                scoreState: state.score
+            ))))
         case .history(.undo):
             guard let last = state.history.entries.last else { return .none }
             state.game = last.gameState
+            state.score = last.scoreState
             return .none
         case let .drag(.score(action)):
             return Effect(value: .score(action))

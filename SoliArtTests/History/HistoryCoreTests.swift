@@ -10,15 +10,14 @@ class HistoryCoreTests: XCTestCase {
         store = TestStore(
             initialState: HistoryState(),
             reducer: historyReducer,
-            environment: HistoryEnvironment(now: { Date(timeIntervalSince1970: 0) })
+            environment: HistoryEnvironment()
         )
     }
 
     func testAddEntry() {
-        let state = GameState()
-        let now = store.environment.now()
-        store.send(.addEntry(state)) {
-            $0.entries = [HistoryEntry(date: now, gameState: state)]
+        let entry = HistoryEntry(date: .now, gameState: GameState(), scoreState: ScoreState())
+        store.send(.addEntry(entry)) {
+            $0.entries = [entry]
         }
     }
 
@@ -26,15 +25,13 @@ class HistoryCoreTests: XCTestCase {
         testAddEntry()
         let firstEntry = store.state.entries.first!
 
-        var state2 = GameState()
-        state2.foundations.append(Foundation(suit: .clubs, cards: [Card(.ace, of: .clubs, isFacedUp: true)]))
-        state2.piles.append(Pile(id: 1, cards: [Card(.two, of: .clubs, isFacedUp: true)]))
+        var gameState = GameState()
+        gameState.foundations.append(Foundation(suit: .clubs, cards: [Card(.ace, of: .clubs, isFacedUp: true)]))
+        gameState.piles.append(Pile(id: 1, cards: [Card(.two, of: .clubs, isFacedUp: true)]))
+        let secondEntry = HistoryEntry(date: .now, gameState: gameState, scoreState: ScoreState(score: 15, moves: 2))
 
-        let date = Date(timeIntervalSince1970: 60)
-        store.environment.now = { date }
-
-        store.send(.addEntry(state2)) {
-            $0.entries = [firstEntry, HistoryEntry(date: date, gameState: state2)]
+        store.send(.addEntry(secondEntry)) {
+            $0.entries = [firstEntry, secondEntry]
         }
 
         store.send(.undo) {
