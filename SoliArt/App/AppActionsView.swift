@@ -9,9 +9,18 @@ struct AppActionsView: View {
             HStack {
                 if viewStore.isAutoFinishAvailable {
                     Button { viewStore.send(.hint(.checkForAutoFinish)) } label: {
-                        Label("Auto finish", systemImage: "wand.and.stars")
+                        Label("Auto finish", systemImage: "wand.and.stars").labelStyle(.iconOnly)
                     }
                     .disabled(viewStore.isAutoFinishing)
+                    .foregroundColor(.white)
+                    .buttonStyle(.bordered)
+                    .padding()
+                }
+
+                if !viewStore.isAutoFinishing {
+                    Button { viewStore.send(.game(.promptResetGame)) } label: {
+                        Label("Reset", systemImage: "exclamationmark.arrow.circlepath").labelStyle(.iconOnly)
+                    }
                     .foregroundColor(.white)
                     .buttonStyle(.bordered)
                     .padding()
@@ -20,7 +29,7 @@ struct AppActionsView: View {
                 Spacer()
 
                 Button { viewStore.send(.history(.undo), animation: .linear) } label: {
-                    Label("Undo", systemImage: "arrow.uturn.backward")
+                    Label("Undo", systemImage: "arrow.uturn.backward").labelStyle(.iconOnly)
                 }
                 .foregroundColor(.white)
                 .buttonStyle(.bordered)
@@ -40,11 +49,23 @@ struct AppActionsView: View {
 #if DEBUG
 struct AppActionsView_Previews: PreviewProvider {
     static var previews: some View {
-        AppActionsView(store: Store(
-            initialState: AppState(),
-            reducer: appReducer,
-            environment: .preview
-        ).scope(state: \.hint))
+        VStack {
+            AppActionsView(store: Store(
+                initialState: AppState(),
+                reducer: appReducer,
+                environment: .preview
+            ).scope(state: \.hint))
+
+            AppActionsView(store: Store(
+                initialState: AppState(
+                    game: GameState(
+                        foundations: [Foundation(suit: .spades, cards: [])],
+                        piles: [Pile(id: 1, cards: [Card(.ace, of: .spades, isFacedUp: true)])]
+                    )),
+                reducer: appReducer,
+                environment: .preview
+            ).scope(state: \.hint))
+        }
     }
 }
 #endif
