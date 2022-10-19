@@ -18,7 +18,7 @@ struct AppActionsView: View {
                 }
 
                 if !viewStore.isAutoFinishing {
-                    Button { viewStore.send(.game(.promptResetGame)) } label: {
+                    Button { viewStore.send(.game(.confirmResetGame)) } label: {
                         Label("Reset", systemImage: "exclamationmark.arrow.circlepath").labelStyle(.iconOnly)
                     }
                     .foregroundColor(.white)

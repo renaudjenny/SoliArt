@@ -1,5 +1,6 @@
 import ComposableArchitecture
 
+// TODO: migrate to ConfirmationDialog
 extension AlertState where Action == HintAction {
     static var autoFinish: Self {
         AlertState(

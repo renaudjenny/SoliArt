@@ -75,8 +75,8 @@ class GameCoreTests: XCTestCase {
 
         shuffleCards()
 
-        store.send(.promptResetGame) {
-            $0.resetGameAlert = .resetGame
+        store.send(.confirmResetGame) {
+            $0.resetGameConfirmationDialog = .resetGame
         }
 
         store.send(.drawCard) {
@@ -87,7 +87,7 @@ class GameCoreTests: XCTestCase {
         }
 
         store.send(.resetGame) {
-            $0.resetGameAlert = nil
+            $0.resetGameConfirmationDialog = nil
             $0.isGameOver = true
         }
 

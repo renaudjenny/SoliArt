@@ -15,7 +15,10 @@ struct AppView: View {
             }
             .task { viewStore.send(.game(.shuffleCards)) }
             .task { viewStore.send(.drag(.setNamespace(namespace))) }
-            .alert(store.scope(state: \.game.resetGameAlert), dismiss: .game(.cancelResetGame))
+            .confirmationDialog(
+                store.scope(state: \.game.resetGameConfirmationDialog, action: AppAction.game),
+                dismiss: .cancelResetGame
+            )
             .alert(store.scope(state: { $0._hint.autoFinishAlert }, action: AppAction.hint), dismiss: .cancelAutoFinish)
         }
     }

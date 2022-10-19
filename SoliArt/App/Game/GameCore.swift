@@ -9,14 +9,14 @@ struct GameState: Equatable {
     var piles = IdentifiedArrayOf<Pile>(uniqueElements: (1...7).map { Pile(id: $0, cards: []) })
     var deck = Deck(downwards: [], upwards: [])
     var isGameOver = true
-    var resetGameAlert: AlertState<AppAction>?
+    var resetGameConfirmationDialog: ConfirmationDialogState<GameAction>?
 }
 
 enum GameAction: Equatable {
     case shuffleCards
     case drawCard
     case flipDeck
-    case promptResetGame
+    case confirmResetGame
     case cancelResetGame
     case resetGame
 }
@@ -75,14 +75,14 @@ let gameReducer = Reducer<GameState, GameAction, GameEnvironment> { state, actio
         })
         state.deck.upwards = []
         return .none
-    case .promptResetGame:
-        state.resetGameAlert = .resetGame
+    case .confirmResetGame:
+        state.resetGameConfirmationDialog = .resetGame
         return .none
     case .cancelResetGame:
-        state.resetGameAlert = nil
+        state.resetGameConfirmationDialog = nil
         return .none
     case .resetGame:
-        state.resetGameAlert = nil
+        state.resetGameConfirmationDialog = nil
         state.isGameOver = true
         return Effect(value: .shuffleCards)
     }
