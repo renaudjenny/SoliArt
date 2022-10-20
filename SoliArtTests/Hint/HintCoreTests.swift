@@ -53,7 +53,7 @@ class HintCoreTests: XCTestCase {
         }
     }
 
-    func testAlertAboutAutoFinish() {
+    func testConfirmationDialogAboutAutoFinish() {
         let almostFinishedGameState = AppState.almostFinishedGame.game
         store = TestStore(
             initialState: HintState(
@@ -65,11 +65,11 @@ class HintCoreTests: XCTestCase {
             environment: HintEnvironment(mainQueue: scheduler.eraseToAnyScheduler())
         )
         store.send(.checkForAutoFinish) {
-            $0.autoFinishAlert = .autoFinish
+            $0.autoFinishConfirmationDialog = .autoFinish
         }
     }
 
-    func testAlertAboutAutoFinishWhenItsNotPossibleToAutoFinish() {
+    func testConfirmationDialogAboutAutoFinishWhenItsNotPossibleToAutoFinish() {
         store = TestStore(
             initialState: HintState(
                 foundations: GameState().foundations,
@@ -83,10 +83,10 @@ class HintCoreTests: XCTestCase {
     }
 
     func testAutoFinish() {
-        testAlertAboutAutoFinish()
+        testConfirmationDialogAboutAutoFinish()
 
         store.send(.autoFinish) {
-            $0.autoFinishAlert = nil
+            $0.autoFinishConfirmationDialog = nil
             $0.isAutoFinishing = true
         }
     }

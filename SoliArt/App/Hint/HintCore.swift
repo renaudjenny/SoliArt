@@ -3,7 +3,7 @@ import SwiftUI
 
 struct HintState: Equatable {
     var hint: Hint?
-    var autoFinishAlert: AlertState<HintAction>?
+    var autoFinishConfirmationDialog: ConfirmationDialogState<HintAction>?
     var isAutoFinishing = false
     var foundations: IdentifiedArrayOf<Foundation> = []
     var piles: IdentifiedArrayOf<Pile> = []
@@ -53,14 +53,14 @@ let hintReducer = Reducer<HintState, HintAction, HintEnvironment> { state, actio
         return .none
     case .checkForAutoFinish:
         guard state.isAutoFinishAvailable else { return .none }
-        state.autoFinishAlert = .autoFinish
+        state.autoFinishConfirmationDialog = .autoFinish
         return .none
     case .cancelAutoFinish:
-        state.autoFinishAlert = nil
+        state.autoFinishConfirmationDialog = nil
         return .none
     case .autoFinish:
         state.isAutoFinishing = true
-        state.autoFinishAlert = nil
+        state.autoFinishConfirmationDialog = nil
         guard let hint = state.hints.first else { return Effect(value: .stopAutoFinish) }
         return Effect(value: .setAutoFinishHint(hint))
     case let .setAutoFinishHint(hint):
@@ -76,7 +76,7 @@ extension AppState {
         get {
             HintState(
                 hint: _hint.hint,
-                autoFinishAlert: _hint.autoFinishAlert,
+                autoFinishConfirmationDialog: _hint.autoFinishConfirmationDialog,
                 isAutoFinishing: _hint.isAutoFinishing,
                 foundations: game.foundations,
                 piles: game.piles,
@@ -85,11 +85,11 @@ extension AppState {
         }
         set { (
             _hint.hint,
-            _hint.autoFinishAlert,
+            _hint.autoFinishConfirmationDialog,
             _hint.isAutoFinishing
         ) = (
             newValue.hint,
-            newValue.autoFinishAlert,
+            newValue.autoFinishConfirmationDialog,
             newValue.isAutoFinishing
         )}
     }

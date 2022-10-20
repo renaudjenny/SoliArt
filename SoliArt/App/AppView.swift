@@ -19,7 +19,10 @@ struct AppView: View {
                 store.scope(state: \.game.resetGameConfirmationDialog, action: AppAction.game),
                 dismiss: .cancelResetGame
             )
-            .alert(store.scope(state: { $0._hint.autoFinishAlert }, action: AppAction.hint), dismiss: .cancelAutoFinish)
+            .confirmationDialog(
+                store.scope(state: { $0._hint.autoFinishConfirmationDialog }, action: AppAction.hint),
+                dismiss: .cancelAutoFinish
+            )
         }
     }
 
