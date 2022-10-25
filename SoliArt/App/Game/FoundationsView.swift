@@ -95,6 +95,7 @@ struct FoundationsView: View {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color.green)
                         .brightness(-40/100)
+                        .frame(width: viewStore.drag.cardSize.width, height: viewStore.drag.cardSize.height)
                         .overlay(Text("Flip").foregroundColor(.white).padding(4))
                 }
                 .buttonStyle(.plain)
