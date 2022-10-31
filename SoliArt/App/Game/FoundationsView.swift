@@ -103,6 +103,7 @@ struct FoundationsView: View {
                 RoundedRectangle(cornerRadius: 4)
                     .fill(Color.green)
                     .brightness(-40/100)
+                    .frame(width: viewStore.drag.cardSize.width, height: viewStore.drag.cardSize.height)
             }
         }
     }
@@ -158,30 +159,194 @@ struct FoundationsView: View {
 #if DEBUG
 struct FoundationsView_Previews: PreviewProvider {
     static var previews: some View {
-        Preview()
-    }
-
-    private struct Preview: View {
-        let store = Store(
-            initialState: AppState(),
+        let store1 = Store(
+            initialState: .previewWithDrawnCards,
             reducer: appReducer,
             environment: .preview
         )
-
-        var body: some View {
-            WithViewStore(store) { viewStore in
-                VStack(spacing: 0) {
-                    FoundationsView(store: store)
-                    PilesView(store: store)
-                }
-                .task { viewStore.send(.game(.shuffleCards)) }
-                .task {
-                    viewStore.send(.game(.drawCard))
-                    viewStore.send(.game(.drawCard))
-                    viewStore.send(.game(.drawCard))
-                }
-            }
+        VStack(spacing: 0) {
+            FoundationsView(store: store1)
+            PilesView(store: store1)
         }
+        .previewDisplayName("With Drawn Cards")
+
+        let store2 = Store(
+            initialState: .previewWithAllCardsDrawned,
+            reducer: appReducer,
+            environment: .preview
+        )
+        VStack(spacing: 0) {
+            FoundationsView(store: store2)
+            PilesView(store: store2)
+        }
+        .previewDisplayName("With All Cards Drawn")
+
+        let store3 = Store(
+            initialState: .previewWithAnEmptyDeck,
+            reducer: appReducer,
+            environment: .preview
+        )
+        VStack(spacing: 0) {
+            FoundationsView(store: store3)
+            PilesView(store: store3)
+        }
+        .previewDisplayName("With Empty Deck")
+    }
+}
+
+extension AppState {
+    static var previewWithDrawnCards: Self {
+        AppState(
+            game: .previewWithDrawnCards,
+            _drag: DragState(windowSize: UIScreen.main.bounds.size, namespace: namespace)
+        )
+    }
+
+    static var previewWithAllCardsDrawned: Self {
+        AppState(
+            game: .previewWithAllCardsDrawned,
+            _drag: DragState(windowSize: UIScreen.main.bounds.size, namespace: namespace)
+        )
+    }
+
+    static var previewWithAnEmptyDeck: Self {
+        AppState(
+            game: .previewWithEmptyDeck,
+            _drag: DragState(windowSize: UIScreen.main.bounds.size, namespace: namespace)
+        )
+    }
+
+    @Namespace private static var namespace: Namespace.ID
+}
+
+extension GameState {
+    static var previewWithDrawnCards: Self {
+            GameState(
+                foundations: .preview,
+                piles: .preview,
+                deck: Deck(
+                    downwards: [
+                        Card(.ace, of: .hearts, isFacedUp: false),
+                        Card(.two, of: .hearts, isFacedUp: false),
+                        Card(.three, of: .hearts, isFacedUp: false),
+                    ],
+                    upwards: [
+                        Card(.five, of: .hearts, isFacedUp: true),
+                        Card(.six, of: .hearts, isFacedUp: true),
+                        Card(.seven, of: .hearts, isFacedUp: true),
+                    ]
+                ),
+                isGameOver: false
+            )
+    }
+
+    static var previewWithAllCardsDrawned: Self {
+            GameState(
+                foundations: .preview,
+                piles: .preview,
+                deck: Deck(
+                    downwards: [],
+                    upwards: [
+                        Card(.seven, of: .hearts, isFacedUp: true),
+                        Card(.five, of: .hearts, isFacedUp: true),
+                        Card(.six, of: .hearts, isFacedUp: true)
+                    ]
+                ),
+                isGameOver: false
+            )
+    }
+
+    static var previewWithEmptyDeck: Self {
+            GameState(
+                foundations: .preview,
+                piles: .preview,
+                deck: Deck(
+                    downwards: [],
+                    upwards: [Card(.seven, of: .hearts, isFacedUp: true)]
+                ),
+                isGameOver: false
+            )
+    }
+}
+
+extension IdentifiedArrayOf where Element == Foundation {
+    static var preview: IdentifiedArrayOf<Foundation> {
+        IdentifiedArrayOf(uniqueElements: [
+            Foundation(suit: .hearts, cards: []),
+            Foundation(suit: .clubs, cards: []),
+            Foundation(suit: .diamonds, cards: []),
+            Foundation(suit: .spades, cards: []),
+        ])
+    }
+}
+
+extension IdentifiedArrayOf where Element == Pile {
+    static var preview: IdentifiedArrayOf<Pile> {
+        [
+            Pile(
+                id: 1,
+                cards: [
+                    StandardDeckCard(.four, of: .hearts, isFacedUp: true),
+                ]
+            ),
+            Pile(
+                id: 2,
+                cards: [
+                    StandardDeckCard(.two, of: .clubs, isFacedUp: false),
+                    StandardDeckCard(.ace, of: .clubs, isFacedUp: true),
+                ]
+            ),
+            Pile(
+                id: 3,
+                cards: [
+                    StandardDeckCard(.five, of: .clubs, isFacedUp: false),
+                    StandardDeckCard(.four, of: .clubs, isFacedUp: false),
+                    StandardDeckCard(.three, of: .clubs, isFacedUp: true),
+                ]
+            ),
+            Pile(
+                id: 4,
+                cards: [
+                    StandardDeckCard(.king, of: .clubs, isFacedUp: false),
+                    StandardDeckCard(.queen, of: .hearts, isFacedUp: false),
+                    StandardDeckCard(.jack, of: .clubs, isFacedUp: false),
+                    StandardDeckCard(.ten, of: .hearts, isFacedUp: true),
+                ]
+            ),
+            Pile(
+                id: 5,
+                cards: [
+                    StandardDeckCard(.king, of: .spades, isFacedUp: false),
+                    StandardDeckCard(.queen, of: .diamonds, isFacedUp: false),
+                    StandardDeckCard(.jack, of: .spades, isFacedUp: false),
+                    StandardDeckCard(.ten, of: .diamonds, isFacedUp: false),
+                    StandardDeckCard(.nine, of: .spades, isFacedUp: true),
+                ]
+            ),
+            Pile(
+                id: 6,
+                cards: [
+                    StandardDeckCard(.six, of: .hearts, isFacedUp: false),
+                    StandardDeckCard(.five, of: .diamonds, isFacedUp: false),
+                    StandardDeckCard(.four, of: .diamonds, isFacedUp: false),
+                    StandardDeckCard(.three, of: .diamonds, isFacedUp: false),
+                    StandardDeckCard(.two, of: .diamonds, isFacedUp: false),
+                    StandardDeckCard(.ace, of: .diamonds, isFacedUp: true),
+                ]
+            ),
+            Pile(
+                id: 7,
+                cards: [
+                    StandardDeckCard(.eight, of: .clubs, isFacedUp: false),
+                    StandardDeckCard(.seven, of: .clubs, isFacedUp: false),
+                    StandardDeckCard(.six, of: .clubs, isFacedUp: false),
+                    StandardDeckCard(.eight, of: .diamonds, isFacedUp: false),
+                    StandardDeckCard(.seven, of: .diamonds, isFacedUp: false),
+                    StandardDeckCard(.six, of: .diamonds, isFacedUp: false),
+                    StandardDeckCard(.five, of: .hearts, isFacedUp: true),
+                ]
+            ),
+        ]
     }
 }
 #endif
