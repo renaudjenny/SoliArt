@@ -135,6 +135,13 @@ struct AppView_Previews: PreviewProvider {
             reducer: appReducer,
             environment: .preview
         ))
+
+        AppView(store: Store(
+            initialState: .autoFinishAvailable,
+            reducer: appReducer,
+            environment: .preview
+        ))
+        .previewDisplayName("Autofinish enabled")
     }
 }
 
@@ -193,7 +200,8 @@ extension AppState {
                 ])
             ),
             isGameOver: false
-        )
+        ),
+        _drag: DragState(windowSize: UIScreen.main.bounds.size, namespace: namespace)
     )
 
     static let finishedGame = AppState(game: GameState(
@@ -213,7 +221,101 @@ extension AppState {
         _drag: DragState(windowSize: CGSize(width: 300, height: 500), namespace: namespace)
     )
 
+    static var autoFinishAvailable: Self {
+        AppState(
+            game: .previewWithAutoFinishAvailable,
+            _drag: DragState(windowSize: UIScreen.main.bounds.size, namespace: namespace)
+        )
+    }
+
     @Namespace private static var namespace: Namespace.ID
+}
+
+extension GameState {
+    static var previewWithAutoFinishAvailable: Self {
+        GameState(
+            foundations: IdentifiedArrayOf(uniqueElements: Suit.allCases.map { suit in
+                Foundation(
+                    suit: suit,
+                    cards: IdentifiedArrayOf(uniqueElements: Rank.allCases.map { rank in
+                        StandardDeckCard(rank, of: suit, isFacedUp: true)
+                    }.prefix(5))
+                )
+            }),
+            piles: IdentifiedArrayOf(uniqueElements: [
+                Pile(
+                    id: 1,
+                    cards: IdentifiedArrayOf(uniqueElements: [
+                        StandardDeckCard(.seven, of: .clubs, isFacedUp: true),
+                    ])
+                ),
+                Pile(
+                    id: 2,
+                    cards: IdentifiedArrayOf(uniqueElements: [
+                        StandardDeckCard(.nine, of: .hearts, isFacedUp: true),
+                        StandardDeckCard(.eight, of: .clubs, isFacedUp: true),
+                    ])
+                ),
+                Pile(
+                    id: 3,
+                    cards: IdentifiedArrayOf(uniqueElements: [
+                        StandardDeckCard(.eight, of: .hearts, isFacedUp: true),
+                        StandardDeckCard(.seven, of: .spades, isFacedUp: true),
+                        StandardDeckCard(.six, of: .hearts, isFacedUp: true),
+                    ])
+                ),
+                Pile(
+                    id: 4,
+                    cards: IdentifiedArrayOf(uniqueElements: [
+                        StandardDeckCard(.king, of: .clubs, isFacedUp: true),
+                        StandardDeckCard(.queen, of: .hearts, isFacedUp: true),
+                        StandardDeckCard(.jack, of: .clubs, isFacedUp: true),
+                        StandardDeckCard(.ten, of: .hearts, isFacedUp: true),
+                        StandardDeckCard(.nine, of: .clubs, isFacedUp: true),
+                    ])
+                ),
+                Pile(
+                    id: 5,
+                    cards: IdentifiedArrayOf(uniqueElements: [
+                        StandardDeckCard(.king, of: .spades, isFacedUp: true),
+                        StandardDeckCard(.queen, of: .diamonds, isFacedUp: true),
+                        StandardDeckCard(.jack, of: .spades, isFacedUp: true),
+                        StandardDeckCard(.ten, of: .diamonds, isFacedUp: true),
+                        StandardDeckCard(.nine, of: .spades, isFacedUp: true),
+                    ])
+                ),
+                Pile(id: 6, cards: []),
+                Pile(
+                    id: 7,
+                    cards: IdentifiedArrayOf(uniqueElements: [
+                        StandardDeckCard(.eight, of: .spades, isFacedUp: true),
+                        StandardDeckCard(.seven, of: .hearts, isFacedUp: true),
+                        StandardDeckCard(.six, of: .spades, isFacedUp: true),
+                    ])
+                ),
+            ]),
+            deck: Deck(
+                downwards: IdentifiedArrayOf(uniqueElements: [
+                    StandardDeckCard(.king, of: .hearts, isFacedUp: false),
+                    StandardDeckCard(.ten, of: .clubs, isFacedUp: false),
+                    StandardDeckCard(.ten, of: .spades, isFacedUp: false),
+                    StandardDeckCard(.six, of: .clubs, isFacedUp: false),
+                    StandardDeckCard(.nine, of: .diamonds, isFacedUp: false),
+                    StandardDeckCard(.jack, of: .hearts, isFacedUp: false),
+                    StandardDeckCard(.king, of: .diamonds, isFacedUp: false),
+                    StandardDeckCard(.jack, of: .diamonds, isFacedUp: false),
+                ]),
+                upwards: IdentifiedArrayOf(uniqueElements: [
+                    StandardDeckCard(.queen, of: .spades, isFacedUp: true),
+                    StandardDeckCard(.queen, of: .clubs, isFacedUp: true),
+                    StandardDeckCard(.eight, of: .diamonds, isFacedUp: true),
+                    StandardDeckCard(.seven, of: .diamonds, isFacedUp: true),
+                    StandardDeckCard(.six, of: .diamonds, isFacedUp: true),
+                ])
+            ),
+            isGameOver: false
+        )
+    }
 }
 
 private extension IdentifiedArray<Foundation.ID, Foundation> {

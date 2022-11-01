@@ -78,6 +78,17 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             return .none
         case let .drag(.score(action)):
             return Effect(value: .score(action))
+        case .hint(.autoFinish):
+            let isFlipDeckNeeded = state.game.deck.downwards.count == 0 && state.game.deck.upwards.count > 1
+            if isFlipDeckNeeded {
+                return .run { send in
+                    try await environment.mainQueue.sleep(for: 0.2)
+                    await send(.game(.flipDeck))
+                    try await environment.mainQueue.sleep(for: 0.2)
+                    await send(.hint(.autoFinish))
+                }
+            }
+            return .none
         case let .hint(.setAutoFinishHint(hint)):
             return .run { [frames = state.drag.frames] send in
                 let position = hint.destination
