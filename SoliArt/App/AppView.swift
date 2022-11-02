@@ -14,7 +14,6 @@ struct AppView: View {
                 hint
             }
             .task { viewStore.send(.game(.shuffleCards)) }
-            .task { viewStore.send(.drag(.setNamespace(namespace))) }
             .confirmationDialog(
                 store.scope(state: \.game.resetGameConfirmationDialog, action: AppAction.game),
                 dismiss: .cancelResetGame
@@ -31,8 +30,9 @@ struct AppView: View {
             GeometryReader { geo in
                 VStack(spacing: 0) {
                     ScoreView(store: store.actionless.scope(state: \.score))
-                    FoundationsView(store: store).zIndex(foundationIndex(priority: viewStore.drag.zIndexPriority))
-                    PilesView(store: store)
+                    FoundationsView(store: store, namespace: namespace)
+                        .zIndex(foundationIndex(priority: viewStore.drag.zIndexPriority))
+                    PilesView(store: store, namespace: namespace)
                     AppActionsView(store: store.scope(state: \.hint))
                 }
                 .preference(key: WindowSizePreferenceKey.self, value: geo.size)
@@ -201,7 +201,7 @@ extension AppState {
             ),
             isGameOver: false
         ),
-        _drag: DragState(windowSize: UIScreen.main.bounds.size, namespace: namespace)
+        _drag: DragState(windowSize: UIScreen.main.bounds.size)
     )
 
     static let finishedGame = AppState(game: GameState(
@@ -218,13 +218,13 @@ extension AppState {
 
     static let startedGame = AppState(
         game: GameState(foundations: .startedGame, piles: .startedGame, deck: .startedGame, isGameOver: false),
-        _drag: DragState(windowSize: CGSize(width: 300, height: 500), namespace: namespace)
+        _drag: DragState(windowSize: UIScreen.main.bounds.size)
     )
 
     static var autoFinishAvailable: Self {
         AppState(
             game: .previewWithAutoFinishAvailable,
-            _drag: DragState(windowSize: UIScreen.main.bounds.size, namespace: namespace)
+            _drag: DragState(windowSize: UIScreen.main.bounds.size)
         )
     }
 

@@ -4,6 +4,7 @@ import SwiftUICardGame
 
 struct FoundationsView: View {
     let store: Store<AppState, AppAction>
+    let namespace: Namespace.ID
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
@@ -56,9 +57,13 @@ struct FoundationsView: View {
             ZStack {
                 ForEach(viewStore.state.deckUpwardsCardsAndOffsets, id: \.card) { card, xOffset, isDraggable in
                     if isDraggable {
-                        DraggableCardView(store: store.scope(state: \.drag, action: AppAction.drag), card: card)
-                            .onTapGesture(count: 2) { viewStore.send(.doubleTapCard(card), animation: .spring()) }
-                            .offset(x: xOffset)
+                        DraggableCardView(
+                            store: store.scope(state: \.drag, action: AppAction.drag),
+                            card: card,
+                            namespace: namespace
+                        )
+                        .onTapGesture(count: 2) { viewStore.send(.doubleTapCard(card), animation: .spring()) }
+                        .offset(x: xOffset)
                     } else {
                         StandardDeckCardView(card: card) { EmptyView() }
                             .offset(x: xOffset)
@@ -142,7 +147,11 @@ struct FoundationsView: View {
                 }
 
                 foundation.cards.last.map { last in
-                    DraggableCardView(store: store.scope(state: \.drag, action: AppAction.drag), card: last)
+                    DraggableCardView(
+                        store: store.scope(state: \.drag, action: AppAction.drag),
+                        card: last,
+                        namespace: namespace
+                    )
                 }
             }
         }
@@ -158,6 +167,8 @@ struct FoundationsView: View {
 
 #if DEBUG
 struct FoundationsView_Previews: PreviewProvider {
+    @Namespace private static var namespace
+
     static var previews: some View {
         let store1 = Store(
             initialState: .previewWithDrawnCards,
@@ -165,8 +176,8 @@ struct FoundationsView_Previews: PreviewProvider {
             environment: .preview
         )
         VStack(spacing: 0) {
-            FoundationsView(store: store1)
-            PilesView(store: store1)
+            FoundationsView(store: store1, namespace: namespace)
+            PilesView(store: store1, namespace: namespace)
         }
         .previewDisplayName("With Drawn Cards")
 
@@ -176,8 +187,8 @@ struct FoundationsView_Previews: PreviewProvider {
             environment: .preview
         )
         VStack(spacing: 0) {
-            FoundationsView(store: store2)
-            PilesView(store: store2)
+            FoundationsView(store: store2, namespace: namespace)
+            PilesView(store: store2, namespace: namespace)
         }
         .previewDisplayName("With All Cards Drawn")
 
@@ -187,8 +198,8 @@ struct FoundationsView_Previews: PreviewProvider {
             environment: .preview
         )
         VStack(spacing: 0) {
-            FoundationsView(store: store3)
-            PilesView(store: store3)
+            FoundationsView(store: store3, namespace: namespace)
+            PilesView(store: store3, namespace: namespace)
         }
         .previewDisplayName("With Empty Deck")
     }
@@ -198,21 +209,21 @@ extension AppState {
     static var previewWithDrawnCards: Self {
         AppState(
             game: .previewWithDrawnCards,
-            _drag: DragState(windowSize: UIScreen.main.bounds.size, namespace: namespace)
+            _drag: DragState(windowSize: UIScreen.main.bounds.size)
         )
     }
 
     static var previewWithAllCardsDrawned: Self {
         AppState(
             game: .previewWithAllCardsDrawned,
-            _drag: DragState(windowSize: UIScreen.main.bounds.size, namespace: namespace)
+            _drag: DragState(windowSize: UIScreen.main.bounds.size)
         )
     }
 
     static var previewWithAnEmptyDeck: Self {
         AppState(
             game: .previewWithEmptyDeck,
-            _drag: DragState(windowSize: UIScreen.main.bounds.size, namespace: namespace)
+            _drag: DragState(windowSize: UIScreen.main.bounds.size)
         )
     }
 

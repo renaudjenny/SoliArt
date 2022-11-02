@@ -4,6 +4,7 @@ import SwiftUICardGame
 
 struct PilesView: View {
     let store: Store<AppState, AppAction>
+    let namespace: Namespace.ID
 
     var body: some View {
         WithViewStore(store) { viewStore in
@@ -46,10 +47,14 @@ struct PilesView: View {
         WithViewStore(store) { viewStore in
             ZStack {
                 ForEach(viewStore.drag.pileCardsAndOffsets(pileID: pileID), id: \.card.id) { card, offset in
-                    DraggableCardView(store: store.scope(state: \.drag, action: AppAction.drag), card: card)
-                        .frame(width: viewStore.drag.cardSize.width, height: viewStore.drag.cardSize.height)
-                        .offset(y: offset)
-                        .onTapGesture(count: 2) { viewStore.send(.drag(.doubleTapCard(card)), animation: .spring()) }
+                    DraggableCardView(
+                        store: store.scope(state: \.drag, action: AppAction.drag),
+                        card: card,
+                        namespace: namespace
+                    )
+                    .frame(width: viewStore.drag.cardSize.width, height: viewStore.drag.cardSize.height)
+                    .offset(y: offset)
+                    .onTapGesture(count: 2) { viewStore.send(.drag(.doubleTapCard(card)), animation: .spring()) }
                 }
             }
         }
@@ -65,22 +70,21 @@ struct PilesView: View {
 
 #if DEBUG
 struct PilesView_Previews: PreviewProvider {
+    @Namespace private static var namespace
+
     static var previews: some View {
-        PilesView(store: Store(
-            initialState: .startedGame,
-            reducer: appReducer,
-            environment: .preview
-        ))
+        PilesView(store: .startedGame, namespace: namespace)
+        PilesView(store: .finishedGame, namespace: namespace)
+            .previewDisplayName("Finished game")
     }
 }
 
-struct PilesWinView_Previews: PreviewProvider {
-    static var previews: some View {
-        PilesView(store: Store(
-            initialState: .finishedGame,
-            reducer: appReducer,
-            environment: .preview
-        ))
+extension Store where State == AppState, Action == AppAction {
+    static var startedGame: Store<AppState, AppAction> {
+        Store(initialState: .startedGame, reducer: appReducer, environment: .preview)
+    }
+    static var finishedGame: Store<AppState, AppAction> {
+        Store(initialState: .finishedGame, reducer: appReducer, environment: .preview)
     }
 }
 #endif

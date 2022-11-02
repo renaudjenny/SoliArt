@@ -6,7 +6,6 @@ struct DragState: Equatable {
     var windowSize: CGSize = .zero
     var draggingState: DraggingState?
     var zIndexPriority: DraggingSource = .pile(id: 1)
-    var namespace: Namespace.ID?
     var piles: IdentifiedArrayOf<Pile> = []
     var foundations: IdentifiedArrayOf<Foundation> = []
     var deck = Deck(downwards: [], upwards: [])
@@ -18,7 +17,6 @@ enum DragAction: Equatable {
     case dragCard(Card, position: CGPoint)
     case dropCards
     case doubleTapCard(Card)
-    case setNamespace(Namespace.ID)
     case resetZIndexPriority
     case score(ScoreAction)
 }
@@ -52,9 +50,6 @@ let dragReducer = Reducer<DragState, DragAction, DragEnvironment> { state, actio
         else { return .none }
 
         return state.move(card: card, foundation: foundation)
-    case let .setNamespace(namespace):
-        state.namespace = namespace
-        return .none
     case .score:
         return .none
     }
@@ -75,7 +70,6 @@ extension AppState {
                 windowSize: _drag.windowSize,
                 draggingState: _drag.draggingState,
                 zIndexPriority: _drag.zIndexPriority,
-                namespace: _drag.namespace,
                 piles: game.piles,
                 foundations: game.foundations,
                 deck: game.deck
@@ -87,7 +81,6 @@ extension AppState {
                 _drag.windowSize,
                 _drag.draggingState,
                 _drag.zIndexPriority,
-                _drag.namespace,
 
                 game.piles,
                 game.foundations,
@@ -97,7 +90,6 @@ extension AppState {
                 newValue.windowSize,
                 newValue.draggingState,
                 newValue.zIndexPriority,
-                newValue.namespace,
 
                 newValue.piles,
                 newValue.foundations,
