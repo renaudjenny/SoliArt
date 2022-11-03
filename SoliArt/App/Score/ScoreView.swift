@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 struct ScoreView: View {
-    let store: Store<ScoreState, Never>
+    let store: StoreOf<Score>
     
     var body: some View {
         WithViewStore(store) { viewStore in
@@ -25,9 +25,8 @@ struct ScoreView: View {
 struct ScoreView_Previews: PreviewProvider {
     static var previews: some View {
         ScoreView(store: Store(
-            initialState: ScoreState(score: 123, moves: 123),
-            reducer: .empty,
-            environment: ScoreEnvironment()
+            initialState: Score.State(score: 123, moves: 123),
+            reducer: Score()
         ))
     }
 }

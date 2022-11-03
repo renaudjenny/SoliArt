@@ -29,7 +29,7 @@ struct AppView: View {
         WithViewStore(store) { viewStore in
             GeometryReader { geo in
                 VStack(spacing: 0) {
-                    ScoreView(store: store.actionless.scope(state: \.score))
+                    ScoreView(store: store.scope(state: \.score, action: AppAction.score))
                     FoundationsView(store: store, namespace: namespace)
                         .zIndex(foundationIndex(priority: viewStore.drag.zIndexPriority))
                     PilesView(store: store, namespace: namespace)

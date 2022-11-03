@@ -5,7 +5,7 @@ import SwiftUI
 struct AppState: Equatable {
     var game = GameState()
     var _drag = DragState()
-    var score = ScoreState()
+    var score = Score.State()
     var _hint = HintState()
     var history = HistoryState()
 }
@@ -13,7 +13,7 @@ struct AppState: Equatable {
 enum AppAction: Equatable {
     case game(GameAction)
     case drag(DragAction)
-    case score(ScoreAction)
+    case score(Score.Action)
     case hint(HintAction)
     case history(HistoryAction)
 }
@@ -35,11 +35,12 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         action: /AppAction.drag,
         environment: { DragEnvironment(mainQueue: $0.mainQueue) }
     ),
-    scoreReducer.pullback(
-        state: \.score,
-        action: /AppAction.score,
-        environment: { _ in ScoreEnvironment() }
-    ),
+    AnyReducer { _ in
+        Score()
+
+    }
+        .pullback(state: \.score, action: /AppAction.score, environment: { $0 })
+    ,
     hintReducer.pullback(
         state: \.hint,
         action: /AppAction.hint,
@@ -62,7 +63,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
                 Effect(value: .score(.score(.recycling)))
             )
         case .game(.resetGame):
-            state.score = ScoreState()
+            state.score = Score.State()
             return .none
         case .game(.shuffleCards), .game(.drawCard), .drag(.doubleTapCard), .drag(.dropCards):
             guard state.game != state.history.entries.last?.gameState else { return .none }

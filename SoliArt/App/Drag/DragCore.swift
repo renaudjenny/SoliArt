@@ -18,7 +18,7 @@ enum DragAction: Equatable {
     case dropCards
     case doubleTapCard(Card)
     case resetZIndexPriority
-    case score(ScoreAction)
+    case score(Score.Action)
 }
 
 struct DragEnvironment {
