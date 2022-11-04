@@ -6,7 +6,7 @@ struct AppState: Equatable {
     var game = GameState()
     var _drag = Drag.State()
     var score = Score.State()
-    var _hint = HintState()
+    var _hint = Hint.State()
     var history = HistoryState()
 }
 
@@ -14,7 +14,7 @@ enum AppAction: Equatable {
     case game(GameAction)
     case drag(Drag.Action)
     case score(Score.Action)
-    case hint(HintAction)
+    case hint(Hint.Action)
     case history(HistoryAction)
 }
 
@@ -33,18 +33,16 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     AnyReducer {
         Drag()
     }
-        .pullback(state: \.drag, action: /AppAction.drag, environment: { $0 }),
+        .pullback(state: \.drag, action: /AppAction.drag, environment: { _ in }),
     AnyReducer { _ in
         Score()
 
     }
-        .pullback(state: \.score, action: /AppAction.score, environment: { $0 })
-    ,
-    hintReducer.pullback(
-        state: \.hint,
-        action: /AppAction.hint,
-        environment: { HintEnvironment(mainQueue: $0.mainQueue) }
-    ),
+        .pullback(state: \.score, action: /AppAction.score, environment: { $0 }),
+    AnyReducer {
+        Hint()
+    }
+        .pullback(state: \.hint, action: /AppAction.hint, environment: { _ in }),
     historyReducer.pullback(
         state: \.history,
         action: /AppAction.history,

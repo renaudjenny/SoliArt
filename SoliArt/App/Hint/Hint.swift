@@ -1,13 +1,13 @@
 import SwiftUI
 
-struct Hint: Equatable {
+struct HintMove: Equatable {
     let card: Card
     let origin: Source
     let destination: Destination
     var position: Position
 }
 
-extension Hint {
+extension HintMove {
     enum Source: Equatable {
         case pile(id: Pile.ID)
         case deck

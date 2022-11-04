@@ -47,7 +47,7 @@ extension Drag.State {
         }
     }
 
-    func destinationPosition(_ destination: Hint.Destination) -> CGPoint {
+    func destinationPosition(_ destination: HintMove.Destination) -> CGPoint {
         switch destination {
         case let .foundation(id):
             guard let rect = frames

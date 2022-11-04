@@ -1,80 +1,81 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct HintState: Equatable {
-    var hint: Hint?
-    var autoFinishConfirmationDialog: ConfirmationDialogState<HintAction>?
-    var isAutoFinishing = false
-    var foundations: IdentifiedArrayOf<Foundation> = []
-    var piles: IdentifiedArrayOf<Pile> = []
-    var deck = Deck(downwards: [], upwards: [])
-}
+struct Hint: ReducerProtocol {
+    struct State: Equatable {
+        var hint: HintMove?
+        var autoFinishConfirmationDialog: ConfirmationDialogState<Hint.Action>?
+        var isAutoFinishing = false
+        var foundations: IdentifiedArrayOf<Foundation> = []
+        var piles: IdentifiedArrayOf<Pile> = []
+        var deck = Deck(downwards: [], upwards: [])
+    }
 
-enum HintAction: Equatable {
-    case hint
-    case setHintCardPosition(Hint.Position)
-    case removeHint
-    case checkForAutoFinish
-    case cancelAutoFinish
-    case autoFinish
-    case setAutoFinishHint(Hint)
-    case stopAutoFinish
-}
+    enum Action: Equatable {
+        case hint
+        case setHintCardPosition(HintMove.Position)
+        case removeHint
+        case checkForAutoFinish
+        case cancelAutoFinish
+        case autoFinish
+        case setAutoFinishHint(HintMove)
+        case stopAutoFinish
+    }
 
-struct HintEnvironment {
-    let mainQueue: AnySchedulerOf<DispatchQueue>
-}
+    @Dependency(\.mainQueue) var mainQueue
 
-let hintReducer = Reducer<HintState, HintAction, HintEnvironment> { state, action, environment in
-    enum HintCancelID {}
-    enum AutoFinishCancelID {}
+    func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+        enum HintCancelID {}
+        enum AutoFinishCancelID {}
 
-    switch action {
-    case .hint:
-        guard let hint = state.hints.first else { return .none }
-        state.hint = hint
+        switch action {
+        case .hint:
+            guard let hint = state.hints.first else { return .none }
+            state.hint = hint
 
-        return .run { send in
-            try await environment.mainQueue.sleep(for: 0.5)
-            await send(.setHintCardPosition(.destination), animation: .linear)
-            try await environment.mainQueue.sleep(for: 1)
-            await send(.setHintCardPosition(.source))
-            try await environment.mainQueue.sleep(for: 1)
-            await send(.setHintCardPosition(.destination), animation: .linear)
-            try await environment.mainQueue.sleep(for: 1)
-            await send(.removeHint)
+            return .run { send in
+                try await mainQueue.sleep(for: 0.5)
+                await send(.setHintCardPosition(.destination), animation: .linear)
+                try await mainQueue.sleep(for: 1)
+                await send(.setHintCardPosition(.source))
+                try await mainQueue.sleep(for: 1)
+                await send(.setHintCardPosition(.destination), animation: .linear)
+                try await mainQueue.sleep(for: 1)
+                await send(.removeHint)
+            }
+            .cancellable(id: HintCancelID.self)
+        case let .setHintCardPosition(position):
+            state.hint?.position = position
+            return .none
+        case .removeHint:
+            state.hint = nil
+            return .none
+        case .checkForAutoFinish:
+            guard state.isAutoFinishAvailable else { return .none }
+            state.autoFinishConfirmationDialog = .autoFinish
+            return .none
+        case .cancelAutoFinish:
+            state.autoFinishConfirmationDialog = nil
+            return .none
+        case .autoFinish:
+            state.isAutoFinishing = true
+            state.autoFinishConfirmationDialog = nil
+            guard let hint = state.hints.first else { return Effect(value: .stopAutoFinish) }
+            return Effect(value: .setAutoFinishHint(hint))
+        case .setAutoFinishHint:
+            return .none
+        case .stopAutoFinish:
+            state.isAutoFinishing = false
+            return .none
         }
-        .cancellable(id: HintCancelID.self)
-    case let .setHintCardPosition(position):
-        state.hint?.position = position
-        return .none
-    case .removeHint:
-        state.hint = nil
-        return .none
-    case .checkForAutoFinish:
-        guard state.isAutoFinishAvailable else { return .none }
-        state.autoFinishConfirmationDialog = .autoFinish
-        return .none
-    case .cancelAutoFinish:
-        state.autoFinishConfirmationDialog = nil
-        return .none
-    case .autoFinish:
-        state.isAutoFinishing = true
-        state.autoFinishConfirmationDialog = nil
-        guard let hint = state.hints.first else { return Effect(value: .stopAutoFinish) }
-        return Effect(value: .setAutoFinishHint(hint))
-    case let .setAutoFinishHint(hint):
-        return .none
-    case .stopAutoFinish:
-        state.isAutoFinishing = false
-        return .none
     }
 }
 
+
 extension AppState {
-    var hint: HintState {
+    var hint: Hint.State {
         get {
-            HintState(
+            Hint.State(
                 hint: _hint.hint,
                 autoFinishConfirmationDialog: _hint.autoFinishConfirmationDialog,
                 isAutoFinishing: _hint.isAutoFinishing,

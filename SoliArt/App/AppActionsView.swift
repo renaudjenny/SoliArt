@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 struct AppActionsView: View {
-    let store: Store<HintState, AppAction>
+    let store: Store<Hint.State, AppAction>
 
     var body: some View {
         WithViewStore(store) { viewStore in
