@@ -1,6 +1,6 @@
 import SwiftUI
 
-extension DragState {
+extension Drag.State {
     func pileCardsAndOffsets(pileID: Pile.ID) -> [(card: Card, yOffset: Double)] {
         guard let cards = piles[id: pileID]?.cards else { return [] }
         let spacing = cardSize.width * 2/5 + 4

@@ -201,7 +201,7 @@ extension AppState {
             ),
             isGameOver: false
         ),
-        _drag: DragState(windowSize: UIScreen.main.bounds.size)
+        _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
     )
 
     static let finishedGame = AppState(game: GameState(
@@ -218,13 +218,13 @@ extension AppState {
 
     static let startedGame = AppState(
         game: GameState(foundations: .startedGame, piles: .startedGame, deck: .startedGame, isGameOver: false),
-        _drag: DragState(windowSize: UIScreen.main.bounds.size)
+        _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
     )
 
     static var autoFinishAvailable: Self {
         AppState(
             game: .previewWithAutoFinishAvailable,
-            _drag: DragState(windowSize: UIScreen.main.bounds.size)
+            _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
         )
     }
 

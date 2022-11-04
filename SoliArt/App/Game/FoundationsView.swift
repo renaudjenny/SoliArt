@@ -209,21 +209,21 @@ extension AppState {
     static var previewWithDrawnCards: Self {
         AppState(
             game: .previewWithDrawnCards,
-            _drag: DragState(windowSize: UIScreen.main.bounds.size)
+            _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
         )
     }
 
     static var previewWithAllCardsDrawned: Self {
         AppState(
             game: .previewWithAllCardsDrawned,
-            _drag: DragState(windowSize: UIScreen.main.bounds.size)
+            _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
         )
     }
 
     static var previewWithAnEmptyDeck: Self {
         AppState(
             game: .previewWithEmptyDeck,
-            _drag: DragState(windowSize: UIScreen.main.bounds.size)
+            _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
         )
     }
 

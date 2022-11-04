@@ -14,7 +14,7 @@ enum DraggingSource: Equatable {
     case deckDownwards
     case removed
 
-    static func card(_ card: Card, in state: DragState) -> Self {
+    static func card(_ card: Card, in state: Drag.State) -> Self {
         if let pileID = state.piles.first(where: { $0.cards.contains(card) })?.id {
             return .pile(id: pileID)
         } else if let foundationID = state.foundations.first(where: { $0.cards.contains(card) })?.id {
@@ -29,7 +29,7 @@ enum DraggingSource: Equatable {
 }
 
 
-extension DragState {
+extension Drag.State {
     var draggedCards: [Card] {
         guard let card = draggingState?.card else { return [] }
         switch DraggingSource.card(card, in: self) {
@@ -52,14 +52,14 @@ extension DragState {
         return false
     }
 
-    mutating func dropCards(mainQueue: AnySchedulerOf<DispatchQueue>) -> Effect<DragAction, Never> {
+    mutating func dropCards(mainQueue: AnySchedulerOf<DispatchQueue>) -> Effect<Drag.Action, Never> {
         guard let draggingState = draggingState else { return .none }
 
         let dropFrame = frames.first { frame in
             frame.rect.contains(draggingState.position)
         }
 
-        let dropEffect = Effect<DragAction, Never>(value: .resetZIndexPriority)
+        let dropEffect = Effect<Drag.Action, Never>(value: .resetZIndexPriority)
             .delay(for: 0.5, scheduler: mainQueue)
             .eraseToEffect()
 
@@ -73,7 +73,7 @@ extension DragState {
                 return dropEffect
             }
 
-            let scoringEffect: Effect<DragAction, Never>
+            let scoringEffect: Effect<Drag.Action, Never>
             switch DraggingSource.card(draggingState.card, in: self) {
             case let .pile(pileID):
                 let hasTurnOverCard = removePileCards(pileID: pileID, cards: draggedCards)
@@ -109,10 +109,10 @@ extension DragState {
         }
     }
 
-    mutating func move(card: Card, foundation: Foundation) -> Effect<DragAction, Never> {
+    mutating func move(card: Card, foundation: Foundation) -> Effect<Drag.Action, Never> {
         guard isValidScoring(card: card, onto: foundation) else { return .none }
 
-        let scoringEffect: Effect<DragAction, Never>
+        let scoringEffect: Effect<Drag.Action, Never>
         switch DraggingSource.card(card, in: self) {
         case let .pile(pileID):
             removePileCards(pileID: pileID, cards: [card])

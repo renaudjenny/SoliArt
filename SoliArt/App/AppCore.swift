@@ -4,7 +4,7 @@ import SwiftUI
 
 struct AppState: Equatable {
     var game = GameState()
-    var _drag = DragState()
+    var _drag = Drag.State()
     var score = Score.State()
     var _hint = HintState()
     var history = HistoryState()
@@ -12,7 +12,7 @@ struct AppState: Equatable {
 
 enum AppAction: Equatable {
     case game(GameAction)
-    case drag(DragAction)
+    case drag(Drag.Action)
     case score(Score.Action)
     case hint(HintAction)
     case history(HistoryAction)
@@ -30,11 +30,10 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         action: /AppAction.game,
         environment: { GameEnvironment(mainQueue: $0.mainQueue, shuffleCards: $0.shuffleCards) }
     ),
-    dragReducer.pullback(
-        state: \.drag,
-        action: /AppAction.drag,
-        environment: { DragEnvironment(mainQueue: $0.mainQueue) }
-    ),
+    AnyReducer {
+        Drag()
+    }
+        .pullback(state: \.drag, action: /AppAction.drag, environment: { $0 }),
     AnyReducer { _ in
         Score()
 
