@@ -3,7 +3,7 @@ import Foundation
 import SwiftUI
 
 struct AppState: Equatable {
-    var game = GameState()
+    var game = Game.State()
     var _drag = Drag.State()
     var score = Score.State()
     var _hint = Hint.State()
@@ -11,7 +11,7 @@ struct AppState: Equatable {
 }
 
 enum AppAction: Equatable {
-    case game(GameAction)
+    case game(Game.Action)
     case drag(Drag.Action)
     case score(Score.Action)
     case hint(Hint.Action)
@@ -25,11 +25,10 @@ struct AppEnvironment {
 }
 
 let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
-    gameReducer.pullback(
-        state: \.game,
-        action: /AppAction.game,
-        environment: { GameEnvironment(mainQueue: $0.mainQueue, shuffleCards: $0.shuffleCards) }
-    ),
+    AnyReducer {
+        Game()
+    }
+        .pullback(state: \.game, action: /AppAction.game, environment: { _ in }),
     AnyReducer {
         Drag()
     }

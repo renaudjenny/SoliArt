@@ -58,7 +58,7 @@ struct AppActionsView_Previews: PreviewProvider {
 
             AppActionsView(store: Store(
                 initialState: AppState(
-                    game: GameState(
+                    game: Game.State(
                         foundations: [Foundation(suit: .spades, cards: [])],
                         piles: [Pile(id: 1, cards: [Card(.ace, of: .spades, isFacedUp: true)])]
                     )),

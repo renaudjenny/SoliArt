@@ -2,6 +2,6 @@ import Foundation
 
 struct HistoryEntry: Equatable {
     let date: Date
-    let gameState: GameState
+    let gameState: Game.State
     let scoreState: Score.State
 }

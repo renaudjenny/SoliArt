@@ -1,6 +1,6 @@
 import ComposableArchitecture
 
-extension ConfirmationDialogState where Action == GameAction {
+extension ConfirmationDialogState where Action == Game.Action {
     static var resetGame: Self {
         ConfirmationDialogState(
             title: TextState("Confirm reset game"),

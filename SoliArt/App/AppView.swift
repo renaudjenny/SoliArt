@@ -173,7 +173,7 @@ extension AppEnvironment {
 
 extension AppState {
     static let almostFinishedGame = AppState(
-        game: GameState(
+        game: Game.State(
             foundations: IdentifiedArrayOf(uniqueElements: Suit.allCases.map { suit in
                 Foundation(
                     suit: suit,
@@ -204,7 +204,7 @@ extension AppState {
         _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
     )
 
-    static let finishedGame = AppState(game: GameState(
+    static let finishedGame = AppState(game: Game.State(
         foundations: IdentifiedArrayOf(uniqueElements: Suit.allCases.map { suit in
             Foundation(
                 suit: suit,
@@ -217,7 +217,7 @@ extension AppState {
     ))
 
     static let startedGame = AppState(
-        game: GameState(foundations: .startedGame, piles: .startedGame, deck: .startedGame, isGameOver: false),
+        game: Game.State(foundations: .startedGame, piles: .startedGame, deck: .startedGame, isGameOver: false),
         _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
     )
 
@@ -231,9 +231,9 @@ extension AppState {
     @Namespace private static var namespace: Namespace.ID
 }
 
-extension GameState {
+extension Game.State {
     static var previewWithAutoFinishAvailable: Self {
-        GameState(
+        Game.State(
             foundations: IdentifiedArrayOf(uniqueElements: Suit.allCases.map { suit in
                 Foundation(
                     suit: suit,

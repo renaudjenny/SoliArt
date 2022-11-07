@@ -25,6 +25,7 @@
 		4C6169D3286CDD6E006B4D48 /* FoundationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C6169D2286CDD6E006B4D48 /* FoundationsView.swift */; };
 		4C6169D5286CDF34006B4D48 /* PilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C6169D4286CDF34006B4D48 /* PilesView.swift */; };
 		4CA0D7CE2863AEAB00EF30D1 /* Color+Assets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA0D7CD2863AEAB00EF30D1 /* Color+Assets.swift */; };
+		4CAE86CD2919AB2E00CF6520 /* ShuffleCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAE86CC2919AB2E00CF6520 /* ShuffleCards.swift */; };
 		4CB1CB5828B02E980077C247 /* ScoreCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB1CB5728B02E980077C247 /* ScoreCore.swift */; };
 		4CB1CB5B28B031C10077C247 /* ScoreCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB1CB5A28B031C10077C247 /* ScoreCoreTests.swift */; };
 		4CD8819A28B7F09C008B4619 /* Hint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD8819928B7F09C008B4619 /* Hint.swift */; };
@@ -81,6 +82,7 @@
 		4C6169D2286CDD6E006B4D48 /* FoundationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationsView.swift; sourceTree = "<group>"; };
 		4C6169D4286CDF34006B4D48 /* PilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PilesView.swift; sourceTree = "<group>"; };
 		4CA0D7CD2863AEAB00EF30D1 /* Color+Assets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Assets.swift"; sourceTree = "<group>"; };
+		4CAE86CC2919AB2E00CF6520 /* ShuffleCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleCards.swift; sourceTree = "<group>"; };
 		4CB1CB5728B02E980077C247 /* ScoreCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreCore.swift; sourceTree = "<group>"; };
 		4CB1CB5A28B031C10077C247 /* ScoreCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreCoreTests.swift; sourceTree = "<group>"; };
 		4CD8819928B7F09C008B4619 /* Hint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hint.swift; sourceTree = "<group>"; };
@@ -129,6 +131,7 @@
 		4C2E2BAB285B00700095A238 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				4CAE86CB2919AAEF00CF6520 /* Dependencies */,
 				4C43E5AC28AB47540055BAE0 /* ConfirmationDialogState+ResetGame.swift */,
 				4CD881BC28CF92BC008B4619 /* AppActionsView.swift */,
 				4C2E2BAC285B007F0095A238 /* AppCore.swift */,
@@ -219,6 +222,14 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4CAE86CB2919AAEF00CF6520 /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				4CAE86CC2919AB2E00CF6520 /* ShuffleCards.swift */,
+			);
+			path = Dependencies;
 			sourceTree = "<group>";
 		};
 		4CB1CB5628B02E8F0077C247 /* Score */ = {
@@ -468,6 +479,7 @@
 				4CD8819C28BBD75B008B4619 /* CardPosition.swift in Sources */,
 				4C6169D5286CDF34006B4D48 /* PilesView.swift in Sources */,
 				4CD881BB28CA782B008B4619 /* HintState+Hints.swift in Sources */,
+				4CAE86CD2919AB2E00CF6520 /* ShuffleCards.swift in Sources */,
 				4CD881BD28CF92BC008B4619 /* AppActionsView.swift in Sources */,
 				4C3D194F28547D810096404F /* SoliArtApp.swift in Sources */,
 				4CD881A628BCF43A008B4619 /* DragCore.swift in Sources */,

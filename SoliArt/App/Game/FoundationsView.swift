@@ -230,9 +230,9 @@ extension AppState {
     @Namespace private static var namespace: Namespace.ID
 }
 
-extension GameState {
+extension Game.State {
     static var previewWithDrawnCards: Self {
-            GameState(
+        Game.State(
                 foundations: .preview,
                 piles: .preview,
                 deck: Deck(
@@ -252,7 +252,7 @@ extension GameState {
     }
 
     static var previewWithAllCardsDrawned: Self {
-            GameState(
+        Game.State(
                 foundations: .preview,
                 piles: .preview,
                 deck: Deck(
@@ -268,7 +268,7 @@ extension GameState {
     }
 
     static var previewWithEmptyDeck: Self {
-            GameState(
+        Game.State(
                 foundations: .preview,
                 piles: .preview,
                 deck: Deck(
