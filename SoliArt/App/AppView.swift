@@ -3,7 +3,7 @@ import SwiftUI
 import SwiftUICardGame
 
 struct AppView: View {
-    let store: Store<AppState, AppAction>
+    let store: StoreOf<App>
     @Namespace private var namespace
 
     var body: some View {
@@ -15,11 +15,11 @@ struct AppView: View {
             }
             .task { viewStore.send(.game(.shuffleCards)) }
             .confirmationDialog(
-                store.scope(state: \.game.resetGameConfirmationDialog, action: AppAction.game),
+                store.scope(state: \.game.resetGameConfirmationDialog, action: App.Action.game),
                 dismiss: .cancelResetGame
             )
             .confirmationDialog(
-                store.scope(state: { $0._hint.autoFinishConfirmationDialog }, action: AppAction.hint),
+                store.scope(state: { $0._hint.autoFinishConfirmationDialog }, action: App.Action.hint),
                 dismiss: .cancelAutoFinish
             )
         }
@@ -29,7 +29,7 @@ struct AppView: View {
         WithViewStore(store) { viewStore in
             GeometryReader { geo in
                 VStack(spacing: 0) {
-                    ScoreView(store: store.scope(state: \.score, action: AppAction.score))
+                    ScoreView(store: store.scope(state: \.score, action: App.Action.score))
                     FoundationsView(store: store, namespace: namespace)
                         .zIndex(foundationIndex(priority: viewStore.drag.zIndexPriority))
                     PilesView(store: store, namespace: namespace)
@@ -130,49 +130,14 @@ private extension Frame {
 #if DEBUG
 struct AppView_Previews: PreviewProvider {
     static var previews: some View {
-        AppView(store: Store(
-            initialState: AppState(),
-            reducer: appReducer,
-            environment: .preview
-        ))
-
-        AppView(store: Store(
-            initialState: .autoFinishAvailable,
-            reducer: appReducer,
-            environment: .preview
-        ))
-        .previewDisplayName("Autofinish enabled")
+        AppView(store: Store(initialState: App.State(), reducer: App()))
+        AppView(store: Store(initialState: .autoFinishAvailable, reducer: App()))
+            .previewDisplayName("Autofinish enabled")
     }
 }
 
-extension AppEnvironment {
-    static let preview = AppEnvironment(
-        mainQueue: .main,
-        shuffleCards: { .standard52Deck.shuffled() },
-        now: Date.init
-    )
-
-    static let superEasyGame = AppEnvironment(
-        mainQueue: .main,
-        shuffleCards: {
-            var cards = Rank.allCases.flatMap { rank in
-                Suit.allCases.map { suit in
-                    StandardDeckCard(rank, of: suit, isFacedUp: false)
-                }
-            }
-            cards.swapAt(5, 1)
-            cards.swapAt(9, 3)
-            cards.swapAt(14, 1)
-            cards.swapAt(20, 4)
-            cards.swapAt(27, 6)
-            return cards
-        },
-        now: Date.init
-    )
-}
-
-extension AppState {
-    static let almostFinishedGame = AppState(
+extension App.State {
+    static let almostFinishedGame = App.State(
         game: Game.State(
             foundations: IdentifiedArrayOf(uniqueElements: Suit.allCases.map { suit in
                 Foundation(
@@ -204,7 +169,7 @@ extension AppState {
         _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
     )
 
-    static let finishedGame = AppState(game: Game.State(
+    static let finishedGame = App.State(game: Game.State(
         foundations: IdentifiedArrayOf(uniqueElements: Suit.allCases.map { suit in
             Foundation(
                 suit: suit,
@@ -216,13 +181,13 @@ extension AppState {
         isGameOver: false
     ))
 
-    static let startedGame = AppState(
+    static let startedGame = App.State(
         game: Game.State(foundations: .startedGame, piles: .startedGame, deck: .startedGame, isGameOver: false),
         _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
     )
 
     static var autoFinishAvailable: Self {
-        AppState(
+        App.State(
             game: .previewWithAutoFinishAvailable,
             _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
         )

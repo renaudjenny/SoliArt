@@ -3,7 +3,7 @@ import SwiftUI
 import SwiftUICardGame
 
 struct FoundationsView: View {
-    let store: Store<AppState, AppAction>
+    let store: StoreOf<App>
     let namespace: Namespace.ID
     @Environment(\.colorScheme) private var colorScheme
 
@@ -19,7 +19,7 @@ struct FoundationsView: View {
     }
 
     private var foundations: some View {
-        WithViewStore(store.scope(state: \.drag, action: AppAction.drag)) { viewStore in
+        WithViewStore(store.scope(state: \.drag, action: App.Action.drag)) { viewStore in
             HStack {
                 ForEach(viewStore.foundations) { foundation in
                     RoundedRectangle(cornerRadius: 4)
@@ -53,12 +53,12 @@ struct FoundationsView: View {
     }
 
     private var deckUpwards: some View {
-        WithViewStore(store.scope(state: \.drag, action: AppAction.drag)) { viewStore in
+        WithViewStore(store.scope(state: \.drag, action: App.Action.drag)) { viewStore in
             ZStack {
                 ForEach(viewStore.state.deckUpwardsCardsAndOffsets, id: \.card) { card, xOffset, isDraggable in
                     if isDraggable {
                         DraggableCardView(
-                            store: store.scope(state: \.drag, action: AppAction.drag),
+                            store: store.scope(state: \.drag, action: App.Action.drag),
                             card: card,
                             namespace: namespace
                         )
@@ -148,7 +148,7 @@ struct FoundationsView: View {
 
                 foundation.cards.last.map { last in
                     DraggableCardView(
-                        store: store.scope(state: \.drag, action: AppAction.drag),
+                        store: store.scope(state: \.drag, action: App.Action.drag),
                         card: last,
                         namespace: namespace
                     )
@@ -172,8 +172,7 @@ struct FoundationsView_Previews: PreviewProvider {
     static var previews: some View {
         let store1 = Store(
             initialState: .previewWithDrawnCards,
-            reducer: appReducer,
-            environment: .preview
+            reducer: App()
         )
         VStack(spacing: 0) {
             FoundationsView(store: store1, namespace: namespace)
@@ -183,8 +182,7 @@ struct FoundationsView_Previews: PreviewProvider {
 
         let store2 = Store(
             initialState: .previewWithAllCardsDrawned,
-            reducer: appReducer,
-            environment: .preview
+            reducer: App()
         )
         VStack(spacing: 0) {
             FoundationsView(store: store2, namespace: namespace)
@@ -194,8 +192,7 @@ struct FoundationsView_Previews: PreviewProvider {
 
         let store3 = Store(
             initialState: .previewWithAnEmptyDeck,
-            reducer: appReducer,
-            environment: .preview
+            reducer: App()
         )
         VStack(spacing: 0) {
             FoundationsView(store: store3, namespace: namespace)
@@ -205,23 +202,23 @@ struct FoundationsView_Previews: PreviewProvider {
     }
 }
 
-extension AppState {
+extension App.State {
     static var previewWithDrawnCards: Self {
-        AppState(
+        App.State(
             game: .previewWithDrawnCards,
             _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
         )
     }
 
     static var previewWithAllCardsDrawned: Self {
-        AppState(
+        App.State(
             game: .previewWithAllCardsDrawned,
             _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
         )
     }
 
     static var previewWithAnEmptyDeck: Self {
-        AppState(
+        App.State(
             game: .previewWithEmptyDeck,
             _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
         )

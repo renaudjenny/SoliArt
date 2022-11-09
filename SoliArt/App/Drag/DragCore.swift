@@ -62,7 +62,7 @@ extension Drag.State {
     }
 }
 
-extension AppState {
+extension App.State {
     var drag: Drag.State {
         get {
             Drag.State(

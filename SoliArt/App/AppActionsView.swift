@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 struct AppActionsView: View {
-    let store: Store<Hint.State, AppAction>
+    let store: Store<Hint.State, App.Action>
 
     var body: some View {
         WithViewStore(store) { viewStore in
@@ -51,19 +51,17 @@ struct AppActionsView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
             AppActionsView(store: Store(
-                initialState: AppState(),
-                reducer: appReducer,
-                environment: .preview
+                initialState: App.State(),
+                reducer: App()
             ).scope(state: \.hint))
 
             AppActionsView(store: Store(
-                initialState: AppState(
+                initialState: App.State(
                     game: Game.State(
                         foundations: [Foundation(suit: .spades, cards: [])],
                         piles: [Pile(id: 1, cards: [Card(.ace, of: .spades, isFacedUp: true)])]
                     )),
-                reducer: appReducer,
-                environment: .preview
+                reducer: App()
             ).scope(state: \.hint))
         }
     }

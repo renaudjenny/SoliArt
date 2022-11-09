@@ -3,7 +3,7 @@ import SwiftUI
 import SwiftUICardGame
 
 struct PilesView: View {
-    let store: Store<AppState, AppAction>
+    let store: StoreOf<App>
     let namespace: Namespace.ID
 
     var body: some View {
@@ -48,7 +48,7 @@ struct PilesView: View {
             ZStack {
                 ForEach(viewStore.drag.pileCardsAndOffsets(pileID: pileID), id: \.card.id) { card, offset in
                     DraggableCardView(
-                        store: store.scope(state: \.drag, action: AppAction.drag),
+                        store: store.scope(state: \.drag, action: App.Action.drag),
                         card: card,
                         namespace: namespace
                     )
@@ -79,12 +79,12 @@ struct PilesView_Previews: PreviewProvider {
     }
 }
 
-extension Store where State == AppState, Action == AppAction {
-    static var startedGame: Store<AppState, AppAction> {
-        Store(initialState: .startedGame, reducer: appReducer, environment: .preview)
+extension Store where State == App.State, Action == App.Action {
+    static var startedGame: Store<App.State, App.Action> {
+        Store(initialState: .startedGame, reducer: App())
     }
-    static var finishedGame: Store<AppState, AppAction> {
-        Store(initialState: .finishedGame, reducer: appReducer, environment: .preview)
+    static var finishedGame: Store<App.State, App.Action> {
+        Store(initialState: .finishedGame, reducer: App())
     }
 }
 #endif

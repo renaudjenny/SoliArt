@@ -72,7 +72,7 @@ struct Hint: ReducerProtocol {
 }
 
 
-extension AppState {
+extension App.State {
     var hint: Hint.State {
         get {
             Hint.State(
