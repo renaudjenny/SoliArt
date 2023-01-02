@@ -183,7 +183,8 @@ extension App.State {
 
     static let startedGame = App.State(
         game: Game.State(foundations: .startedGame, piles: .startedGame, deck: .startedGame, isGameOver: false),
-        _drag: Drag.State(windowSize: UIScreen.main.bounds.size)
+        _drag: Drag.State(windowSize: UIScreen.main.bounds.size),
+        score: Score.State(score: 120, moves: 31)
     )
 
     static var autoFinishAvailable: Self {
@@ -347,8 +348,6 @@ private extension IdentifiedArray<Pile.ID, Pile> {
         Pile(
             id: 5,
             cards: IdentifiedArrayOf(uniqueElements: [
-                StandardDeckCard(.king, of: .spades, isFacedUp: true),
-                StandardDeckCard(.queen, of: .diamonds, isFacedUp: true),
                 StandardDeckCard(.jack, of: .spades, isFacedUp: true),
                 StandardDeckCard(.ten, of: .diamonds, isFacedUp: true),
                 StandardDeckCard(.nine, of: .spades, isFacedUp: true),
@@ -380,7 +379,11 @@ private extension Deck {
                 $0.rank == card.rank && $0.suit == card.suit
             })
         }),
-        upwards: []
+        upwards: [
+            StandardDeckCard(.king, of: .spades, isFacedUp: true),
+            StandardDeckCard(.queen, of: .diamonds, isFacedUp: true),
+            StandardDeckCard(.king, of: .hearts, isFacedUp: true),
+        ]
     )
 }
 #endif
