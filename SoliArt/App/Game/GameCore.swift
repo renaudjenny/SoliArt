@@ -67,6 +67,7 @@ struct Game: ReducerProtocol {
             state.deck.downwards = IdentifiedArrayOf(uniqueElements: cards[1...])
             return .none
         case .flipDeck:
+            guard state.deck.downwards.count == 0 && state.deck.upwards.count > 1 else { return .none }
             state.deck.downwards = IdentifiedArrayOf(uniqueElements: state.deck.upwards.map {
                 var card = $0
                 card.isFacedUp = false

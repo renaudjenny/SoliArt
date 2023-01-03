@@ -81,7 +81,7 @@ struct FoundationsView: View {
         WithViewStore(store) { viewStore in
             if viewStore.game.deck.downwards.count > 0 {
                 Button { viewStore.send(.game(.drawCard)) } label: {
-                    let cards = IdentifiedArrayOf(uniqueElements:viewStore.game.deck.downwards.prefix(3))
+                    let cards = IdentifiedArrayOf(uniqueElements: viewStore.game.deck.downwards.prefix(3))
                     ZStack {
                         ForEach(cards) { card in
                             StandardDeckCardView(card: card) { CardBackground() }.offset(
