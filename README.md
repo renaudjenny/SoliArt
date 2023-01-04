@@ -1,4 +1,4 @@
-# MemoArt
+# SoliArt
 
 **An other Solitaire/Patience/Klondike game but now developed with Swift, SwiftUI, TCA (The Composable Architecture), and with nice Art style**
 
@@ -20,4 +20,4 @@ Artist Direction of the app, logo, and all the card designs are made by [Mathild
 
 ## Minimum required to build the project
 
-Works with Xcode 13.4.1
+Works with Xcode 14.2
