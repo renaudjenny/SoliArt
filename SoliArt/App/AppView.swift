@@ -7,21 +7,13 @@ struct AppView: View {
     @Namespace private var namespace
 
     var body: some View {
-        WithViewStore(store) { viewStore in
+        WithViewStore(store.stateless) { viewStore in
             ZStack {
                 content
                 draggedCards
                 hint
             }
             .task { viewStore.send(.game(.shuffleCards)) }
-            .confirmationDialog(
-                store.scope(state: \.game.resetGameConfirmationDialog, action: App.Action.game),
-                dismiss: .cancelResetGame
-            )
-            .confirmationDialog(
-                store.scope(state: { $0._hint.autoFinishConfirmationDialog }, action: App.Action.hint),
-                dismiss: .cancelAutoFinish
-            )
         }
     }
 
@@ -33,7 +25,7 @@ struct AppView: View {
                     FoundationsView(store: store, namespace: namespace)
                         .zIndex(foundationIndex(priority: viewStore.drag.zIndexPriority))
                     PilesView(store: store, namespace: namespace)
-                    AppActionsView(store: store.scope(state: \.hint))
+                    AppActionsView(store: store)
                 }
                 .preference(key: WindowSizePreferenceKey.self, value: geo.size)
             }

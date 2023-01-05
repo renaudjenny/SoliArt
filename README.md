@@ -3,7 +3,7 @@
 **An other Solitaire/Patience/Klondike game but now developed with Swift, SwiftUI, TCA (The Composable Architecture), and with nice Art style**
 
 
-📲 App Store: 🛠 WIP
+📲 App Store: https://apps.apple.com/app/soliart/id1662367572
 
 ## Features
 

@@ -2,28 +2,36 @@ import ComposableArchitecture
 import SwiftUI
 
 struct AppActionsView: View {
-    let store: Store<Hint.State, App.Action>
+    let store: Store<App.State, App.Action>
 
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack {
-                if viewStore.isAutoFinishAvailable {
+                if viewStore._hint.isAutoFinishAvailable {
                     Button { viewStore.send(.hint(.checkForAutoFinish)) } label: {
                         Label("Auto finish", systemImage: "wand.and.stars").labelStyle(.iconOnly)
                     }
-                    .disabled(viewStore.isAutoFinishing)
+                    .disabled(viewStore._hint.isAutoFinishing)
                     .foregroundColor(.white)
                     .buttonStyle(.bordered)
                     .padding()
+                    .confirmationDialog(
+                        store.scope(state: { $0._hint.autoFinishConfirmationDialog }, action: App.Action.hint),
+                        dismiss: .cancelAutoFinish
+                    )
                 }
 
-                if !viewStore.isAutoFinishing {
+                if !viewStore._hint.isAutoFinishing {
                     Button { viewStore.send(.game(.confirmResetGame)) } label: {
                         Label("Reset", systemImage: "exclamationmark.arrow.circlepath").labelStyle(.iconOnly)
                     }
                     .foregroundColor(.white)
                     .buttonStyle(.bordered)
                     .padding()
+                    .confirmationDialog(
+                        store.scope(state: \.game.resetGameConfirmationDialog, action: App.Action.game),
+                        dismiss: .cancelResetGame
+                    )
                 }
 
                 Spacer()
@@ -53,7 +61,7 @@ struct AppActionsView_Previews: PreviewProvider {
             AppActionsView(store: Store(
                 initialState: App.State(),
                 reducer: App()
-            ).scope(state: \.hint))
+            ))
 
             AppActionsView(store: Store(
                 initialState: App.State(
@@ -62,7 +70,7 @@ struct AppActionsView_Previews: PreviewProvider {
                         piles: [Pile(id: 1, cards: [Card(.ace, of: .spades, isFacedUp: true)])]
                     )),
                 reducer: App()
-            ).scope(state: \.hint))
+            ))
         }
     }
 }
