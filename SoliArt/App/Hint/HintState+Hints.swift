@@ -41,6 +41,6 @@ extension Hint.State {
     }
 
     var isAutoFinishAvailable: Bool {
-        piles.flatMap(\.cards).allSatisfy(\.isFacedUp) && hints.count > 0
+        piles.flatMap(\.cards).allSatisfy(\.isFacedUp)
     }
 }
