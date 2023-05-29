@@ -43,8 +43,10 @@ struct Drag: ReducerProtocol {
             state.zIndexPriority = .pile(id: 1)
             return .none
         case let .doubleTapCard(card):
+            // TODO: add a test for `state.piles.first(where: { $0.cards.contains(card) })?.cards.last == card`
             guard
                 card.isFacedUp,
+                state.piles.first(where: { $0.cards.contains(card) })?.cards.last == card,
                 let foundation = state.foundations.first(where: { $0.suit == card.suit })
             else { return .none }
 

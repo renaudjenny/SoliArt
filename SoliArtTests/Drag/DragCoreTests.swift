@@ -176,6 +176,13 @@ class DragCoreTests: XCTestCase {
         store.send(.doubleTapCard(card))
     }
 
+    func testDoubleTapCardNotTheLastOneOfThePile() {
+        // TODO: write a test to check that double tapping on card that is not the last one of the pile
+        // won't go to the fondation
+        let card = Card(.six, of: .clubs, isFacedUp: true)
+        store.send(.doubleTapCard(card))
+    }
+
     func testDoubleTapCardToScore() {
         let card = Card(.ace, of: .clubs, isFacedUp: true)
         store.send(.doubleTapCard(card)) {

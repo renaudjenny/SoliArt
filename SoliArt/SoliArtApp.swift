@@ -6,7 +6,7 @@ import SwiftUICardGame
 struct SoliArtApp: SwiftUI.App {
     var body: some Scene {
         WindowGroup {
-            AppView(store: Store(initialState: App.State(), reducer: App()))
+            AppView(store: Store(initialState: .almostFinishedGame, reducer: App()))
         }
     }
 }
