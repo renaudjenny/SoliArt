@@ -33,7 +33,10 @@ struct Score: ReducerProtocol {
         case let .score(type):
             state.score += type.score
             state.score = max(state.score, 0)
-            return type == .recycling ? .none : Effect(value: .incrementMove)
+            if type != .recycling {
+                state.moves += 1
+            }
+            return .none
         case .incrementMove:
             state.moves += 1
             return .none

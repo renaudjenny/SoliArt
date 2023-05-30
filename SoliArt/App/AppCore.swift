@@ -41,30 +41,23 @@ struct App: ReducerProtocol {
         Reduce { state, action in
             switch action {
             case .game(.flipDeck):
-                return Effect.merge(
-                    Effect(value: .history(.addEntry(HistoryEntry(
-                        date: date(),
-                        gameState: state.game,
-                        scoreState: state.score
-                    )))),
-                    Effect(value: .score(.score(.recycling)))
+                return .merge(
+                    addHistoryEntry(state: &state),
+                    flipDeck(state: &state)
                 )
             case .game(.resetGame):
                 state.score = Score.State()
                 return .none
             case .game(.shuffleCards), .game(.drawCard), .drag(.doubleTapCard), .drag(.dropCards):
                 guard state.game != state.history.entries.last?.gameState else { return .none }
-                return Effect(value: .history(.addEntry(HistoryEntry(
-                    date: date(),
-                    gameState: state.game,
-                    scoreState: state.score
-                ))))
+                return addHistoryEntry(state: &state)
             case .history(.undo):
                 guard let last = state.history.entries.last else { return .none }
                 state.game = last.gameState
                 state.score = last.scoreState
                 return .none
             case let .drag(.score(action)):
+                // TODO: check score actions and find a better way to share actions between drag and score
                 return Effect(value: .score(action))
             case .hint(.autoFinish):
                 let isFlipDeckNeeded = state.game.deck.downwards.count == 0 && state.game.deck.upwards.count > 1
@@ -116,5 +109,20 @@ struct App: ReducerProtocol {
                 return .none
             }
         }
+    }
+
+    private func addHistoryEntry(state: inout State) -> EffectTask<Action> {
+        state.history.entries.append(HistoryEntry(
+            date: date(),
+            gameState: state.game,
+            scoreState: state.score
+        ))
+        return .none
+    }
+
+    private func flipDeck(state: inout State) -> EffectTask<Action> {
+        state.score.score += Score.ScoreType.recycling.score
+        state.score.score = max(state.score.score, 0)
+        return .none
     }
 }
