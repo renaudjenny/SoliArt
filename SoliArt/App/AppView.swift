@@ -39,7 +39,8 @@ struct AppView: View {
     }
 
     private var draggedCards: some View {
-        WithViewStore(store.scope(state: \.drag)) { viewStore in
+        // TODO: shouldn't observe the whole drag state for perf, should use a ViewState instead
+        WithViewStore(store, observe: \.drag) { viewStore in
             if let position = viewStore.draggingState?.position {
                 let spacing = viewStore.cardSize.width * 2/5 + 4
                 let yOffset = viewStore.cardSize.width * 7/15
@@ -78,8 +79,8 @@ struct AppView: View {
 
     #if DEBUG
     private var debugDragFrames: some View {
-        WithViewStore(store.scope(state: \.drag)) { viewStore in
-            ForEach(viewStore.frames) { frame in
+        WithViewStore(store, observe: \.drag.frames) { viewStore in
+            ForEach(viewStore.state) { frame in
                 VStack {
                     switch frame {
                     case let .foundation(id, _):
