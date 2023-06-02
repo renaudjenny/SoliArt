@@ -1,6 +1,6 @@
 import ComposableArchitecture
 
-extension ConfirmationDialogState where Action == Hint.Action {
+extension ConfirmationDialogState where Action == AutoFinish.Action {
     static var autoFinish: Self {
         ConfirmationDialogState(
             title: TextState("Looks like the game is almost finished"),

@@ -7,21 +7,21 @@ struct AppActionsView: View {
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack {
-                if viewStore._hint.isAutoFinishAvailable {
-                    Button { viewStore.send(.hint(.checkForAutoFinish)) } label: {
+                if viewStore._autoFinish.isAutoFinishAvailable {
+                    Button { viewStore.send(.autoFinish(.checkForAutoFinish)) } label: {
                         Label("Auto finish", systemImage: "wand.and.stars").labelStyle(.iconOnly)
                     }
-                    .disabled(viewStore._hint.isAutoFinishing)
+                    .disabled(viewStore._autoFinish.isAutoFinishing)
                     .foregroundColor(.white)
                     .buttonStyle(.bordered)
                     .padding()
                     .confirmationDialog(
-                        store.scope(state: { $0._hint.autoFinishConfirmationDialog }, action: App.Action.hint),
+                        store.scope(state: { $0._autoFinish.confirmationDialog }, action: App.Action.autoFinish),
                         dismiss: .cancelAutoFinish
                     )
                 }
 
-                if !viewStore._hint.isAutoFinishing {
+                if !viewStore._autoFinish.isAutoFinishing {
                     Button { viewStore.send(.game(.confirmResetGame)) } label: {
                         Label("Reset", systemImage: "exclamationmark.arrow.circlepath").labelStyle(.iconOnly)
                     }

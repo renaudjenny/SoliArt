@@ -9,6 +9,7 @@ struct App: ReducerProtocol {
         var score = Score.State()
         var _hint = Hint.State()
         var history = History.State()
+        var _autoFinish = AutoFinish.State()
     }
 
     enum Action: Equatable {
@@ -17,6 +18,7 @@ struct App: ReducerProtocol {
         case score(Score.Action)
         case hint(Hint.Action)
         case history(History.Action)
+        case autoFinish(AutoFinish.Action)
     }
 
     @Dependency(\.mainQueue) var mainQueue
@@ -37,6 +39,9 @@ struct App: ReducerProtocol {
         }
         Scope(state: \.history, action: /Action.history) {
             History()
+        }
+        Scope(state: \.autoFinish, action: /Action.autoFinish) {
+            AutoFinish()
         }
         Reduce { state, action in
             switch action {
@@ -59,24 +64,15 @@ struct App: ReducerProtocol {
             case let .drag(.score(action)):
                 // TODO: check score actions and find a better way to share actions between drag and score
                 return Effect(value: .score(action))
-            case .hint(.autoFinish):
-                let isFlipDeckNeeded = state.game.deck.downwards.count == 0 && state.game.deck.upwards.count > 1
-                if isFlipDeckNeeded {
-                    return .run { send in
-                        try await mainQueue.sleep(for: 0.2)
-                        await send(.game(.flipDeck))
-                        try await mainQueue.sleep(for: 0.2)
-                        await send(.hint(.autoFinish))
-                    }
-                }
-                return .none
-            case let .hint(.setAutoFinishHint(hint)):
+            case .autoFinish(.autoFinish):
+                guard let hint = state.hint.hints.first else { return .none }
+
                 return .run { [frames = state.drag.frames] send in
                     let position = hint.destination
 
                     guard position != .deck else {
                         await send(.game(.drawCard))
-                        await send(.hint(.autoFinish))
+                        await send(.autoFinish(.autoFinish))
                         return
                     }
 
@@ -95,7 +91,7 @@ struct App: ReducerProtocol {
                     await send(.drag(.dragCard(hint.card, position: dragPosition)), animation: .linear)
                     await send(.drag(.dropCards), animation: .linear)
                     try await mainQueue.sleep(for: 0.2)
-                    await send(.hint(.autoFinish))
+                    await send(.autoFinish(.autoFinish))
                 }
             case .game:
                 return .none
@@ -106,6 +102,8 @@ struct App: ReducerProtocol {
             case .hint:
                 return .none
             case .history:
+                return .none
+            case .autoFinish:
                 return .none
             }
         }
