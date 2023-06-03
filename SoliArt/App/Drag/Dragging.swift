@@ -59,7 +59,7 @@ extension Drag.State {
             frame.rect.contains(draggingState.position)
         }
 
-        let dropEffect = Effect<Drag.Action, Never>(value: .resetZIndexPriority)
+        let dropEffect = EffectTask<Drag.Action>(value: .resetZIndexPriority)
             .delay(for: 0.5, scheduler: mainQueue)
             .eraseToEffect()
 
@@ -73,7 +73,7 @@ extension Drag.State {
                 return dropEffect
             }
 
-            let scoringEffect: Effect<Drag.Action, Never>
+            let scoringEffect: EffectTask<Drag.Action>
             switch DraggingSource.card(draggingState.card, in: self) {
             case let .pile(pileID):
                 let hasTurnOverCard = removePileCards(pileID: pileID, cards: draggedCards)
@@ -109,10 +109,10 @@ extension Drag.State {
         }
     }
 
-    mutating func move(card: Card, foundation: Foundation) -> Effect<Drag.Action, Never> {
+    mutating func move(card: Card, foundation: Foundation) -> EffectTask<Drag.Action> {
         guard isValidScoring(card: card, onto: foundation) else { return .none }
 
-        let scoringEffect: Effect<Drag.Action, Never>
+        let scoringEffect: EffectTask<Drag.Action>
         switch DraggingSource.card(card, in: self) {
         case let .pile(pileID):
             removePileCards(pileID: pileID, cards: [card])
