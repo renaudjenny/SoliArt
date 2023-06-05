@@ -28,32 +28,7 @@ struct Game: ReducerProtocol {
     func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
         switch action {
         case .shuffleCards:
-            guard state.isGameOver else { return .none }
-
-            var cards = shuffleCards()
-
-            state.piles = IdentifiedArrayOf(uniqueElements: state.piles.map {
-                var pile = $0
-                pile.cards = IdentifiedArrayOf(uniqueElements: cards[..<$0.id])
-                cards = Array(cards[$0.id...])
-
-                if var last = pile.cards.last {
-                    last.isFacedUp = true
-                    pile.cards.updateOrAppend(last)
-                }
-
-                return pile
-            })
-
-            state.deck.upwards = []
-            state.deck.downwards = IdentifiedArrayOf(uniqueElements: cards)
-
-            state.foundations = IdentifiedArrayOf(
-                uniqueElements: Suit.orderedCases.map { Foundation(suit: $0, cards: []) }
-            )
-
-            state.isGameOver = false
-            return .none
+            return shuffleCards(state: &state)
         case .drawCard:
             let cards = state.deck.downwards
             guard cards.count > 0 else { return .none }
@@ -84,8 +59,37 @@ struct Game: ReducerProtocol {
         case .resetGame:
             state.resetGameConfirmationDialog = nil
             state.isGameOver = true
-            return Effect(value: .shuffleCards)
+            return shuffleCards(state: &state)
         }
+    }
+
+    private func shuffleCards(state: inout State) -> EffectTask<Action> {
+        guard state.isGameOver else { return .none }
+
+        var cards = shuffleCards()
+
+        state.piles = IdentifiedArrayOf(uniqueElements: state.piles.map {
+            var pile = $0
+            pile.cards = IdentifiedArrayOf(uniqueElements: cards[..<$0.id])
+            cards = Array(cards[$0.id...])
+
+            if var last = pile.cards.last {
+                last.isFacedUp = true
+                pile.cards.updateOrAppend(last)
+            }
+
+            return pile
+        })
+
+        state.deck.upwards = []
+        state.deck.downwards = IdentifiedArrayOf(uniqueElements: cards)
+
+        state.foundations = IdentifiedArrayOf(
+            uniqueElements: Suit.orderedCases.map { Foundation(suit: $0, cards: []) }
+        )
+
+        state.isGameOver = false
+        return .none
     }
 }
 

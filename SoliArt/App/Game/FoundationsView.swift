@@ -39,7 +39,7 @@ struct FoundationsView: View {
     }
 
     private var deck: some View {
-        WithViewStore(store.scope(state: \.drag)) { viewStore in
+        WithViewStore(store, observe: \.drag) { viewStore in
             HStack {
                 Spacer()
                 deckUpwards

@@ -52,7 +52,7 @@ extension Drag.State {
         return false
     }
 
-    mutating func dropCards(mainQueue: AnySchedulerOf<DispatchQueue>) -> Effect<Drag.Action, Never> {
+    mutating func dropCards(mainQueue: AnySchedulerOf<DispatchQueue>) -> EffectTask<Drag.Action> {
         guard let draggingState = draggingState else { return .none }
 
         let dropFrame = frames.first { frame in
@@ -78,14 +78,14 @@ extension Drag.State {
             case let .pile(pileID):
                 let hasTurnOverCard = removePileCards(pileID: pileID, cards: draggedCards)
                 scoringEffect = hasTurnOverCard
-                ? Effect(value: .score(.score(.turnOverPileCard)))
-                : Effect(value: .score(.incrementMove))
+                ? EffectTask(value: .score(.score(.turnOverPileCard)))
+                : EffectTask(value: .score(.incrementMove))
             case let .foundation(foundationID):
                 foundations[id: foundationID]?.cards.remove(draggingState.card)
-                scoringEffect = Effect(value: .score(.score(.moveBackFromFoundation)))
+                scoringEffect = EffectTask(value: .score(.score(.moveBackFromFoundation)))
             case .deckUpwards:
                 deck.upwards.remove(draggingState.card)
-                scoringEffect = Effect(value: .score(.incrementMove))
+                scoringEffect = EffectTask(value: .score(.incrementMove))
             case .deckDownwards, .removed:
                 self.draggingState = nil
                 return dropEffect
@@ -95,14 +95,14 @@ extension Drag.State {
             piles.updateOrAppend(pile)
 
             self.draggingState = nil
-            return Effect.merge(dropEffect, scoringEffect)
+            return .merge(dropEffect, scoringEffect)
         case let .foundation(foundationID, _):
             guard let foundation = foundations[id: foundationID], draggedCards.count == 1 else {
                 self.draggingState = nil
                 return dropEffect
             }
             self.draggingState = nil
-            return Effect.merge(dropEffect, move(card: draggingState.card, foundation: foundation))
+            return .merge(dropEffect, move(card: draggingState.card, foundation: foundation))
         case .deckUpwards, .deckDownwards, .none:
             self.draggingState = nil
             return dropEffect
@@ -116,10 +116,10 @@ extension Drag.State {
         switch DraggingSource.card(card, in: self) {
         case let .pile(pileID):
             removePileCards(pileID: pileID, cards: [card])
-            scoringEffect = Effect(value: .score(.score(.moveToFoundation)))
+            scoringEffect = EffectTask(value: .score(.score(.moveToFoundation)))
         case .deckUpwards:
             deck.upwards.remove(card)
-            scoringEffect = Effect(value: .score(.score(.moveToFoundation)))
+            scoringEffect = EffectTask(value: .score(.score(.moveToFoundation)))
         case .foundation, .deckDownwards, .removed:
             return .none
         }

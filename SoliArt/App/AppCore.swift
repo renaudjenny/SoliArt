@@ -62,8 +62,7 @@ struct App: ReducerProtocol {
                 state.score = last.scoreState
                 return .none
             case let .drag(.score(action)):
-                // TODO: check score actions and find a better way to share actions between drag and score
-                return Effect(value: .score(action))
+                return EffectTask(value: .score(action))
             case .autoFinish(.autoFinish):
                 guard let hint = state.hint.hints.first else { return .none }
 
