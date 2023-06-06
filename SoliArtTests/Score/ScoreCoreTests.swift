@@ -6,7 +6,9 @@ import XCTest
 class ScoreCoreTests: XCTestCase {
 
     func testIncrementingMove() {
-        let store = TestStore(initialState: ScoreState(), reducer: scoreReducer, environment: ScoreEnvironment())
+        let store = TestStore(initialState: Score.State()) {
+            Score()
+        }
 
         store.send(.incrementMove) {
             $0.moves = 1
@@ -22,7 +24,9 @@ class ScoreCoreTests: XCTestCase {
     }
 
     func testScoring() {
-        let store = TestStore(initialState: ScoreState(), reducer: scoreReducer, environment: ScoreEnvironment())
+        let store = TestStore(initialState: Score.State()) {
+            Score()
+        }
 
         store.send(.score(.moveToFoundation)) {
             $0.score = 10

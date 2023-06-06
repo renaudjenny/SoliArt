@@ -6,22 +6,15 @@ import XCTest
 @MainActor
 class AppCoreTests: XCTestCase {
     private var scheduler: TestSchedulerOf<DispatchQueue>!
-    private var store: TestStore<AppState, AppState, AppAction, AppAction, AppEnvironment>!
-    private let now = Date(timeIntervalSince1970: 0)
-
-    @MainActor override func setUp() async throws {
-        scheduler = DispatchQueue.test
-        store = TestStore(
-            initialState: AppState(),
-            reducer: appReducer,
-            environment: AppEnvironment(mainQueue: .main, shuffleCards: { [Card].standard52Deck }, now: { self.now })
-        )
+    private var store: TestStore = TestStore(initialState: App.State()) {
+        App()
     }
+    private let now = Date(timeIntervalSince1970: 0)
 
     func testFlipDeck() {
         store.send(.game(.flipDeck))
 
-        let historyEntry = HistoryEntry(date: self.now, gameState: GameState(), scoreState: ScoreState())
+        let historyEntry = HistoryEntry(date: self.now, gameState: Game.State(), scoreState: Score.State())
         store.receive(.history(.addEntry(historyEntry))) {
             $0.history.entries.append(historyEntry)
         }
@@ -38,13 +31,13 @@ class AppCoreTests: XCTestCase {
         }
 
         store.send(.game(.resetGame)) {
-            $0.score = ScoreState()
+            $0.score = Score.State()
         }
     }
 
     func testGameActionThatUpdateState() {
-        let gameStateAfterShuffle = GameState(
-            foundations: GameState().foundations,
+        let gameStateAfterShuffle = Game.State(
+            foundations: Game.State().foundations,
             piles: GameCoreTests.pilesAfterShuffle(),
             deck: Deck(
                 downwards: IdentifiedArrayOf(uniqueElements: [Card].standard52Deck[28...]),
@@ -58,7 +51,7 @@ class AppCoreTests: XCTestCase {
         let afterShuffleHistoryEntry = HistoryEntry(
             date: self.now,
             gameState: gameStateAfterShuffle,
-            scoreState: ScoreState()
+            scoreState: Score.State()
         )
         store.receive(.history(.addEntry(afterShuffleHistoryEntry))) {
             $0.history.entries = [afterShuffleHistoryEntry]
@@ -74,7 +67,7 @@ class AppCoreTests: XCTestCase {
         let afterDrawingCardHistoryEntry = HistoryEntry(
             date: self.now,
             gameState: gameStateAfterDrawingCard,
-            scoreState: ScoreState()
+            scoreState: Score.State()
         )
         store.receive(.history(.addEntry(afterDrawingCardHistoryEntry))) {
             $0.history.entries.append(afterDrawingCardHistoryEntry)
@@ -91,7 +84,7 @@ class AppCoreTests: XCTestCase {
         let afterDoubleTappingCardHistoryEntry = HistoryEntry(
             date: self.now,
             gameState: gameStateAfterDoubleTappingCard,
-            scoreState: ScoreState()
+            scoreState: Score.State()
         )
         store.receive(.history(.addEntry(afterDoubleTappingCardHistoryEntry))) {
             $0.history.entries.append(afterDoubleTappingCardHistoryEntry)
@@ -127,7 +120,7 @@ class AppCoreTests: XCTestCase {
         let afterDraggingCardHistoryEntry = HistoryEntry(
             date: self.now,
             gameState: gameStateAfterDraggingCard,
-            scoreState: ScoreState(score: 10, moves: 1)
+            scoreState: Score.State(score: 10, moves: 1)
         )
         store.receive(.history(.addEntry(afterDraggingCardHistoryEntry))) {
             $0.history.entries.append(afterDraggingCardHistoryEntry)
@@ -146,31 +139,33 @@ class AppCoreTests: XCTestCase {
         store.send(.history(.undo)) {
             $0.history.entries.removeLast()
             $0.game = $0.history.entries.last!.gameState
-            $0.score = ScoreState(score: 0, moves: 0)
+            $0.score = Score.State(score: 0, moves: 0)
         }
     }
 
     func testAutoFinish() async {
-        var foundations = GameState().foundations
+        var foundations = Game.State().foundations
         let spadesFoundation = Foundation(suit: .spades, cards: [Card(.ace, of: .spades, isFacedUp: true)])
         foundations.updateOrAppend(spadesFoundation)
         store = TestStore(
-            initialState: AppState(game: GameState(foundations: foundations), _hint: HintState(isAutoFinishing: true)),
-            reducer: appReducer,
-            environment: AppEnvironment(mainQueue: .main, shuffleCards: { [Card].standard52Deck }, now: { self.now })
-        )
+            initialState: App.State(
+                game: Game.State(foundations: foundations),
+                _autoFinish: AutoFinish.State(isAutoFinishing: true)
+            )
+        ) {
+            App()
+        }
         let frame = CGRect(x: 10, y: 20, width: 100, height: 200)
         _ = await store.send(.drag(.updateFrames([.foundation(Suit.spades.id, frame)]))) {
             $0.drag.frames.updateOrAppend(.foundation(Suit.spades.id, frame))
         }
 
-        let hint = Hint(
+        let hint = HintMove(
             card: Card(.ace, of: .spades, isFacedUp: true),
             origin: .pile(id: 1),
             destination: .foundation(id: Suit.spades.id),
             position: .destination
         )
-        _ = await store.send(.hint(.setAutoFinishHint(hint)))
         let position = CGPoint(x: frame.midX, y: frame.midY)
         await store.receive(.drag(.dragCard(hint.card, position: position))) {
             $0.drag.draggingState = DraggingState(card: hint.card, position: position)
@@ -184,7 +179,7 @@ class AppCoreTests: XCTestCase {
         await store.receive(.history(.addEntry(historyEntry))) {
             $0.history.entries.append(historyEntry)
         }
-        _ = await store.send(.hint(.checkForAutoFinish))
-        await store.receive(.hint(.autoFinish))
+        _ = await store.send(.autoFinish(.checkForAutoFinish))
+        await store.receive(.autoFinish(.autoFinish))
     }
 }
