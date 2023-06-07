@@ -5,13 +5,10 @@ import XCTest
 
 class GameCoreTests: XCTestCase {
     private var scheduler: TestSchedulerOf<DispatchQueue>!
-    private var store: TestStore<GameState, GameState, GameAction, GameAction, GameEnvironment>!
-    private var cards: [Card] { cardsFromState(store.state) }
-
-    @MainActor override func setUp() async throws {
-        scheduler = DispatchQueue.test
-        store = TestStore(initialState: GameState(), reducer: gameReducer, environment: .test(scheduler: scheduler))
+    private var store = TestStore(initialState: Game.State()) {
+        Game()
     }
+    private var cards: [Card] { cardsFromState(store.state) }
 
     func testShuffleCards() {
         shuffleCards()
@@ -151,7 +148,7 @@ class GameCoreTests: XCTestCase {
     }
 
     static func pilesAfterShuffleForEasyGame() -> IdentifiedArrayOf<Pile> {
-        var cards = AppEnvironment.superEasyGame.shuffleCards()
+        var cards: [Card] = []
         return IdentifiedArrayOf(uniqueElements: (1...7).map {
             var pile = Pile(id: $0, cards: IdentifiedArrayOf(uniqueElements: cards[..<$0]))
             cards = Array(cards[$0...])
@@ -191,24 +188,11 @@ class GameCoreTests: XCTestCase {
         }
     }
 
-    private func cardsFromState(_ state: GameState) -> [Card] {
+    private func cardsFromState(_ state: Game.State) -> [Card] {
         state.piles.flatMap(\.cards)
             + state.foundations.flatMap(\.cards)
             + state.deck.upwards.elements
             + state.deck.downwards.elements
-    }
-}
-
-private extension GameEnvironment {
-    static func test(scheduler: TestSchedulerOf<DispatchQueue>) -> GameEnvironment {
-        GameEnvironment(mainQueue: scheduler.eraseToAnyScheduler(), shuffleCards: { .standard52Deck })
-    }
-
-    static func testEasyGame(scheduler: TestSchedulerOf<DispatchQueue>) -> GameEnvironment {
-        GameEnvironment(
-            mainQueue: scheduler.eraseToAnyScheduler(),
-            shuffleCards: { AppEnvironment.superEasyGame.shuffleCards() }
-        )
     }
 }
 

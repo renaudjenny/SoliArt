@@ -5,18 +5,13 @@ import XCTest
 
 class DragCoreTests: XCTestCase {
     private var scheduler: TestSchedulerOf<DispatchQueue>!
-    private var store: TestStore<DragState, DragState, DragAction, DragAction, DragEnvironment>!
-
-    @MainActor override func setUp() async throws {
-        scheduler = DispatchQueue.test
-        store = TestStore(
-            initialState: DragState(
-                piles: GameCoreTests.pilesAfterShuffle(),
-                foundations: GameState().foundations
-            ),
-            reducer: dragReducer,
-            environment: DragEnvironment(mainQueue: scheduler.eraseToAnyScheduler())
+    private var store = TestStore(
+        initialState: Drag.State(
+            piles: GameCoreTests.pilesAfterShuffle(),
+            foundations: Game.State().foundations
         )
+    ) {
+        Drag()
     }
 
     func testDragCards() {
@@ -47,12 +42,12 @@ class DragCoreTests: XCTestCase {
 
     func testDropCardsToAnOtherPile() {
         store = TestStore(
-            initialState: DragState(
+            initialState: Drag.State(
                 piles: GameCoreTests.pilesAfterShuffleForEasyGame()
-            ),
-            reducer: dragReducer,
-            environment: DragEnvironment(mainQueue: scheduler.eraseToAnyScheduler())
-        )
+            )
+        ) {
+            Drag()
+        }
 
         let frame: Frame = .pile(5, CGRect(x: 100, y: 100, width: 100, height: 200))
         store.send(.updateFrames([frame])) {
@@ -91,13 +86,13 @@ class DragCoreTests: XCTestCase {
 
     func testDropCardsToAFoundation() {
         store = TestStore(
-            initialState: DragState(
+            initialState: Drag.State(
                 piles: GameCoreTests.pilesAfterShuffleForEasyGame(),
-                foundations: GameState().foundations
-            ),
-            reducer: dragReducer,
-            environment: DragEnvironment(mainQueue: scheduler.eraseToAnyScheduler())
-        )
+                foundations: Game.State().foundations
+            )
+        ) {
+            Drag()
+        }
 
         let frame: Frame = .foundation(Suit.spades.id, CGRect(x: 100, y: 100, width: 100, height: 200))
         store.send(.updateFrames([frame])) {
