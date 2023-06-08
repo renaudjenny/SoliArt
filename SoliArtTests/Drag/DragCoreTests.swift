@@ -4,7 +4,6 @@ import SwiftUICardGame
 import XCTest
 
 class DragCoreTests: XCTestCase {
-    private var scheduler: TestSchedulerOf<DispatchQueue>!
     private var store = TestStore(
         initialState: Drag.State(
             piles: GameCoreTests.pilesAfterShuffle(),
@@ -15,6 +14,8 @@ class DragCoreTests: XCTestCase {
     }
 
     func testDragCards() {
+        let scheduler = DispatchQueue.test
+        store.dependencies.mainQueue = scheduler.eraseToAnyScheduler()
         let state = DraggingState(card: Card(.six, of: .clubs, isFacedUp: true), position: CGPoint(x: 123, y: 123))
         store.send(.dragCard(state.card, position: state.position)) {
             $0.draggingState = state
@@ -41,12 +42,15 @@ class DragCoreTests: XCTestCase {
     }
 
     func testDropCardsToAnOtherPile() {
+        let scheduler = DispatchQueue.test
         store = TestStore(
             initialState: Drag.State(
                 piles: GameCoreTests.pilesAfterShuffleForEasyGame()
             )
         ) {
             Drag()
+        } withDependencies: {
+            $0.mainQueue = scheduler.eraseToAnyScheduler()
         }
 
         let frame: Frame = .pile(5, CGRect(x: 100, y: 100, width: 100, height: 200))
@@ -85,6 +89,7 @@ class DragCoreTests: XCTestCase {
     }
 
     func testDropCardsToAFoundation() {
+        let scheduler = DispatchQueue.test
         store = TestStore(
             initialState: Drag.State(
                 piles: GameCoreTests.pilesAfterShuffleForEasyGame(),
@@ -92,6 +97,8 @@ class DragCoreTests: XCTestCase {
             )
         ) {
             Drag()
+        } withDependencies: {
+            $0.mainQueue = scheduler.eraseToAnyScheduler()
         }
 
         let frame: Frame = .foundation(Suit.spades.id, CGRect(x: 100, y: 100, width: 100, height: 200))
@@ -131,6 +138,8 @@ class DragCoreTests: XCTestCase {
     }
 
     func testDragAndDropCardFromAFoundation() {
+        let scheduler = DispatchQueue.test
+        store.dependencies.mainQueue = scheduler.eraseToAnyScheduler()
         testDropCardsToAFoundation()
 
         let frame: Frame = .pile(5, CGRect(x: 300, y: 300, width: 100, height: 200))

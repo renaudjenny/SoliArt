@@ -5,7 +5,6 @@ import XCTest
 
 @MainActor
 class AppCoreTests: XCTestCase {
-    private var scheduler: TestSchedulerOf<DispatchQueue>!
     private var store: TestStore = TestStore(initialState: App.State()) {
         App()
     }
@@ -147,6 +146,7 @@ class AppCoreTests: XCTestCase {
         var foundations = Game.State().foundations
         let spadesFoundation = Foundation(suit: .spades, cards: [Card(.ace, of: .spades, isFacedUp: true)])
         foundations.updateOrAppend(spadesFoundation)
+        let scheduler = DispatchQueue.test
         store = TestStore(
             initialState: App.State(
                 game: Game.State(foundations: foundations),
@@ -154,6 +154,8 @@ class AppCoreTests: XCTestCase {
             )
         ) {
             App()
+        } withDependencies: {
+            $0.mainQueue = scheduler.eraseToAnyScheduler()
         }
         let frame = CGRect(x: 10, y: 20, width: 100, height: 200)
         _ = await store.send(.drag(.updateFrames([.foundation(Suit.spades.id, frame)]))) {

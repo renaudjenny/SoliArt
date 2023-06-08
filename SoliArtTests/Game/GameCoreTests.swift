@@ -148,7 +148,7 @@ class GameCoreTests: XCTestCase {
     }
 
     static func pilesAfterShuffleForEasyGame() -> IdentifiedArrayOf<Pile> {
-        var cards: [Card] = []
+        var cards = [Card].easyFromTheDeck
         return IdentifiedArrayOf(uniqueElements: (1...7).map {
             var pile = Pile(id: $0, cards: IdentifiedArrayOf(uniqueElements: cards[..<$0]))
             cards = Array(cards[$0...])
