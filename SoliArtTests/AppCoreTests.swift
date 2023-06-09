@@ -7,18 +7,33 @@ import XCTest
 class AppCoreTests: XCTestCase {
     private var store: TestStore = TestStore(initialState: App.State()) {
         App()
+    } withDependencies: {
+        $0.date = .constant(Date(timeIntervalSince1970: 0))
     }
     private let now = Date(timeIntervalSince1970: 0)
 
     func testFlipDeck() {
-        store.send(.game(.flipDeck))
-
-        let historyEntry = HistoryEntry(date: self.now, gameState: Game.State(), scoreState: Score.State())
-        store.receive(.history(.addEntry(historyEntry))) {
+        let historyEntry = HistoryEntry(date: now, gameState: Game.State(), scoreState: Score.State())
+        store.send(.game(.flipDeck)) {
             $0.history.entries.append(historyEntry)
         }
+    }
 
-        store.receive(.score(.score(.recycling)))
+    func testFlipDeckWithScore() {
+        store = TestStore(initialState: App.State(score: Score.State(score: 200))) {
+            App()
+        } withDependencies: {
+            $0.date = .constant(self.now)
+        }
+        let historyEntry = HistoryEntry(
+            date: now,
+            gameState: Game.State(),
+            scoreState: Score.State(score: 200)
+        )
+        store.send(.game(.flipDeck)) {
+            $0.history.entries.append(historyEntry)
+            $0.score.score = 100
+        }
     }
 
     func testResetGame() {

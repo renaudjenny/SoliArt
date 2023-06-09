@@ -177,6 +177,30 @@ class GameCoreTests: XCTestCase {
         })
     }
 
+    static func pilesAfterShuffleForSuperEasyGame() -> IdentifiedArrayOf<Pile> {
+        var cards = Rank.allCases.flatMap { rank in
+            Suit.allCases.map { suit in
+                StandardDeckCard(rank, of: suit, isFacedUp: false)
+            }
+        }
+        cards.swapAt(5, 1)
+        cards.swapAt(9, 3)
+        cards.swapAt(14, 1)
+        cards.swapAt(20, 4)
+        cards.swapAt(27, 6)
+        return IdentifiedArrayOf(uniqueElements: (1...7).map {
+            var pile = Pile(id: $0, cards: IdentifiedArrayOf(uniqueElements: cards[..<$0]))
+            cards = Array(cards[$0...])
+
+            if var last = pile.cards.last {
+                last.isFacedUp = true
+                pile.cards.updateOrAppend(last)
+            }
+
+            return pile
+        })
+    }
+
     private func shuffleCards(
         initialCards: [Card] = .standard52Deck,
         pilesAfterShuffle: IdentifiedArrayOf<Pile> = pilesAfterShuffle()
