@@ -9,6 +9,7 @@ class AppCoreTests: XCTestCase {
         App()
     } withDependencies: {
         $0.date = .constant(Date(timeIntervalSince1970: 0))
+        $0.shuffleCards = ShuffleCards { .standard52Deck }
     }
     private let now = Date(timeIntervalSince1970: 0)
 
@@ -39,13 +40,13 @@ class AppCoreTests: XCTestCase {
     func testResetGame() {
         store.send(.score(.score(.moveToFoundation))) {
             $0.score.score = 10
-        }
-        store.receive(.score(.incrementMove)) {
             $0.score.moves = 1
         }
 
         store.send(.game(.resetGame)) {
             $0.score = Score.State()
+            $0.game = .stateWithDispatchedCards(.standard52Deck)
+            $0.game.isGameOver = false
         }
     }
 
@@ -198,5 +199,32 @@ class AppCoreTests: XCTestCase {
         }
         _ = await store.send(.autoFinish(.checkForAutoFinish))
         await store.receive(.autoFinish(.autoFinish))
+    }
+}
+
+extension Game.State {
+    static func stateWithDispatchedCards(_ cards: [Card]) -> Self {
+        var state = Game.State()
+        var cards = cards
+        state.piles = IdentifiedArrayOf(uniqueElements: (1...7).map {
+            var pile = Pile(id: $0, cards: [])
+            pile.cards = IdentifiedArrayOf(uniqueElements: cards[..<$0])
+            cards = Array(cards[$0...])
+
+            if var last = pile.cards.last {
+                last.isFacedUp = true
+                pile.cards.updateOrAppend(last)
+            }
+
+            return pile
+        })
+
+        state.deck.upwards = []
+        state.deck.downwards = IdentifiedArrayOf(uniqueElements: cards)
+
+        state.foundations = IdentifiedArrayOf(
+            uniqueElements: Suit.orderedCases.map { Foundation(suit: $0, cards: []) }
+        )
+        return state
     }
 }

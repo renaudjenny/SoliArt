@@ -22,6 +22,10 @@ struct ShuffleCards {
         return .standard52Deck.shuffled()
     }
 
+    init(shuffle: @escaping () -> [Card]) {
+        self.shuffle = shuffle
+    }
+
     func callAsFunction() -> [Card] {
         shuffle()
     }
