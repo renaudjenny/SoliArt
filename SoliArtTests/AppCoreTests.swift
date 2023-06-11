@@ -45,46 +45,33 @@ class AppCoreTests: XCTestCase {
 
         store.send(.game(.resetGame)) {
             $0.score = Score.State()
-            $0.game = .stateWithDispatchedCards(.standard52Deck)
+            $0.game = .withDispatchedCards
             $0.game.isGameOver = false
         }
     }
 
     func testGameActionThatUpdateState() {
-        let gameStateAfterShuffle = Game.State(
-            foundations: Game.State().foundations,
-            piles: GameCoreTests.pilesAfterShuffle(),
-            deck: Deck(
-                downwards: IdentifiedArrayOf(uniqueElements: [Card].standard52Deck[28...]),
-                upwards: []
-            ),
-            isGameOver: false
-        )
-        store.send(.game(.shuffleCards)) {
-            $0.game = gameStateAfterShuffle
-        }
         let afterShuffleHistoryEntry = HistoryEntry(
             date: self.now,
-            gameState: gameStateAfterShuffle,
+            gameState: .withDispatchedCards,
             scoreState: Score.State()
         )
-        store.receive(.history(.addEntry(afterShuffleHistoryEntry))) {
+        store.send(.game(.shuffleCards)) {
+            $0.game = .withDispatchedCards
             $0.history.entries = [afterShuffleHistoryEntry]
         }
 
-        var gameStateAfterDrawingCard = gameStateAfterShuffle
+        var gameStateAfterDrawingCard: Game.State = .withDispatchedCards
         var drawnCard = gameStateAfterDrawingCard.deck.downwards.removeFirst()
         drawnCard.isFacedUp = true
         gameStateAfterDrawingCard.deck.upwards = [drawnCard]
-        store.send(.game(.drawCard)) {
-            $0.game = gameStateAfterDrawingCard
-        }
         let afterDrawingCardHistoryEntry = HistoryEntry(
             date: self.now,
             gameState: gameStateAfterDrawingCard,
             scoreState: Score.State()
         )
-        store.receive(.history(.addEntry(afterDrawingCardHistoryEntry))) {
+        store.send(.game(.drawCard)) {
+            $0.game = gameStateAfterDrawingCard
             $0.history.entries.append(afterDrawingCardHistoryEntry)
         }
 
@@ -92,23 +79,16 @@ class AppCoreTests: XCTestCase {
         let aceOfClubs = Card(.ace, of: .clubs, isFacedUp: true)
         gameStateAfterDoubleTappingCard.foundations[id: Suit.clubs.rawValue]!.cards.append(aceOfClubs)
         gameStateAfterDoubleTappingCard.piles[id: 1]!.cards = []
-        store.send(.drag(.doubleTapCard(aceOfClubs))) {
-            $0.game = gameStateAfterDoubleTappingCard
-        }
-        store.receive(.drag(.score(.score(.moveToFoundation))))
+        let scoreAfterDoubleTapping = Score.State(score: 10, moves: 1)
         let afterDoubleTappingCardHistoryEntry = HistoryEntry(
             date: self.now,
             gameState: gameStateAfterDoubleTappingCard,
-            scoreState: Score.State()
+            scoreState: scoreAfterDoubleTapping
         )
-        store.receive(.history(.addEntry(afterDoubleTappingCardHistoryEntry))) {
+        store.send(.drag(.doubleTapCard(aceOfClubs))) {
+            $0.game = gameStateAfterDoubleTappingCard
             $0.history.entries.append(afterDoubleTappingCardHistoryEntry)
-        }
-        store.receive(.score(.score(.moveToFoundation))) {
-            $0.score.score = 10
-        }
-        store.receive(.score(.incrementMove)) {
-            $0.score.moves = 1
+            $0.score = scoreAfterDoubleTapping
         }
 
         var gameStateAfterDraggingCard = gameStateAfterDoubleTappingCard
@@ -203,28 +183,15 @@ class AppCoreTests: XCTestCase {
 }
 
 extension Game.State {
-    static func stateWithDispatchedCards(_ cards: [Card]) -> Self {
-        var state = Game.State()
-        var cards = cards
-        state.piles = IdentifiedArrayOf(uniqueElements: (1...7).map {
-            var pile = Pile(id: $0, cards: [])
-            pile.cards = IdentifiedArrayOf(uniqueElements: cards[..<$0])
-            cards = Array(cards[$0...])
-
-            if var last = pile.cards.last {
-                last.isFacedUp = true
-                pile.cards.updateOrAppend(last)
-            }
-
-            return pile
-        })
-
-        state.deck.upwards = []
-        state.deck.downwards = IdentifiedArrayOf(uniqueElements: cards)
-
-        state.foundations = IdentifiedArrayOf(
-            uniqueElements: Suit.orderedCases.map { Foundation(suit: $0, cards: []) }
+    static var withDispatchedCards: Self {
+        Game.State(
+            foundations: Game.State().foundations,
+            piles: GameCoreTests.pilesAfterShuffle(),
+            deck: Deck(
+                downwards: IdentifiedArrayOf(uniqueElements: [Card].standard52Deck[28...]),
+                upwards: []
+            ),
+            isGameOver: false
         )
-        return state
     }
 }

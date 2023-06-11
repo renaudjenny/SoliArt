@@ -19,7 +19,6 @@ struct Drag: ReducerProtocol {
         case dropCards
         case doubleTapCard(Card)
         case resetZIndexPriority
-        case score(Score.Action)
     }
 
     @Dependency(\.mainQueue) var mainQueue: AnySchedulerOf<DispatchQueue>
@@ -54,8 +53,6 @@ struct Drag: ReducerProtocol {
             else { return .none }
 
             return state.move(card: card, foundation: foundation)
-        case .score:
-            return .none
         }
     }
 }

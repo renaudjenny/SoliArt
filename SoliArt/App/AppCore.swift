@@ -55,14 +55,12 @@ struct App: ReducerProtocol {
                 return .none
             case .game(.shuffleCards), .game(.drawCard), .drag(.doubleTapCard), .drag(.dropCards):
                 guard state.game != state.history.entries.last?.gameState else { return .none }
-                return addHistoryEntry(state: &state)
+                return updateScore(state: &state, action: action)
             case .history(.undo):
                 guard let last = state.history.entries.last else { return .none }
                 state.game = last.gameState
                 state.score = last.scoreState
                 return .none
-            case let .drag(.score(action)):
-                return EffectTask(value: .score(action))
             case .autoFinish(.autoFinish):
                 guard let hint = state.hint.hints.first else { return .none }
 
@@ -121,5 +119,19 @@ struct App: ReducerProtocol {
         state.score.score += Score.ScoreType.recycling.score
         state.score.score = max(state.score.score, 0)
         return .none
+    }
+
+    private func updateScore(state: inout State, action: Action) -> EffectTask<Action> {
+        guard case let .score(action) = action else { return .none }
+//        switch action {
+//        case let .score(type):
+//            state.score.score += type.score
+//            state.score.score = max(state.score.score, 0)
+//            if type != .recycling {
+//                state.score.moves += 1
+//            }
+//        }
+
+        return addHistoryEntry(state: &state)
     }
 }
