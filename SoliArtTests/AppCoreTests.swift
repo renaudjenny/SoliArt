@@ -83,12 +83,11 @@ class AppCoreTests: XCTestCase {
         let afterDoubleTappingCardHistoryEntry = HistoryEntry(
             date: self.now,
             gameState: gameStateAfterDoubleTappingCard,
-            scoreState: scoreAfterDoubleTapping
+            scoreState: Score.State()
         )
         store.send(.drag(.doubleTapCard(aceOfClubs))) {
             $0.game = gameStateAfterDoubleTappingCard
             $0.history.entries.append(afterDoubleTappingCardHistoryEntry)
-            $0.score = scoreAfterDoubleTapping
         }
 
         var gameStateAfterDraggingCard = gameStateAfterDoubleTappingCard
@@ -96,6 +95,7 @@ class AppCoreTests: XCTestCase {
         let frame = CGRect(x: 100, y: 100, width: 200, height: 400)
         store.send(.drag(.updateFrames([.pile(2, frame)]))) {
             $0.drag.frames.updateOrAppend(.pile(2, frame))
+            $0.score = Score.State(score: 10, moves: 1)
         }
         let dropPosition = CGPoint(x: 110, y: 110)
         store.send(.drag(.dragCard(draggedCard, position: dropPosition))) {

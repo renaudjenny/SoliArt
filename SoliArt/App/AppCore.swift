@@ -55,12 +55,17 @@ struct App: ReducerProtocol {
                 return .none
             case .game(.shuffleCards), .game(.drawCard), .drag(.doubleTapCard), .drag(.dropCards):
                 guard state.game != state.history.entries.last?.gameState else { return .none }
-                return updateScore(state: &state, action: action)
+                return addHistoryEntry(state: &state)
             case .history(.undo):
                 guard let last = state.history.entries.last else { return .none }
                 state.game = last.gameState
                 state.score = last.scoreState
                 return .none
+            case let .drag(.delegate(action)):
+                switch action {
+                case let .scoringMove(scoring):
+                    return updateScore(state: &state, scoring: scoring)
+                }
             case .autoFinish(.autoFinish):
                 guard let hint = state.hint.hints.first else { return .none }
 
@@ -116,22 +121,24 @@ struct App: ReducerProtocol {
     }
 
     private func flipDeck(state: inout State) -> EffectTask<Action> {
-        state.score.score += Score.ScoreType.recycling.score
+        state.score.score += Scoring.recycling.score
         state.score.score = max(state.score.score, 0)
         return .none
     }
 
-    private func updateScore(state: inout State, action: Action) -> EffectTask<Action> {
-        guard case let .score(action) = action else { return .none }
-//        switch action {
-//        case let .score(type):
-//            state.score.score += type.score
-//            state.score.score = max(state.score.score, 0)
-//            if type != .recycling {
-//                state.score.moves += 1
-//            }
-//        }
+    private func updateScore(state: inout State, scoring: Scoring) -> EffectTask<Action> {
+        switch scoring {
+        case .moveToFoundation, .turnOverPileCard, .moveBackFromFoundation, .recycling:
+            state.score.score += scoring.score
+            state.score.score = max(state.score.score, 0)
+            if scoring != .recycling {
+                state.score.moves += 1
+            }
+        case .incrementMoveOnly:
+            state.score.moves += 1
+        }
 
-        return addHistoryEntry(state: &state)
+        // TODO: should call addHistoryEntry instead of returning none here, so would avoid a second action/reduce cycle
+        return .none
     }
 }

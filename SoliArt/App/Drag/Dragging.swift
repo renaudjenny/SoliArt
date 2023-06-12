@@ -73,19 +73,17 @@ extension Drag.State {
                 return dropEffect
             }
 
-            let scoringEffect: EffectTask<Drag.Action>
+            let scoring: Scoring
             switch DraggingSource.card(draggingState.card, in: self) {
             case let .pile(pileID):
                 let hasTurnOverCard = removePileCards(pileID: pileID, cards: draggedCards)
-                scoringEffect = hasTurnOverCard
-                ? EffectTask(value: .score(.score(.turnOverPileCard)))
-                : EffectTask(value: .score(.incrementMove))
+                scoring = hasTurnOverCard ? .turnOverPileCard : .incrementMoveOnly
             case let .foundation(foundationID):
                 foundations[id: foundationID]?.cards.remove(draggingState.card)
-                scoringEffect = EffectTask(value: .score(.score(.moveBackFromFoundation)))
+                scoring = .moveBackFromFoundation
             case .deckUpwards:
                 deck.upwards.remove(draggingState.card)
-                scoringEffect = EffectTask(value: .score(.incrementMove))
+                scoring = .incrementMoveOnly
             case .deckDownwards, .removed:
                 self.draggingState = nil
                 return dropEffect
@@ -95,7 +93,7 @@ extension Drag.State {
             piles.updateOrAppend(pile)
 
             self.draggingState = nil
-            return .merge(dropEffect, scoringEffect)
+            return .merge(dropEffect, .send(.delegate(.scoringMove(scoring))))
         case let .foundation(foundationID, _):
             guard let foundation = foundations[id: foundationID], draggedCards.count == 1 else {
                 self.draggingState = nil
@@ -112,14 +110,14 @@ extension Drag.State {
     mutating func move(card: Card, foundation: Foundation) -> EffectTask<Drag.Action> {
         guard isValidScoring(card: card, onto: foundation) else { return .none }
 
-        let scoringEffect: EffectTask<Drag.Action>
+        let scoring: Scoring
         switch DraggingSource.card(card, in: self) {
         case let .pile(pileID):
             removePileCards(pileID: pileID, cards: [card])
-            scoringEffect = EffectTask(value: .score(.score(.moveToFoundation)))
+            scoring = .moveToFoundation
         case .deckUpwards:
             deck.upwards.remove(card)
-            scoringEffect = EffectTask(value: .score(.score(.moveToFoundation)))
+            scoring = .moveToFoundation
         case .foundation, .deckDownwards, .removed:
             return .none
         }
@@ -128,7 +126,7 @@ extension Drag.State {
         foundation.cards.updateOrAppend(card)
         foundations.updateOrAppend(foundation)
 
-        return scoringEffect
+        return .send(.delegate(.scoringMove(scoring)))
     }
 }
 

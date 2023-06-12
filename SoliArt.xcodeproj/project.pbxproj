@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4C05E8432A37B28000152331 /* Scoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C05E8422A37B28000152331 /* Scoring.swift */; };
 		4C2E2BAD285B007F0095A238 /* AppCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2E2BAC285B007F0095A238 /* AppCore.swift */; };
 		4C2E2BAF285B00AC0095A238 /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2E2BAE285B00AC0095A238 /* Deck.swift */; };
 		4C3D194F28547D810096404F /* SoliArtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D194E28547D810096404F /* SoliArtApp.swift */; };
@@ -63,6 +64,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4C05E8422A37B28000152331 /* Scoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scoring.swift; sourceTree = "<group>"; };
 		4C2B6C452963271A00B960C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4C2E2BAC285B007F0095A238 /* AppCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCore.swift; sourceTree = "<group>"; };
 		4C2E2BAE285B00AC0095A238 /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
@@ -251,6 +253,7 @@
 			children = (
 				4CB1CB5728B02E980077C247 /* ScoreCore.swift */,
 				4C6169D0286CDCCD006B4D48 /* ScoreView.swift */,
+				4C05E8422A37B28000152331 /* Scoring.swift */,
 			);
 			path = Score;
 			sourceTree = "<group>";
@@ -493,6 +496,7 @@
 				4CD8819C28BBD75B008B4619 /* CardPosition.swift in Sources */,
 				4C6169D5286CDF34006B4D48 /* PilesView.swift in Sources */,
 				4CD881BB28CA782B008B4619 /* HintState+Hints.swift in Sources */,
+				4C05E8432A37B28000152331 /* Scoring.swift in Sources */,
 				4CAE86CD2919AB2E00CF6520 /* ShuffleCards.swift in Sources */,
 				4CD881BD28CF92BC008B4619 /* AppActionsView.swift in Sources */,
 				4C3D194F28547D810096404F /* SoliArtApp.swift in Sources */,
