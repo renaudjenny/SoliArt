@@ -38,7 +38,7 @@ class AppCoreTests: XCTestCase {
     }
 
     func testResetGame() {
-        store.send(.score(.score(.moveToFoundation))) {
+        store.send(.drag(.delegate(.scoringMove(.moveToFoundation)))) {
             $0.score.score = 10
             $0.score.moves = 1
         }
@@ -111,7 +111,7 @@ class AppCoreTests: XCTestCase {
             $0.drag.draggingState = nil
             $0.game = gameStateAfterDraggingCard
         }
-        store.receive(.drag(.score(.score(.turnOverPileCard))))
+        store.receive(.drag(.delegate(.scoringMove(.turnOverPileCard))))
         let afterDraggingCardHistoryEntry = HistoryEntry(
             date: self.now,
             gameState: gameStateAfterDraggingCard,
@@ -120,10 +120,8 @@ class AppCoreTests: XCTestCase {
         store.receive(.history(.addEntry(afterDraggingCardHistoryEntry))) {
             $0.history.entries.append(afterDraggingCardHistoryEntry)
         }
-        store.receive(.score(.score(.turnOverPileCard))) {
+        store.receive(.drag(.delegate(.scoringMove(.turnOverPileCard)))) {
             $0.score.score = 15
-        }
-        store.receive(.score(.incrementMove)) {
             $0.score.moves = 2
         }
     }

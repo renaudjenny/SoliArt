@@ -79,7 +79,7 @@ class DragCoreTests: XCTestCase {
             $0.piles.updateOrAppend(pile5)
         }
 
-        store.receive(.score(.score(.turnOverPileCard)))
+        store.receive(.delegate(.scoringMove(.turnOverPileCard)))
 
         scheduler.advance(by: 0.5)
 
@@ -128,7 +128,7 @@ class DragCoreTests: XCTestCase {
             $0.foundations.updateOrAppend(spadesFoundation)
         }
 
-        store.receive(.score(.score(.moveToFoundation)))
+        store.receive(.delegate(.scoringMove(.moveToFoundation)))
 
         scheduler.advance(by: 0.5)
 
@@ -166,7 +166,7 @@ class DragCoreTests: XCTestCase {
             $0.piles.updateOrAppend(pile5)
         }
 
-        store.receive(.score(.score(.moveBackFromFoundation)))
+        store.receive(.delegate(.scoringMove(.moveBackFromFoundation)))
 
         scheduler.advance(by: 0.5)
 
