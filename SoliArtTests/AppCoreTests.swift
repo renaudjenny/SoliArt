@@ -10,6 +10,7 @@ class AppCoreTests: XCTestCase {
     } withDependencies: {
         $0.date = .constant(Date(timeIntervalSince1970: 0))
         $0.shuffleCards = ShuffleCards { .standard52Deck }
+        $0.mainQueue = DispatchQueue.test.eraseToAnyScheduler()
     }
     private let now = Date(timeIntervalSince1970: 0)
 
@@ -89,6 +90,9 @@ class AppCoreTests: XCTestCase {
             $0.game = gameStateAfterDoubleTappingCard
             $0.history.entries.append(afterDoubleTappingCardHistoryEntry)
         }
+        store.receive(.drag(.delegate(.scoringMove(.moveToFoundation)))) {
+            $0.score = scoreAfterDoubleTapping
+        }
 
         var gameStateAfterDraggingCard = gameStateAfterDoubleTappingCard
         let draggedCard = Card(.two, of: .diamonds, isFacedUp: true)
@@ -107,17 +111,14 @@ class AppCoreTests: XCTestCase {
         lastCardInPile.isFacedUp = true
         gameStateAfterDraggingCard.piles[id: 5]!.cards.updateOrAppend(lastCardInPile)
         gameStateAfterDraggingCard.piles[id: 2]!.cards.append(draggedCard)
-        store.send(.drag(.dropCards)) {
-            $0.drag.draggingState = nil
-            $0.game = gameStateAfterDraggingCard
-        }
-        store.receive(.drag(.delegate(.scoringMove(.turnOverPileCard))))
         let afterDraggingCardHistoryEntry = HistoryEntry(
             date: self.now,
             gameState: gameStateAfterDraggingCard,
             scoreState: Score.State(score: 10, moves: 1)
         )
-        store.receive(.history(.addEntry(afterDraggingCardHistoryEntry))) {
+        store.send(.drag(.dropCards)) {
+            $0.drag.draggingState = nil
+            $0.game = gameStateAfterDraggingCard
             $0.history.entries.append(afterDraggingCardHistoryEntry)
         }
         store.receive(.drag(.delegate(.scoringMove(.turnOverPileCard)))) {
@@ -137,23 +138,31 @@ class AppCoreTests: XCTestCase {
     }
 
     func testAutoFinish() async {
-        var foundations = Game.State().foundations
-        let spadesFoundation = Foundation(suit: .spades, cards: [Card(.ace, of: .spades, isFacedUp: true)])
-        foundations.updateOrAppend(spadesFoundation)
+        var gameState = Game.State()
+        let spadesFoundation = Foundation(suit: .spades, cards: [])
+        gameState.foundations.updateOrAppend(spadesFoundation)
+        let pile = Pile(id: 0, cards: [Card(.ace, of: .spades, isFacedUp: true)])
+        gameState.piles.updateOrAppend(pile)
         let scheduler = DispatchQueue.test
         store = TestStore(
             initialState: App.State(
-                game: Game.State(foundations: foundations),
+                game: gameState,
                 _autoFinish: AutoFinish.State(isAutoFinishing: true)
             )
         ) {
             App()
         } withDependencies: {
+            $0.date = .constant(Date(timeIntervalSince1970: 0))
             $0.mainQueue = scheduler.eraseToAnyScheduler()
+            $0.shuffleCards = ShuffleCards { .standard52Deck }
         }
         let frame = CGRect(x: 10, y: 20, width: 100, height: 200)
-        _ = await store.send(.drag(.updateFrames([.foundation(Suit.spades.id, frame)]))) {
+        await store.send(.drag(.updateFrames([.foundation(Suit.spades.id, frame)]))) {
             $0.drag.frames.updateOrAppend(.foundation(Suit.spades.id, frame))
+        }
+
+        await store.send(.autoFinish(.autoFinish)) {
+            $0.autoFinish.isAutoFinishing = true
         }
 
         let hint = HintMove(
@@ -162,6 +171,7 @@ class AppCoreTests: XCTestCase {
             destination: .foundation(id: Suit.spades.id),
             position: .destination
         )
+
         let position = CGPoint(x: frame.midX, y: frame.midY)
         await store.receive(.drag(.dragCard(hint.card, position: position))) {
             $0.drag.draggingState = DraggingState(card: hint.card, position: position)
@@ -175,7 +185,7 @@ class AppCoreTests: XCTestCase {
         await store.receive(.history(.addEntry(historyEntry))) {
             $0.history.entries.append(historyEntry)
         }
-        _ = await store.send(.autoFinish(.checkForAutoFinish))
+        await store.send(.autoFinish(.checkForAutoFinish))
         await store.receive(.autoFinish(.autoFinish))
     }
 }

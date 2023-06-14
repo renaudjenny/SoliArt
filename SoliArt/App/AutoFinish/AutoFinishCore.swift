@@ -26,7 +26,6 @@ struct AutoFinish: ReducerProtocol {
             state.confirmationDialog = .autoFinish
             return .none
         case .autoFinish:
-            state.isAutoFinishing = true
             state.confirmationDialog = nil
             state.isAutoFinishing = state.nextHint != nil
             return .none
