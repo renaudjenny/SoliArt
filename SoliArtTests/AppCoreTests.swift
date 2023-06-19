@@ -138,18 +138,11 @@ class AppCoreTests: XCTestCase {
     }
 
     func testAutoFinish() async {
+        let aceOfSpades = Card(.ace, of: .spades, isFacedUp: true)
         var gameState = Game.State()
-        let spadesFoundation = Foundation(suit: .spades, cards: [])
-        gameState.foundations.updateOrAppend(spadesFoundation)
-        let pile = Pile(id: 0, cards: [Card(.ace, of: .spades, isFacedUp: true)])
-        gameState.piles.updateOrAppend(pile)
+        gameState.piles[id: 1]?.cards.updateOrAppend(aceOfSpades)
         let scheduler = DispatchQueue.test
-        store = TestStore(
-            initialState: App.State(
-                game: gameState,
-                _autoFinish: AutoFinish.State(isAutoFinishing: true)
-            )
-        ) {
+        let store = TestStore(initialState: App.State(game: gameState)) {
             App()
         } withDependencies: {
             $0.date = .constant(Date(timeIntervalSince1970: 0))
@@ -161,7 +154,12 @@ class AppCoreTests: XCTestCase {
             $0.drag.frames.updateOrAppend(.foundation(Suit.spades.id, frame))
         }
 
+        await store.send(.autoFinish(.checkForAutoFinish)) {
+            $0.autoFinish.confirmationDialog = .autoFinish
+        }
+
         await store.send(.autoFinish(.autoFinish)) {
+            $0.autoFinish.confirmationDialog = nil
             $0.autoFinish.isAutoFinishing = true
         }
 
@@ -175,18 +173,22 @@ class AppCoreTests: XCTestCase {
         let position = CGPoint(x: frame.midX, y: frame.midY)
         await store.receive(.drag(.dragCard(hint.card, position: position))) {
             $0.drag.draggingState = DraggingState(card: hint.card, position: position)
-            $0.drag.zIndexPriority = .foundation(id: Suit.spades.id)
+            $0.drag.zIndexPriority = .pile(id: 1)
         }
+        var newGameState = gameState
+        newGameState.foundations[id: Suit.spades.rawValue]?.cards = [aceOfSpades]
+        newGameState.piles[id: 1]?.cards.removeAll()
+        let historyEntry = HistoryEntry(date: self.now, gameState: newGameState, scoreState: store.state.score)
         await store.receive(.drag(.dropCards)) {
             $0.drag.draggingState = nil
-        }
-        await scheduler.advance(by: 0.2)
-        let historyEntry = HistoryEntry(date: self.now, gameState: store.state.game, scoreState: store.state.score)
-        await store.receive(.history(.addEntry(historyEntry))) {
+            $0.game = newGameState
             $0.history.entries.append(historyEntry)
         }
-        await store.send(.autoFinish(.checkForAutoFinish))
-        await store.receive(.autoFinish(.autoFinish))
+
+        await store.receive(.drag(.delegate(.scoringMove(.moveToFoundation)))) {
+            $0.score.score += 10
+            $0.score.moves += 1
+        }
     }
 }
 
