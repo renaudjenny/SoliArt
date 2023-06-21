@@ -5,16 +5,14 @@ import XCTest
 
 @MainActor
 class AppCoreTests: XCTestCase {
-    private var store: TestStore = TestStore(initialState: App.State()) {
-        App()
-    } withDependencies: {
-        $0.date = .constant(Date(timeIntervalSince1970: 0))
-        $0.shuffleCards = ShuffleCards { .standard52Deck }
-        $0.mainQueue = DispatchQueue.test.eraseToAnyScheduler()
-    }
-    private let now = Date(timeIntervalSince1970: 0)
-
     func testFlipDeck() {
+        let now = Date(timeIntervalSince1970: 0)
+        let store = TestStore(initialState: App.State()) {
+            App()
+        } withDependencies: {
+            $0.date = .constant(now)
+            $0.shuffleCards = ShuffleCards { .standard52Deck }
+        }
         let historyEntry = HistoryEntry(date: now, gameState: Game.State(), scoreState: Score.State())
         store.send(.game(.flipDeck)) {
             $0.history.entries.append(historyEntry)
@@ -22,10 +20,11 @@ class AppCoreTests: XCTestCase {
     }
 
     func testFlipDeckWithScore() {
-        store = TestStore(initialState: App.State(score: Score.State(score: 200))) {
+        let now = Date(timeIntervalSince1970: 0)
+        let store = TestStore(initialState: App.State(score: Score.State(score: 200))) {
             App()
         } withDependencies: {
-            $0.date = .constant(self.now)
+            $0.date = .constant(now)
         }
         let historyEntry = HistoryEntry(
             date: now,
@@ -39,8 +38,13 @@ class AppCoreTests: XCTestCase {
     }
 
     func testResetGame() {
+        let store = TestStore(initialState: App.State(score: Score.State(score: 200))) {
+            App()
+        } withDependencies: {
+            $0.shuffleCards = ShuffleCards { .standard52Deck }
+        }
         store.send(.drag(.delegate(.scoringMove(.moveToFoundation)))) {
-            $0.score.score = 10
+            $0.score.score = 210
             $0.score.moves = 1
         }
 
@@ -51,13 +55,22 @@ class AppCoreTests: XCTestCase {
         }
     }
 
-    func testGameActionThatUpdateState() {
+    func testGameActionThatUpdateState() async {
+        let now = Date(timeIntervalSince1970: 0)
+        let scheduler = DispatchQueue.test
+        let store = TestStore(initialState: App.State()) {
+            App()
+        } withDependencies: {
+            $0.date = .constant(now)
+            $0.shuffleCards = ShuffleCards { .standard52Deck }
+            $0.mainQueue = scheduler.eraseToAnyScheduler()
+        }
         let afterShuffleHistoryEntry = HistoryEntry(
-            date: self.now,
+            date: now,
             gameState: .withDispatchedCards,
             scoreState: Score.State()
         )
-        store.send(.game(.shuffleCards)) {
+        await store.send(.game(.shuffleCards)) {
             $0.game = .withDispatchedCards
             $0.history.entries = [afterShuffleHistoryEntry]
         }
@@ -67,11 +80,11 @@ class AppCoreTests: XCTestCase {
         drawnCard.isFacedUp = true
         gameStateAfterDrawingCard.deck.upwards = [drawnCard]
         let afterDrawingCardHistoryEntry = HistoryEntry(
-            date: self.now,
+            date: now,
             gameState: gameStateAfterDrawingCard,
             scoreState: Score.State()
         )
-        store.send(.game(.drawCard)) {
+        await store.send(.game(.drawCard)) {
             $0.game = gameStateAfterDrawingCard
             $0.history.entries.append(afterDrawingCardHistoryEntry)
         }
@@ -82,27 +95,27 @@ class AppCoreTests: XCTestCase {
         gameStateAfterDoubleTappingCard.piles[id: 1]!.cards = []
         let scoreAfterDoubleTapping = Score.State(score: 10, moves: 1)
         let afterDoubleTappingCardHistoryEntry = HistoryEntry(
-            date: self.now,
+            date: now,
             gameState: gameStateAfterDoubleTappingCard,
             scoreState: Score.State()
         )
-        store.send(.drag(.doubleTapCard(aceOfClubs))) {
+        await store.send(.drag(.doubleTapCard(aceOfClubs))) {
             $0.game = gameStateAfterDoubleTappingCard
             $0.history.entries.append(afterDoubleTappingCardHistoryEntry)
         }
-        store.receive(.drag(.delegate(.scoringMove(.moveToFoundation)))) {
+        await store.receive(.drag(.delegate(.scoringMove(.moveToFoundation)))) {
             $0.score = scoreAfterDoubleTapping
         }
 
         var gameStateAfterDraggingCard = gameStateAfterDoubleTappingCard
         let draggedCard = Card(.two, of: .diamonds, isFacedUp: true)
         let frame = CGRect(x: 100, y: 100, width: 200, height: 400)
-        store.send(.drag(.updateFrames([.pile(2, frame)]))) {
+        await store.send(.drag(.updateFrames([.pile(2, frame)]))) {
             $0.drag.frames.updateOrAppend(.pile(2, frame))
             $0.score = Score.State(score: 10, moves: 1)
         }
         let dropPosition = CGPoint(x: 110, y: 110)
-        store.send(.drag(.dragCard(draggedCard, position: dropPosition))) {
+        await store.send(.drag(.dragCard(draggedCard, position: dropPosition))) {
             $0.drag.draggingState = DraggingState(card: draggedCard, position: dropPosition)
             $0.drag.zIndexPriority = .pile(id: 5)
         }
@@ -112,32 +125,56 @@ class AppCoreTests: XCTestCase {
         gameStateAfterDraggingCard.piles[id: 5]!.cards.updateOrAppend(lastCardInPile)
         gameStateAfterDraggingCard.piles[id: 2]!.cards.append(draggedCard)
         let afterDraggingCardHistoryEntry = HistoryEntry(
-            date: self.now,
+            date: now,
             gameState: gameStateAfterDraggingCard,
             scoreState: Score.State(score: 10, moves: 1)
         )
-        store.send(.drag(.dropCards)) {
+        await store.send(.drag(.dropCards)) {
             $0.drag.draggingState = nil
             $0.game = gameStateAfterDraggingCard
             $0.history.entries.append(afterDraggingCardHistoryEntry)
         }
-        store.receive(.drag(.delegate(.scoringMove(.turnOverPileCard)))) {
+        await scheduler.advance(by: .seconds(0.5))
+        await store.receive(.drag(.delegate(.scoringMove(.turnOverPileCard)))) {
             $0.score.score = 15
             $0.score.moves = 2
+        }
+        await store.receive(.drag(.resetZIndexPriority)) {
+            $0.drag.zIndexPriority = .pile(id: 1)
         }
     }
 
     func testHistoryUndo() {
-        testGameActionThatUpdateState()
-
+        let now = Date(timeIntervalSince1970: 0)
+        let store = TestStore(
+            initialState: App.State(
+                history: History.State(
+                    entries: [
+                        HistoryEntry(
+                            date: now,
+                            gameState: .withDispatchedCards,
+                            scoreState: Score.State(score: 0, moves: 1)
+                        ),
+                        HistoryEntry(
+                            date: now,
+                            gameState: .previewWithDrawnCards,
+                            scoreState: Score.State(score: 10, moves: 2)
+                        )
+                    ]
+                )
+            )
+        ) {
+            App()
+        }
         store.send(.history(.undo)) {
             $0.history.entries.removeLast()
-            $0.game = $0.history.entries.last!.gameState
-            $0.score = Score.State(score: 0, moves: 0)
+            $0.game = .withDispatchedCards
+            $0.score = Score.State(score: 0, moves: 1)
         }
     }
 
     func testAutoFinish() async {
+        let now = Date(timeIntervalSince1970: 0)
         let aceOfSpades = Card(.ace, of: .spades, isFacedUp: true)
         var gameState = Game.State()
         gameState.piles[id: 1]?.cards.updateOrAppend(aceOfSpades)
@@ -145,7 +182,7 @@ class AppCoreTests: XCTestCase {
         let store = TestStore(initialState: App.State(game: gameState)) {
             App()
         } withDependencies: {
-            $0.date = .constant(Date(timeIntervalSince1970: 0))
+            $0.date = .constant(now)
             $0.mainQueue = scheduler.eraseToAnyScheduler()
             $0.shuffleCards = ShuffleCards { .standard52Deck }
         }
@@ -158,11 +195,6 @@ class AppCoreTests: XCTestCase {
             $0.autoFinish.confirmationDialog = .autoFinish
         }
 
-        await store.send(.autoFinish(.autoFinish)) {
-            $0.autoFinish.confirmationDialog = nil
-            $0.autoFinish.isAutoFinishing = true
-        }
-
         let hint = HintMove(
             card: Card(.ace, of: .spades, isFacedUp: true),
             origin: .pile(id: 1),
@@ -171,23 +203,33 @@ class AppCoreTests: XCTestCase {
         )
 
         let position = CGPoint(x: frame.midX, y: frame.midY)
+
+        var newGameState = gameState
+        newGameState.foundations[id: Suit.spades.rawValue]?.cards = [aceOfSpades]
+        newGameState.piles[id: 1]?.cards.removeAll()
+        let historyEntry = HistoryEntry(date: now, gameState: newGameState, scoreState: store.state.score)
+
+        await store.send(.autoFinish(.autoFinish)) {
+            $0.autoFinish.confirmationDialog = nil
+            $0.autoFinish.isAutoFinishing = true
+        }
+
         await store.receive(.drag(.dragCard(hint.card, position: position))) {
             $0.drag.draggingState = DraggingState(card: hint.card, position: position)
             $0.drag.zIndexPriority = .pile(id: 1)
         }
-        var newGameState = gameState
-        newGameState.foundations[id: Suit.spades.rawValue]?.cards = [aceOfSpades]
-        newGameState.piles[id: 1]?.cards.removeAll()
-        let historyEntry = HistoryEntry(date: self.now, gameState: newGameState, scoreState: store.state.score)
         await store.receive(.drag(.dropCards)) {
             $0.drag.draggingState = nil
             $0.game = newGameState
             $0.history.entries.append(historyEntry)
         }
-
+        await scheduler.advance(by: .seconds(0.2))
         await store.receive(.drag(.delegate(.scoringMove(.moveToFoundation)))) {
             $0.score.score += 10
             $0.score.moves += 1
+        }
+        await store.receive(.autoFinish(.autoFinish)) {
+            $0.autoFinish.isAutoFinishing = false
         }
     }
 }
