@@ -44,6 +44,10 @@ struct App: ReducerProtocol {
             AutoFinish()
         }
         Reduce { state, action in
+            enum CancelID {
+                case autoFinish
+            }
+
             switch action {
             case .game(.flipDeck):
                 return .merge(
@@ -67,7 +71,8 @@ struct App: ReducerProtocol {
                     return updateScore(state: &state, scoring: scoring)
                 }
             case .autoFinish(.autoFinish):
-                guard let hint = state.hint.hints.first else { return .none }
+                guard let hint = state.hint.hints.first
+                else { return .cancel(id: CancelID.autoFinish) }
 
                 return .run { [frames = state.drag.frames] send in
                     let position = hint.destination
@@ -95,6 +100,7 @@ struct App: ReducerProtocol {
                     try await mainQueue.sleep(for: 0.2)
                     await send(.autoFinish(.autoFinish))
                 }
+                .cancellable(id: CancelID.autoFinish)
             case .game:
                 return .none
             case .drag:

@@ -223,7 +223,7 @@ class AppCoreTests: XCTestCase {
             $0.game = newGameState
             $0.history.entries.append(historyEntry)
         }
-        await scheduler.advance(by: .seconds(0.2))
+        await scheduler.advance(by: .seconds(0.5))
         await store.receive(.drag(.delegate(.scoringMove(.moveToFoundation)))) {
             $0.score.score += 10
             $0.score.moves += 1
@@ -231,6 +231,7 @@ class AppCoreTests: XCTestCase {
         await store.receive(.autoFinish(.autoFinish)) {
             $0.autoFinish.isAutoFinishing = false
         }
+        await store.receive(.drag(.resetZIndexPriority))
     }
 }
 
