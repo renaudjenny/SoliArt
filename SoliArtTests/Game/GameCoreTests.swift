@@ -229,6 +229,7 @@ private extension Array where Element == Card {
         }
         cards.swapAt(0, 28)
         cards.swapAt(2, 29)
+        cards.swapAt(1, 5)
         return cards
     }
 }
