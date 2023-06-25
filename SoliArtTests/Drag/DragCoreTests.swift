@@ -147,30 +147,30 @@ class DragCoreTests: XCTestCase {
         } withDependencies: {
             $0.mainQueue = scheduler.eraseToAnyScheduler()
         }
-        await testDropCardsToAFoundation()
+        let aceOfDiamonds = Card(.ace, of: .diamonds, isFacedUp: true)
+        await store.send(.doubleTapCard(aceOfDiamonds)) {
+            $0.piles[id: 3]?.cards.remove(aceOfDiamonds)
+            $0.piles[id: 3]?.cards[id: Card(.two, of: .clubs, isFacedUp: false).id]?.isFacedUp = true
+            $0.foundations[id: Suit.diamonds.id]!.cards.updateOrAppend(aceOfDiamonds)
+        }
+        await store.receive(.delegate(.scoringMove(.moveToFoundation)))
 
-        let frame: Frame = .pile(5, CGRect(x: 300, y: 300, width: 100, height: 200))
+        let frame: Frame = .pile(3, CGRect(x: 300, y: 300, width: 100, height: 200))
         let frames = IdentifiedArrayOf(uniqueElements: store.state.frames + [frame])
         await store.send(.updateFrames(frames)) {
             $0.frames = frames
         }
 
-        let dragCard = Card(.ace, of: .spades, isFacedUp: true)
-        let state = DraggingState(card: dragCard, position: CGPoint(x: 323, y: 323))
+        let state = DraggingState(card: aceOfDiamonds, position: CGPoint(x: 323, y: 323))
         await store.send(.dragCard(state.card, position: state.position)) {
             $0.draggingState = state
-            $0.zIndexPriority = .foundation(id: Suit.spades.id)
+            $0.zIndexPriority = .foundation(id: Suit.diamonds.id)
         }
 
         await store.send(.dropCards) {
             $0.draggingState = nil
-            var spadesFoundation = $0.foundations[id: Suit.spades.id]!
-            spadesFoundation.cards.remove(dragCard)
-            $0.foundations.updateOrAppend(spadesFoundation)
-
-            var pile5 = $0.piles[id: 5]!
-            pile5.cards.append(dragCard)
-            $0.piles.updateOrAppend(pile5)
+            $0.foundations[id: Suit.diamonds.id]!.cards.remove(aceOfDiamonds)
+            $0.piles[id: 3]!.cards.append(aceOfDiamonds)
         }
 
         await store.receive(.delegate(.scoringMove(.moveBackFromFoundation)))
