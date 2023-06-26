@@ -8,6 +8,8 @@ class ScoreCoreTests: XCTestCase {
     func testIncrementingMove() {
         let store = TestStore(initialState: App.State()) {
             App()
+        } withDependencies: {
+            $0.shuffleCards = ShuffleCards { .standard52Deck }
         }
 
         store.send(.drag(.delegate(.scoringMove(.incrementMoveOnly)))) {
@@ -19,7 +21,15 @@ class ScoreCoreTests: XCTestCase {
         }
 
         store.send(.game(.confirmResetGame)) {
+            $0.game.resetGameConfirmationDialog = .resetGame
+        }
+
+        store.send(.game(.resetGame)) {
             $0.score.moves = 0
+            $0.game.resetGameConfirmationDialog = nil
+            $0.game.isGameOver = false
+            $0.game.piles = .standard
+            $0.game.deck = .standard
         }
     }
 

@@ -239,12 +239,93 @@ extension Game.State {
     static var withDispatchedCards: Self {
         Game.State(
             foundations: Game.State().foundations,
-            piles: GameCoreTests.pilesAfterShuffle(),
+            piles: .standard,
             deck: Deck(
                 downwards: IdentifiedArrayOf(uniqueElements: [Card].standard52Deck[28...]),
                 upwards: []
             ),
             isGameOver: false
+        )
+    }
+}
+
+extension IdentifiedArray<Int, Pile> {
+    static var standard: Self {
+        IdentifiedArrayOf(uniqueElements: [
+            Pile(id: 1, cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.ace, of: .clubs, isFacedUp: true)
+            ])),
+            Pile(id: 2, cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.two, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.three, of: .clubs, isFacedUp: true),
+            ])),
+            Pile(id: 3, cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.four, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.five, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.six, of: .clubs, isFacedUp: true),
+            ])),
+            Pile(id: 4, cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.seven, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.eight, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.nine, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.ten, of: .clubs, isFacedUp: true),
+            ])),
+            Pile(id: 5, cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.jack, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.queen, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.king, of: .clubs, isFacedUp: false),
+                StandardDeckCard(.ace, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.two, of: .diamonds, isFacedUp: true),
+            ])),
+            Pile(id: 6, cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.three, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.four, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.five, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.six, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.seven, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.eight, of: .diamonds, isFacedUp: true),
+            ])),
+            Pile(id: 7, cards: IdentifiedArrayOf(uniqueElements: [
+                StandardDeckCard(.nine, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.ten, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.jack, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.queen, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.king, of: .diamonds, isFacedUp: false),
+                StandardDeckCard(.ace, of: .hearts, isFacedUp: false),
+                StandardDeckCard(.two, of: .hearts, isFacedUp: true),
+            ])),
+        ])
+    }
+
+    static var easyGame: Self {
+        var cards = Rank.allCases.flatMap { rank in
+            Suit.allCases.map { suit in
+                StandardDeckCard(rank, of: suit, isFacedUp: false)
+            }
+        }
+        cards.swapAt(0, 28)
+        cards.swapAt(2, 29)
+        cards.swapAt(1, 5)
+
+        return IdentifiedArrayOf(uniqueElements: (1...7).map {
+            var pile = Pile(id: $0, cards: IdentifiedArrayOf(uniqueElements: cards[..<$0]))
+            cards = Array(cards[$0...])
+
+            if var last = pile.cards.last {
+                last.isFacedUp = true
+                pile.cards.updateOrAppend(last)
+            }
+
+            return pile
+        })
+    }
+}
+
+extension Deck {
+    static var standard: Self {
+        Deck(
+            downwards: IdentifiedArray(uniqueElements: [Card].standard52Deck[28...]),
+            upwards: []
         )
     }
 }

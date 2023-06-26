@@ -8,7 +8,7 @@ class DragCoreTests: XCTestCase {
     func testDragCards() async {
         let store = TestStore(
             initialState: Drag.State(
-                piles: GameCoreTests.pilesAfterShuffle(),
+                piles: .standard,
                 foundations: Game.State().foundations
             )
         ) {
@@ -37,7 +37,7 @@ class DragCoreTests: XCTestCase {
     func testUpdateFrame() async {
         let store = TestStore(
             initialState: Drag.State(
-                piles: GameCoreTests.pilesAfterShuffle(),
+                piles: .standard,
                 foundations: Game.State().foundations
             )
         ) {
@@ -53,7 +53,7 @@ class DragCoreTests: XCTestCase {
         let scheduler = DispatchQueue.test
         let store = TestStore(
             initialState: Drag.State(
-                piles: GameCoreTests.pilesAfterShuffleForEasyGame()
+                piles: .easyGame
             )
         ) {
             Drag()
@@ -95,7 +95,7 @@ class DragCoreTests: XCTestCase {
         let scheduler = DispatchQueue.test
         let store = TestStore(
             initialState: Drag.State(
-                piles: GameCoreTests.pilesAfterShuffleForEasyGame(),
+                piles: .easyGame,
                 foundations: Game.State().foundations
             )
         ) {
@@ -139,7 +139,7 @@ class DragCoreTests: XCTestCase {
         let scheduler = DispatchQueue.test
         let store = TestStore(
             initialState: Drag.State(
-                piles: GameCoreTests.pilesAfterShuffleForEasyGame(),
+                piles: .easyGame,
                 foundations: Game.State().foundations
             )
         ) {
@@ -185,7 +185,7 @@ class DragCoreTests: XCTestCase {
     func testDoubleTapCardWithoutScoring() async {
         let store = TestStore(
             initialState: Drag.State(
-                piles: GameCoreTests.pilesAfterShuffle(),
+                piles: .standard,
                 foundations: Game.State().foundations
             )
         ) {
@@ -200,7 +200,7 @@ class DragCoreTests: XCTestCase {
         // won't go to the fondation
         let store = TestStore(
             initialState: Drag.State(
-                piles: GameCoreTests.pilesAfterShuffle(),
+                piles: .standard,
                 foundations: Game.State().foundations
             )
         ) {
@@ -213,7 +213,7 @@ class DragCoreTests: XCTestCase {
     func testDoubleTapCardToScore() async {
         let store = TestStore(
             initialState: Drag.State(
-                piles: GameCoreTests.pilesAfterShuffle(),
+                piles: .standard,
                 foundations: Game.State().foundations
             )
         ) {
@@ -224,5 +224,6 @@ class DragCoreTests: XCTestCase {
             $0.foundations[id: Suit.clubs.rawValue]?.cards.append(card)
             $0.piles[id: 1]?.cards.remove(card)
         }
+        await store.receive(.delegate(.scoringMove(.moveToFoundation)))
     }
 }

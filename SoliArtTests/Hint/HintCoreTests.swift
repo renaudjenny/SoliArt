@@ -8,7 +8,7 @@ class HintCoreTests: XCTestCase {
     private var store = TestStore(
         initialState: Hint.State(
             foundations: Game.State().foundations,
-            piles: GameCoreTests.pilesAfterShuffleForEasyGame()
+            piles: .easyGame
         )
     ) {
         Hint()
@@ -29,7 +29,7 @@ class HintCoreTests: XCTestCase {
         store = TestStore(
             initialState: Hint.State(
                 foundations: Game.State().foundations,
-                piles: GameCoreTests.pilesAfterShuffleForEasyFromTheDeck(),
+                piles: .easyGame,
                 deck: Deck(downwards: [], upwards: IdentifiedArrayOf(uniqueElements: [
                     Card(.ace, of: .clubs, isFacedUp: true)
                 ]))
@@ -72,7 +72,7 @@ class HintCoreTests: XCTestCase {
         store = TestStore(
             initialState: Hint.State(
                 foundations: Game.State().foundations,
-                piles: GameCoreTests.pilesAfterShuffle(),
+                piles: .standard,
                 deck: Deck(downwards: [], upwards: [])
             )
         ) {
