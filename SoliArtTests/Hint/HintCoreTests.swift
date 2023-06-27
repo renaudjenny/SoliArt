@@ -3,42 +3,62 @@ import ComposableArchitecture
 import SwiftUICardGame
 import XCTest
 
+@MainActor
 class HintCoreTests: XCTestCase {
-    private var scheduler: TestSchedulerOf<DispatchQueue>!
-    private var store = TestStore(
-        initialState: Hint.State(
-            foundations: Game.State().foundations,
-            piles: .easyGame
-        )
-    ) {
-        Hint()
-    }
-
-    func testHintToMoveFromPileToFoundation() {
-        store.send(.hint) {
+    func testHintToMoveFromPileToFoundation() async {
+        let scheduler = DispatchQueue.test
+        let store = TestStore(
+            initialState: Hint.State(foundations: Game.State().foundations, piles: .easyGame)
+        ) {
+            Hint()
+        } withDependencies: {
+            $0.mainQueue = scheduler.eraseToAnyScheduler()
+        }
+        await store.send(.hint) {
             $0.hint = HintMove(
-                card: Card(.ace, of: .clubs, isFacedUp: true),
-                origin: .pile(id: 1),
-                destination: .foundation(id: Suit.clubs.rawValue),
+                card: Card(.ace, of: .diamonds, isFacedUp: true),
+                origin: .pile(id: 3),
+                destination: .foundation(id: Suit.diamonds.rawValue),
                 position: .source
             )
         }
+        await scheduler.advance(by: .seconds(0.5))
+        await store.receive(.setHintCardPosition(.destination)) {
+            $0.hint?.position = .destination
+        }
+        await scheduler.advance(by: .seconds(1))
+        await store.receive(.setHintCardPosition(.source)) {
+            $0.hint?.position = .source
+        }
+        await scheduler.advance(by: .seconds(1))
+        await store.receive(.setHintCardPosition(.destination)) {
+            $0.hint?.position = .destination
+        }
+        await scheduler.advance(by: .seconds(1))
+        await store.receive(.removeHint) {
+            $0.hint = nil
+        }
     }
 
-    func testHintToMoveFromDeckToFoundation() {
-        store = TestStore(
+    func testHintToMoveFromDeckToFoundation() async {
+        let scheduler = DispatchQueue.test
+        var piles = IdentifiedArrayOf<Pile>.standard
+        piles[id: 1]?.cards.remove(Card(.ace, of: .clubs, isFacedUp: true))
+        let store = TestStore(
             initialState: Hint.State(
                 foundations: Game.State().foundations,
-                piles: .easyGame,
+                piles: piles,
                 deck: Deck(downwards: [], upwards: IdentifiedArrayOf(uniqueElements: [
                     Card(.ace, of: .clubs, isFacedUp: true)
                 ]))
             )
         ) {
             Hint()
+        } withDependencies: {
+            $0.mainQueue = scheduler.eraseToAnyScheduler()
         }
 
-        store.send(.hint) {
+        await store.send(.hint) {
             $0.hint = HintMove(
                 card: Card(.ace, of: .clubs, isFacedUp: true),
                 origin: .deck,
@@ -46,13 +66,29 @@ class HintCoreTests: XCTestCase {
                 position: .source
             )
         }
+        await scheduler.advance(by: .seconds(0.5))
+        await store.receive(.setHintCardPosition(.destination)) {
+            $0.hint?.position = .destination
+        }
+        await scheduler.advance(by: .seconds(1))
+        await store.receive(.setHintCardPosition(.source)) {
+            $0.hint?.position = .source
+        }
+        await scheduler.advance(by: .seconds(1))
+        await store.receive(.setHintCardPosition(.destination)) {
+            $0.hint?.position = .destination
+        }
+        await scheduler.advance(by: .seconds(1))
+        await store.receive(.removeHint) {
+            $0.hint = nil
+        }
     }
 
     // FIXME: Autofinish tests should be moved to their own file and use their own reducer
 
-    func testConfirmationDialogAboutAutoFinish() {
+    func testConfirmationDialogAboutAutoFinish() async {
         let almostFinishedGameState = App.State.almostFinishedGame.game
-        store = TestStore(
+        let store = TestStore(
             initialState: Hint.State(
                 foundations: almostFinishedGameState.foundations,
                 piles: almostFinishedGameState.piles,
@@ -68,8 +104,8 @@ class HintCoreTests: XCTestCase {
 //        }
     }
 
-    func testConfirmationDialogAboutAutoFinishWhenItsNotPossibleToAutoFinish() {
-        store = TestStore(
+    func testConfirmationDialogAboutAutoFinishWhenItsNotPossibleToAutoFinish() async {
+        let store = TestStore(
             initialState: Hint.State(
                 foundations: Game.State().foundations,
                 piles: .standard,
