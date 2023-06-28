@@ -61,6 +61,6 @@ extension App.State {
 
 extension AutoFinish.State {
     var isAutoFinishAvailable: Bool {
-        piles.flatMap(\.cards).allSatisfy(\.isFacedUp)
+        piles.count > 0 && piles.flatMap(\.cards).allSatisfy(\.isFacedUp)
     }
 }
