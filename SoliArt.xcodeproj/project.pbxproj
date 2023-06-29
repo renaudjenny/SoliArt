@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4C05E8432A37B28000152331 /* Scoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C05E8422A37B28000152331 /* Scoring.swift */; };
+		4C2171CE2A4E07CC00670A3E /* AutoFinishTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2171CD2A4E07CC00670A3E /* AutoFinishTests.swift */; };
 		4C2E2BAD285B007F0095A238 /* AppCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2E2BAC285B007F0095A238 /* AppCore.swift */; };
 		4C2E2BAF285B00AC0095A238 /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2E2BAE285B00AC0095A238 /* Deck.swift */; };
 		4C3D194F28547D810096404F /* SoliArtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3D194E28547D810096404F /* SoliArtApp.swift */; };
@@ -65,6 +66,7 @@
 
 /* Begin PBXFileReference section */
 		4C05E8422A37B28000152331 /* Scoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scoring.swift; sourceTree = "<group>"; };
+		4C2171CD2A4E07CC00670A3E /* AutoFinishTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoFinishTests.swift; sourceTree = "<group>"; };
 		4C2B6C452963271A00B960C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4C2E2BAC285B007F0095A238 /* AppCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCore.swift; sourceTree = "<group>"; };
 		4C2E2BAE285B00AC0095A238 /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
@@ -133,6 +135,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4C2171CC2A4E07BA00670A3E /* AutoFinish */ = {
+			isa = PBXGroup;
+			children = (
+				4C2171CD2A4E07CC00670A3E /* AutoFinishTests.swift */,
+			);
+			path = AutoFinish;
+			sourceTree = "<group>";
+		};
 		4C2E2BAB285B00700095A238 /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -198,6 +208,7 @@
 		4C3D195E28547D840096404F /* SoliArtTests */ = {
 			isa = PBXGroup;
 			children = (
+				4C2171CC2A4E07BA00670A3E /* AutoFinish */,
 				4CD881B328C290C3008B4619 /* History */,
 				4CD881B028BD6187008B4619 /* Hint */,
 				4CD881AD28BD601C008B4619 /* Drag */,
@@ -515,6 +526,7 @@
 				4CB1CB5B28B031C10077C247 /* ScoreCoreTests.swift in Sources */,
 				4CD881B228BD6196008B4619 /* HintCoreTests.swift in Sources */,
 				4CD881B528C2920E008B4619 /* HistoryCoreTests.swift in Sources */,
+				4C2171CE2A4E07CC00670A3E /* AutoFinishTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -83,38 +83,4 @@ class HintCoreTests: XCTestCase {
             $0.hint = nil
         }
     }
-
-    // FIXME: Autofinish tests should be moved to their own file and use their own reducer
-
-    func testConfirmationDialogAboutAutoFinish() async {
-        let almostFinishedGameState = App.State.almostFinishedGame.game
-        let store = TestStore(
-            initialState: Hint.State(
-                foundations: almostFinishedGameState.foundations,
-                piles: almostFinishedGameState.piles,
-                deck: almostFinishedGameState.deck
-            )
-        ) {
-            Hint()
-        }
-
-        XCTFail("Autofinish tests should be moved to their own file and use their own reducer")
-//        store.send(.checkForAutoFinish) {
-//            $0.autoFinishConfirmationDialog = .autoFinish
-//        }
-    }
-
-    func testConfirmationDialogAboutAutoFinishWhenItsNotPossibleToAutoFinish() async {
-        let store = TestStore(
-            initialState: Hint.State(
-                foundations: Game.State().foundations,
-                piles: .standard,
-                deck: Deck(downwards: [], upwards: [])
-            )
-        ) {
-            Hint()
-        }
-        XCTFail("Autofinish tests should be moved to their own file and use their own reducer")
-//        store.send(.checkForAutoFinish)
-    }
 }

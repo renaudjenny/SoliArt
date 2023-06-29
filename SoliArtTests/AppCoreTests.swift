@@ -329,3 +329,11 @@ extension Deck {
         )
     }
 }
+
+extension IdentifiedArray<String, Foundation> {
+    static var standard: Self {
+        IdentifiedArrayOf<Foundation>(
+            uniqueElements: Suit.orderedCases.map { Foundation(suit: $0, cards: []) }
+        )
+    }
+}
