@@ -3,10 +3,11 @@ import SwiftUI
 extension Drag.State {
     func pileCardsAndOffsets(pileID: Pile.ID) -> [(card: Card, yOffset: Double)] {
         guard let cards = piles[id: pileID]?.cards else { return [] }
-        let spacing = cardSize.width * 2/5 + 4
+        let facedDownSpacing = cardSize.width * 1/20 + 4
+        let facedUpSpacing = cardSize.width * 1/3 + 8
         return cards.reduce([]) { result, card in
             guard let previous = result.last else { return [(card, 0)] }
-            let spacing: Double = previous.card.isFacedUp ? spacing : spacing/5
+            let spacing: Double = previous.card.isFacedUp ? facedUpSpacing : facedDownSpacing
             return result + [(card, previous.yOffset + spacing)]
         }
     }
