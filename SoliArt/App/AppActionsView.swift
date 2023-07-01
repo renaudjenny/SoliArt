@@ -7,7 +7,7 @@ struct AppActionsView: View {
     var body: some View {
         WithViewStore(store) { viewStore in
             HStack {
-                if viewStore._autoFinish.isAutoFinishAvailable {
+                if viewStore.autoFinish.isAutoFinishAvailable {
                     Button { viewStore.send(.autoFinish(.checkForAutoFinish)) } label: {
                         Label("Auto finish", systemImage: "wand.and.stars").labelStyle(.iconOnly)
                     }
