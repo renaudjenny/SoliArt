@@ -96,3 +96,13 @@ enum Frame: Equatable, Hashable, Identifiable {
         }
     }
 }
+
+#if DEBUG
+import ComposableArchitecture
+
+struct CardPosition_Preview: PreviewProvider {
+    static var previews: some View {
+        AppView(store: Store(initialState: .maximumCardInAPile, reducer: App()))
+    }
+}
+#endif

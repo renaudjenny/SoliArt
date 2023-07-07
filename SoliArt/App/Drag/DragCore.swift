@@ -66,7 +66,13 @@ struct Drag: ReducerProtocol {
 
 extension Drag.State {
     var cardSize: CGSize {
-        let height = min(windowSize.height * 16/100, windowSize.width * 15/100)
+        var height = min(windowSize.height * 16/100, windowSize.width * 15/100)
+        guard let maxCardsInPiles = piles.map(\.cards.count).max(), maxCardsInPiles > 0 else {
+            return CGSize(width: height * 5/7, height: height)
+        }
+        while height * 1/2 * Double(maxCardsInPiles) > windowSize.height {
+            height -= 4
+        }
         return CGSize(width: height * 5/7, height: height)
     }
 }

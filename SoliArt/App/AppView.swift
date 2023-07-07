@@ -187,6 +187,64 @@ extension App.State {
         )
     }
 
+    static var maximumCardInAPile: Self {
+        var cards = [Card].standard52Deck
+
+        let useOnLastPileCards: [Card] = [
+            Card(.king, of: .hearts, isFacedUp: false),
+            Card(.queen, of: .spades, isFacedUp: false),
+            Card(.jack, of: .hearts, isFacedUp: false),
+            Card(.ten, of: .spades, isFacedUp: false),
+            Card(.nine, of: .hearts, isFacedUp: false),
+            Card(.eight, of: .spades, isFacedUp: false),
+            Card(.seven, of: .hearts, isFacedUp: false),
+            Card(.six, of: .spades, isFacedUp: false),
+            Card(.five, of: .hearts, isFacedUp: false),
+            Card(.four, of: .spades, isFacedUp: false),
+            Card(.three, of: .hearts, isFacedUp: false),
+            Card(.two, of: .spades, isFacedUp: false),
+            Card(.ace, of: .hearts, isFacedUp: false),
+        ]
+
+        cards.removeAll { useOnLastPileCards.contains($0) }
+
+        var game = Game.State()
+        game.piles = IdentifiedArrayOf(uniqueElements: game.piles.map {
+            var pile = $0
+            pile.cards = IdentifiedArrayOf(uniqueElements: cards[..<$0.id])
+            cards = Array(cards[$0.id...])
+
+            if var last = pile.cards.last {
+                last.isFacedUp = true
+                pile.cards.updateOrAppend(last)
+            }
+
+            return pile
+        })
+
+        game.deck.upwards = []
+        game.deck.downwards = IdentifiedArrayOf(uniqueElements: cards)
+
+        game.foundations = IdentifiedArrayOf(
+            uniqueElements: Suit.orderedCases.map { Foundation(suit: $0, cards: []) }
+        )
+
+        game.isGameOver = false
+
+        game.piles[id: 7]?.cards.append(contentsOf: useOnLastPileCards.map {
+            var card = $0
+            card.isFacedUp = true
+            return card
+        })
+
+        return App.State(game: game)
+    }
+
+    private static func swapCards(_ cards: inout [Card], a: Card, b: Card) {
+        guard let aIndex = cards.firstIndex(of: a), let bIndex = cards.firstIndex(of: b) else { return }
+        cards.swapAt(aIndex, bIndex)
+    }
+
     @Namespace private static var namespace: Namespace.ID
 }
 
